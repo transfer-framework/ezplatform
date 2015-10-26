@@ -1,6 +1,8 @@
 Transfer eZ Platform
 ====================
 
+[![Build Status](https://travis-ci.org/transfer-framework/ezplatform.svg?branch=1.0)](https://travis-ci.org/transfer-framework/ezplatform)
+
 Notice
 ------
 
