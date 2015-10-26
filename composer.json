@@ -3,6 +3,7 @@
     "type": "transfer-extension",
     "description": "eZ Platform extension for Transfer",
     "keywords": ["transfer", "ezpublish", "ezplatform"],
+    "license": "MIT",
     "author": [
         {
             "name": "Valentin Jonovs",
