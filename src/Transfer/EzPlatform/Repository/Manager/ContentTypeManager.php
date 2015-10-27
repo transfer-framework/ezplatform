@@ -66,7 +66,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      *
      * @param string $identifier Identifier
      *
-     * @return bool|ContentType
+     * @return ContentType
      */
     public function findByIdentifier($identifier)
     {
@@ -139,7 +139,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $updatedFieldDefinitions = $object->data['fields'];
 
         // Delete field definitions which no longer exist
-        foreach (array_filter($existingFieldDefinitions, function ($existingFieldDefinition) use ($updatedFieldDefinitions) {
+        foreach (array_filter($existingFieldDefinitions, function($existingFieldDefinition) use ($updatedFieldDefinitions) {
             return !array_key_exists($existingFieldDefinition->identifier, $updatedFieldDefinitions);
         }) as $deleteFieldDefinition) {
             $this->contentTypeService->removeFieldDefinition($contentTypeDraft, $deleteFieldDefinition);
