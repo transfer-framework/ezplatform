@@ -41,7 +41,10 @@ class ObjectService extends AbstractRepositoryService
         }
 
         $this->contentManager = new Manager\ContentManager($this->repository);
-        $this->contentManager->setLogger($this->logger);
+
+        if ($this->logger) {
+            $this->contentManager->setLogger($this->logger);
+        }
 
         return $this->contentManager;
     }
