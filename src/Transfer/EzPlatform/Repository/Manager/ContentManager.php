@@ -132,7 +132,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $this->created[] = $object;
 
-        return $content;
+        // @TODO Return ContentObject
+        return null;
     }
 
     /**
@@ -157,7 +158,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $object->setVersionInfo($content->versionInfo);
         $object->setContentInfo($content->contentInfo);
 
-        return $content;
+        // @TODO Return ContentObject
+        return null;
     }
 
     /**
@@ -211,7 +213,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             return false;
         }
 
-        $object = $this->find($object);
+        $object = $this->findByRemoteId($object->getRemoteId());
 
         if ($object->getProperty('content_info')) {
             $this->contentService->deleteContent($object->getProperty('content_info'));
@@ -237,6 +239,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $contentMetadataUpdateStruct->mainLocationId = $location->id;
 
         $object->setMainLocationId($location->id);
+
+        if ($object->getContentInfo() == null) {
+            return null;
+        }
 
         return $this->contentService->updateContentMetadata($object->getContentInfo(), $contentMetadataUpdateStruct);
     }
