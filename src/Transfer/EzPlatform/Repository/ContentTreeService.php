@@ -149,10 +149,9 @@ class ContentTreeService extends AbstractRepositoryService
 
         $location = $this->getLocationService()->createLocation($object->getContentInfo(), $locationStruct);
         if ($location != null) {
-            $this->logger->info(
-                sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)),
-                array('SubtreeService::publishLocation')
-            );
+            if ($this->logger) {
+                $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array('SubtreeService::publishLocation'));
+            }
         } else {
             $this->logger->error(
                 sprintf('Failed creating location for %s', $object->getProperty('name')),
@@ -192,10 +191,9 @@ class ContentTreeService extends AbstractRepositoryService
             return;
         }
 
-        $this->logger->info(
-            sprintf('Force main location id for %s', $object->getProperty('name')),
-            array('SubtreeService::ensureMainLocationIdIsSet')
-        );
+        if ($this->logger) {
+            $this->logger->info(sprintf('Force main location id for %s', $object->getProperty('name')), array('SubtreeService::ensureMainLocationIdIsSet'));
+        }
 
         $this->objectService->getContentManager()->setMainLocation($object, $location);
     }
