@@ -92,8 +92,10 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
         $repository = $this->options['repository'];
         $repository->beginTransaction();
 
-        $this->treeService->setLogger($this->logger);
-        $this->objectService->setLogger($this->logger);
+        if ($this->logger) {
+            $this->treeService->setLogger($this->logger);
+            $this->objectService->setLogger($this->logger);
+        }
 
         $response = new Response();
 
@@ -113,7 +115,11 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
                 $object = $service->create($object);
                 $versionInfo[] = $object;
             } catch (\Exception $e) {
-                $this->logger->error($e->getMessage());
+                if ($this->logger) {
+                    $this->logger->error($e->getMessage());
+                }
+
+                throw $e;
             }
         }
 
