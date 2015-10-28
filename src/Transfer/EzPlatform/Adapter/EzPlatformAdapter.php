@@ -27,19 +27,24 @@ use Transfer\EzPlatform\Repository\ObjectService;
 class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 {
     /**
-     * @var ContentTreeService
+     * @var ContentTreeService Tree service
      */
     protected $treeService;
 
     /**
-     * @var ObjectService
+     * @var ObjectService Object service
      */
     protected $objectService;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface Logger
      */
     protected $logger;
+
+    /**
+     * @var array Options
+     */
+    protected $options;
 
     /**
      * Constructor.
@@ -69,10 +74,9 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
         ));
 
         $resolver->setRequired(array('repository'));
-        $resolver->setAllowedTypes(array(
-            'repository' => 'eZ\Publish\API\Repository\Repository',
-            'repository_current_user' => array('string', 'null'),
-        ));
+
+        $resolver->setAllowedTypes('repository', array('eZ\Publish\API\Repository\Repository'));
+        $resolver->setAllowedTypes('repository_current_user', array('string', 'null'));
     }
 
     /**
