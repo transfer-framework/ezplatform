@@ -91,7 +91,12 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      */
     public function findByRemoteId($remoteId)
     {
-        $content = $this->contentService->loadContentByRemoteId($remoteId);
+        try {
+            $content = $this->contentService->loadContentByRemoteId($remoteId);
+        }
+        catch (\Exception $e) {
+            return null;
+        }
 
         $object = new ContentObject($content->fields);
         $object->setContentInfo($content->contentInfo);
@@ -168,7 +173,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new MissingIdentificationPropertyException($object);
         }
 
-        if ($existingObject = $this->find($object)) {
+        if ($existingObject = $this->findByRemoteId($object->getRemoteId())) {
             if ($object->getProperty('update') === false) {
                 return;
             }
@@ -183,12 +188,15 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
             return $this->update($existingObject);
         } else {
-            $this->logger->info(
-                sprintf('No existing content object for %s. Creating new content object...',
-                    $object->getProperty('name')
-                ),
-                array('ContentManager::createOrUpdate')
-            );
+            if ($this->logger) {
+                $this->logger->info(
+                    sprintf(
+                        'No existing content object for %s. Creating new content object...',
+                        $object->getProperty('name')
+                    ),
+                    array('ContentManager::createOrUpdate')
+                );
+            }
 
             return $this->create($object);
         }
