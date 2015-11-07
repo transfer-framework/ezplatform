@@ -89,7 +89,14 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
+            if($this->logger) {
+                $this->logger->warning(sprintf('%s excepted object of type ContentTypeObject, got "%s". Skipping.', __METHOD__,  get_class($object)));
+            }
             return;
+        }
+
+        if($this->logger) {
+            $this->logger->info(sprintf('Creating contenttype %s.', $object->data['identifier']));
         }
 
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->data['identifier']);
@@ -113,7 +120,13 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
 
         $contentTypeGroup = $this->contentTypeService->loadContentTypeGroupByIdentifier($object->data['group_identifier']);
         $contentTypeDraft = $this->contentTypeService->createContentType($contentTypeCreateStruct, array($contentTypeGroup));
+        if($this->logger) {
+            $this->logger->info(sprintf('Created contenttype %s.', $object->data['identifier']));
+        }
         $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
+        if($this->logger) {
+            $this->logger->info(sprintf('Published contenttype %s.', $object->data['identifier']));
+        }
 
         return $this->findByIdentifier($object->data['identifier']);
     }
@@ -124,7 +137,14 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
+            if($this->logger) {
+                $this->logger->warning(sprintf('%s excepted object of type ContentTypeObject, got "%s". Skipping.', __METHOD__,  get_class($object)));
+            }
             return;
+        }
+
+        if($this->logger) {
+            $this->logger->info(sprintf('Updating contenttype %s.', $object->data['identifier']));
         }
 
         $contentType = $this->findByIdentifier($object->data['identifier']);
@@ -182,6 +202,9 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $contentTypeUpdateStruct->names = $object->data['names'];
         $contentTypeUpdateStruct->descriptions = $object->data['descriptions'];
         $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
+        if($this->logger) {
+            $this->logger->info(sprintf('Updated contenttype %s.', $object->data['identifier']));
+        }
 
         return $this->findByIdentifier($object->data['identifier']);
     }
@@ -191,7 +214,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function createOrUpdate(ObjectInterface $object)
     {
-        if (!$object instanceof ValueObject) {
+        if (!$object instanceof ContentTypeObject) {
+            if($this->logger) {
+                $this->logger->warning(sprintf('%s excepted object of type ContentTypeObject, got "%s". Skipping.', __METHOD__,  get_class($object)));
+            }
             return;
         }
 
