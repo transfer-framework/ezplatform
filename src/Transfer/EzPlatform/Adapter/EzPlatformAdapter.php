@@ -18,7 +18,9 @@ use Transfer\Adapter\Transaction\Request;
 use Transfer\Adapter\Transaction\Response;
 use Transfer\Data\TreeObject;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
+use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\ObjectService;
 
 /**
@@ -46,6 +48,8 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     protected $options;
 
+    protected $contentTypeManager;
+
     /**
      * Constructor.
      *
@@ -60,6 +64,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
         $this->objectService = new ObjectService($this->options['repository']);
         $this->treeService = new ContentTreeService($this->options['repository'], $this->objectService);
+        $this->contentTypeManager = new ContentTypeManager($this->options['repository']);
     }
 
     /**
@@ -92,6 +97,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     public function send(Request $request)
     {
+
         /** @var Repository $repository */
         $repository = $this->options['repository'];
         $repository->beginTransaction();
@@ -99,6 +105,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
         if ($this->logger) {
             $this->treeService->setLogger($this->logger);
             $this->objectService->setLogger($this->logger);
+            $this->contentTypeManager->setLogger($this->logger);
         }
 
         $response = new Response();
@@ -115,24 +122,28 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
                 $service->setCurrentUser($this->options['repository_current_user']);
             }
 
-            try {
-                $object = $service->create($object);
-                $versionInfo[] = $object;
-            } catch (\Exception $e) {
-                if ($this->logger) {
-                    $this->logger->error($e->getMessage());
+            if ($object instanceof ContentTypeObject) {
+                $response->setData(new \ArrayIterator($this->contentTypeManager->createOrUpdate($object)));
+            } else {
+                try {
+                    $object = $service->create($object);
+                    $versionInfo[] = $object;
+                } catch (\Exception $e) {
+                    if ($this->logger) {
+                        $this->logger->error($e->getMessage());
+                    }
+
+                    throw $e;
                 }
 
-                throw $e;
+                $versionInfoObjects = array();
+                foreach ($versionInfo as $versionInfoElement) {
+                    $versionInfoObjects[] = new ValueObject($versionInfoElement);
+                }
+
+                $response->setData(new \ArrayIterator($versionInfoObjects));
             }
         }
-
-        $versionInfoObjects = array();
-        foreach ($versionInfo as $versionInfoElement) {
-            $versionInfoObjects[] = new ValueObject($versionInfoElement);
-        }
-
-        $response->setData(new \ArrayIterator($versionInfoObjects));
 
         $repository->commit();
 
