@@ -93,9 +93,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     {
         try {
             $content = $this->contentService->loadContentByRemoteId($remoteId);
-        }
-        catch (\Exception $e) {
-            return null;
+        } catch (\Exception $e) {
+            return;
         }
 
         $object = new ContentObject($content->fields);
@@ -133,7 +132,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $this->created[] = $object;
 
         // @TODO Return ContentObject
-        return null;
+        return;
     }
 
     /**
@@ -159,7 +158,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $object->setContentInfo($content->contentInfo);
 
         // @TODO Return ContentObject
-        return null;
+        return;
     }
 
     /**
@@ -241,7 +240,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $object->setMainLocationId($location->id);
 
         if ($object->getContentInfo() == null) {
-            return null;
+            return;
         }
 
         return $this->contentService->updateContentMetadata($object->getContentInfo(), $contentMetadataUpdateStruct);

@@ -13,21 +13,19 @@ use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Transfer\Data\ObjectInterface;
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
-use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
-use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
+use Transfer\EzPlatform\Data\FieldDefinitionObject;
 
 /**
  * Content type manager.
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class ContentTypeManager implements LoggerAwareInterface
 {
     /**
      * @var Repository
@@ -66,12 +64,12 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      *
      * @param string $identifier Identifier
      *
-     * @return ContentType
+     * @return ContentType|false
      */
     public function findByIdentifier($identifier)
     {
         if (!is_string($identifier)) {
-            return;
+            return false;
         }
 
         try {
@@ -84,50 +82,77 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     }
 
     /**
-     * {@inheritdoc}
+     * Create a ContentType object and returns it.
+     *  Will return null if the argument is not of an ContentTypeObject.
+     *  Will return false if we were unable to fetch the ContentType after creating it.
+     *
+     * @param ContentTypeObject $object
+     *
+     * @return ContentType|false|null
      */
-    public function create(ObjectInterface $object)
+    public function create(ContentTypeObject $object)
     {
-        if (!$object instanceof ContentTypeObject) {
-            return;
+        if ($this->logger) {
+            $this->logger->info(sprintf('Creating contenttype %s.', $object->getIdentifier()));
         }
 
-        $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->data['identifier']);
-        $contentTypeCreateStruct->mainLanguageCode = $object->data['main_language_code'];
-        $contentTypeCreateStruct->nameSchema = $object->data['name_schema'];
-        $contentTypeCreateStruct->urlAliasSchema = $object->data['url_alias_schema'];
-        $contentTypeCreateStruct->names = $object->data['names'];
-        $contentTypeCreateStruct->descriptions = $object->data['descriptions'];
+        $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->getIdentifier());
+        $contentTypeCreateStruct->names = $object->getNames();
+        $contentTypeCreateStruct->remoteId = sha1(microtime());
+        $contentTypeCreateStruct->isContainer = $object->isContainer;
+        $contentTypeCreateStruct->mainLanguageCode = $object->mainLanguageCode;
+        $contentTypeCreateStruct->nameSchema = $object->nameSchema;
+        $contentTypeCreateStruct->urlAliasSchema = $object->urlAliasSchema;
+        $contentTypeCreateStruct->descriptions = $object->getDescriptions();
+        $contentTypeCreateStruct->isContainer = $object->isContainer;
+        $contentTypeCreateStruct->defaultAlwaysAvailable = $object->defaultAlwaysAvailable;
+        $contentTypeCreateStruct->defaultSortField = $object->defaultSortField;
+        $contentTypeCreateStruct->defaultSortOrder = $object->defaultSortOrder;
 
-        foreach ($object->data['fields'] as $identifier => $field) {
-            $titleFieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($identifier, $field['type']);
-            $titleFieldCreateStruct->names = $field['names'];
-            $titleFieldCreateStruct->descriptions = $field['descriptions'];
-            $titleFieldCreateStruct->fieldGroup = $field['field_group'];
-            $titleFieldCreateStruct->position = $field['position'];
-            $titleFieldCreateStruct->isTranslatable = $field['is_translatable'];
-            $titleFieldCreateStruct->isRequired = $field['is_required'];
-            $titleFieldCreateStruct->isSearchable = $field['is_searchable'];
+        foreach ($object->getFieldDefinitions() as $field) {
+            /* @var FieldDefinitionObject $field */
+            $titleFieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
+            $titleFieldCreateStruct->names = $field->getNames();
+            $titleFieldCreateStruct->descriptions = $field->getDescriptions();
+            $titleFieldCreateStruct->fieldGroup = $field->fieldGroup;
+            $titleFieldCreateStruct->position = $field->position;
+            $titleFieldCreateStruct->isTranslatable = $field->isTranslatable;
+            $titleFieldCreateStruct->isRequired = $field->isRequired;
+            $titleFieldCreateStruct->isSearchable = $field->isSearchable;
+            $titleFieldCreateStruct->isInfoCollector = $field->isInfoCollector;
             $contentTypeCreateStruct->addFieldDefinition($titleFieldCreateStruct);
         }
 
-        $contentTypeGroup = $this->contentTypeService->loadContentTypeGroupByIdentifier($object->data['group_identifier']);
+        $contentTypeGroup = $this->contentTypeService->loadContentTypeGroupByIdentifier($object->getMainGroupIdentifier());
         $contentTypeDraft = $this->contentTypeService->createContentType($contentTypeCreateStruct, array($contentTypeGroup));
-        $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
 
-        return $this->findByIdentifier($object->data['identifier']);
+        if ($this->logger) {
+            $this->logger->info(sprintf('Created contenttype draft %s.', $object->getIdentifier()));
+        }
+        $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
+        if ($this->logger) {
+            $this->logger->info(sprintf('Published contenttype draft %s.', $object->getIdentifier()));
+        }
+
+        return $this->findByIdentifier($object->getIdentifier());
     }
 
     /**
-     * {@inheritdoc}
+     * Updates a ContentType and FieldTypes and returns it.
+     *  Will return null if the argument is not of an ContentTypeObject.
+     *  Will return false if we were unable to fetch the ContentType after updating it.
+     *
+     * @param ContentTypeObject $object
+     *
+     * @return ContentType|false|null
      */
-    public function update(ObjectInterface $object)
+    public function update(ContentTypeObject $object)
     {
-        if (!$object instanceof ContentTypeObject) {
-            return;
+        if ($this->logger) {
+            $this->logger->info(sprintf('Updating contenttype %s.', $object->getIdentifier()));
         }
 
-        $contentType = $this->findByIdentifier($object->data['identifier']);
+        $contentType = $this->findByIdentifier($object->getIdentifier());
 
         try {
             $contentTypeDraft = $this->contentTypeService->loadContentTypeDraft($contentType->id);
@@ -135,67 +160,61 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             $contentTypeDraft = $this->contentTypeService->createContentTypeDraft($contentType);
         }
 
+        // eZ fields
         $existingFieldDefinitions = $contentType->getFieldDefinitions();
-        $updatedFieldDefinitions = $object->data['fields'];
+
+        // Transfer fields
+        $updatedFieldDefinitions = $object->getFieldDefinitions();
 
         // Delete field definitions which no longer exist
-        foreach (array_filter($existingFieldDefinitions, function($existingFieldDefinition) use ($updatedFieldDefinitions) {
-            return !array_key_exists($existingFieldDefinition->identifier, $updatedFieldDefinitions);
-        }) as $deleteFieldDefinition) {
-            $this->contentTypeService->removeFieldDefinition($contentTypeDraft, $deleteFieldDefinition);
-        };
+        $updatedFieldIdentifiers = array();
+        foreach ($updatedFieldDefinitions as $updatedFieldDefinition) {
+            $updatedFieldIdentifiers[] = $updatedFieldDefinition->getIdentifier();
+        }
 
-        foreach ($updatedFieldDefinitions as $identifier => $updatedField) {
+        foreach ($updatedFieldDefinitions as $updatedField) {
 
-            // Check if the field definition should be updated
+            // Updating existing field definitions
             foreach ($existingFieldDefinitions as $existingField) {
-                if ($existingField->identifier == $identifier) {
-                    $fieldDefinitionUpdateStruct = $this->contentTypeService->newFieldDefinitionUpdateStruct();
-                    $fieldDefinitionUpdateStruct->names = $updatedField['names'];
-                    $fieldDefinitionUpdateStruct->descriptions = $updatedField['descriptions'];
-                    $fieldDefinitionUpdateStruct->fieldGroup = $updatedField['field_group'];
-                    $fieldDefinitionUpdateStruct->position = $updatedField['position'];
-                    $fieldDefinitionUpdateStruct->isTranslatable = $updatedField['is_translatable'];
-                    $fieldDefinitionUpdateStruct->isRequired = $updatedField['is_required'];
-                    $fieldDefinitionUpdateStruct->isSearchable = $updatedField['is_searchable'];
-                    $this->contentTypeService->updateFieldDefinition($contentTypeDraft, $existingField, $fieldDefinitionUpdateStruct);
+                if ($existingField->identifier == $updatedField->getIdentifier()) {
+                    $this->contentTypeService->updateFieldDefinition(
+                        $contentTypeDraft,
+                        $existingField,
+                        $this->updateFieldDefinition($updatedField)
+                    );
                     continue 2;
                 }
             }
 
-            // Otherwise, create a new field definition
-            $fieldDefinitionCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($identifier, $updatedField['type']);
-            $fieldDefinitionCreateStruct->names = $updatedField['names'];
-            $fieldDefinitionCreateStruct->descriptions = $updatedField['descriptions'];
-            $fieldDefinitionCreateStruct->fieldGroup = $updatedField['field_group'];
-            $fieldDefinitionCreateStruct->position = $updatedField['position'];
-            $fieldDefinitionCreateStruct->isTranslatable = $updatedField['is_translatable'];
-            $fieldDefinitionCreateStruct->isRequired = $updatedField['is_required'];
-            $fieldDefinitionCreateStruct->isSearchable = $updatedField['is_searchable'];
-            $this->contentTypeService->addFieldDefinition($contentTypeDraft, $fieldDefinitionCreateStruct);
+            // Creating new field definitions
+            $this->contentTypeService->addFieldDefinition(
+                $contentTypeDraft,
+                $this->createFieldDefinition($updatedField)
+            );
         }
 
         $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
-        $contentTypeUpdateStruct->mainLanguageCode = $object->data['main_language_code'];
-        $contentTypeUpdateStruct->nameSchema = $object->data['name_schema'];
-        $contentTypeUpdateStruct->urlAliasSchema = $object->data['url_alias_schema'];
-        $contentTypeUpdateStruct->names = $object->data['names'];
-        $contentTypeUpdateStruct->descriptions = $object->data['descriptions'];
+        $object->fillContentTypeStruct($contentTypeUpdateStruct);
         $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
+        $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
+        if ($this->logger) {
+            $this->logger->info(sprintf('Updated contenttype %s.', $object->getIdentifier()));
+        }
 
-        return $this->findByIdentifier($object->data['identifier']);
+        return $this->findByIdentifier($object->getIdentifier());
     }
 
     /**
-     * {@inheritdoc}
+     * @see ContentTypeManager::create
+     * @see ContentTypeManager::update
+     *
+     * @param ContentTypeObject $object
+     *
+     * @return ContentType|false|null
      */
-    public function createOrUpdate(ObjectInterface $object)
+    public function createOrUpdate(ContentTypeObject $object)
     {
-        if (!$object instanceof ValueObject) {
-            return;
-        }
-
-        $contentObject = $this->findByIdentifier($object->data['identifier']);
+        $contentObject = $this->findByIdentifier($object->getIdentifier());
         if (!$contentObject) {
             return $this->create($object);
         } else {
@@ -204,15 +223,13 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     }
 
     /**
-     * {@inheritdoc}
+     * @param string$identifier
+     *
+     * @return bool
      */
-    public function remove(ObjectInterface $object)
+    public function removeByIdentifier($identifier)
     {
-        if (!$object instanceof ValueObject) {
-            return;
-        }
-
-        $contentType = $this->findByIdentifier($object->data['identifier']);
+        $contentType = $this->findByIdentifier($identifier);
 
         if (!$contentType) {
             return true;
@@ -221,5 +238,31 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $this->contentTypeService->deleteContentType($contentType);
 
         return true;
+    }
+
+    /**
+     * @param FieldDefinitionObject $field
+     *
+     * @return FieldDefinitionCreateStruct
+     */
+    private function createFieldDefinition(FieldDefinitionObject $field)
+    {
+        $definition = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
+        $field->fillFieldDefinitionUpdateStruct($definition);
+
+        return $definition;
+    }
+
+    /**
+     * @param FieldDefinitionObject $field
+     *
+     * @return FieldDefinitionUpdateStruct
+     */
+    private function updateFieldDefinition(FieldDefinitionObject $field)
+    {
+        $definition = $this->contentTypeService->newFieldDefinitionUpdateStruct();
+        $field->fillFieldDefinitionUpdateStruct($definition);
+
+        return $definition;
     }
 }
