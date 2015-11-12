@@ -65,7 +65,6 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
         $this->objectService = new ObjectService($this->options['repository']);
         $this->treeService = new ContentTreeService($this->options['repository'], $this->objectService);
         $this->contentTypeManager = new ContentTypeManager($this->options['repository']);
-
     }
 
     /**
@@ -125,7 +124,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
                 $service->setCurrentUser($this->options['repository_current_user']);
             }
 
-            if($object instanceof ContentTypeObject) {
+            if ($object instanceof ContentTypeObject) {
                 $response->setData(new \ArrayIterator($this->contentTypeManager->createOrUpdate($object)));
             } else {
                 try {

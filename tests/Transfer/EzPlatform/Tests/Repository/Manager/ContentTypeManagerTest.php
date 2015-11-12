@@ -10,6 +10,7 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -36,15 +37,48 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $this->assertEquals('<name>', $contentType->urlAliasSchema);
         $this->assertEquals('<name>', $contentType->nameSchema);
         $this->assertEquals('eng-GB', $contentType->mainLanguageCode);
+        $this->assertTrue($contentType->isContainer);
         $contentFieldDefinition = $contentType->fieldDefinitions[0];
         $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\FieldDefinition', $contentFieldDefinition);
-        $this->assertEquals('title', $contentFieldDefinition->identifier);
+        $this->assertEquals('name', $contentFieldDefinition->identifier);
         $this->assertEquals('Name', $contentFieldDefinition->getName('eng-GB'));
         $this->assertEquals('Name of the frontpage', $contentFieldDefinition->getDescription('eng-GB'));
         $this->assertEquals('ezstring', $contentFieldDefinition->fieldTypeIdentifier);
         $this->assertTrue($contentFieldDefinition->isTranslatable);
         $this->assertTrue($contentFieldDefinition->isRequired);
         $this->assertTrue($contentFieldDefinition->isSearchable);
+        $this->assertFalse($contentFieldDefinition->isInfoCollector);
+
+        $this->update($manager);
+
+        $contentType = $manager->findByIdentifier('frontpage');
+        $this->assertEquals('Updated frontpage', $contentType->getName('eng-GB'));
+        $this->assertEquals('Updated frontpage description', $contentType->getDescription('eng-GB'));
+        $this->assertFalse($contentType->isContainer);
+
+        $this->assertCount(3, $contentType->fieldDefinitions);
+        $contentFieldDefinition = $contentType->fieldDefinitions[1];
+        $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\FieldDefinition', $contentFieldDefinition);
+        $this->assertEquals('name', $contentFieldDefinition->identifier);
+        $this->assertEquals('Name', $contentFieldDefinition->getName('eng-GB'));
+        $this->assertEquals('Updated name description', $contentFieldDefinition->getDescription('eng-GB'));
+        $this->assertEquals('ezstring', $contentFieldDefinition->fieldTypeIdentifier);
+        $this->assertFalse($contentFieldDefinition->isTranslatable);
+        $this->assertFalse($contentFieldDefinition->isRequired);
+        $this->assertFalse($contentFieldDefinition->isSearchable);
+        $this->assertFalse($contentFieldDefinition->isInfoCollector);
+
+        $contentFieldDefinition = $contentType->fieldDefinitions[0];
+        $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\FieldDefinition', $contentFieldDefinition);
+        $this->assertEquals('short_description', $contentFieldDefinition->identifier);
+        $this->assertEquals('Short description', $contentFieldDefinition->getName('eng-GB'));
+        $this->assertEquals('', $contentFieldDefinition->getDescription('eng-GB'));
+        $this->assertEquals('ezstring', $contentFieldDefinition->fieldTypeIdentifier);
+        $this->assertTrue($contentFieldDefinition->isTranslatable);
+        $this->assertFalse($contentFieldDefinition->isRequired);
+        $this->assertTrue($contentFieldDefinition->isSearchable);
+        $this->assertFalse($contentFieldDefinition->isInfoCollector);
+
     }
 
     public function testUpdate()
@@ -62,135 +96,20 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
     protected function create(ContentTypeManager $manager)
     {
-        return $manager->create(
-            new ContentTypeObject(array(
-                'group_identifier' => 'Content',
-                'identifier' => 'frontpage',
-                'main_language_code' => 'eng-GB',
-                'name_schema' => '<name>',
-                'url_alias_schema' => '<name>',
-                'names' => array(
-                    'eng-GB' => 'Frontpage',
-                ),
-                'descriptions' => array(
-                    'eng-GB' => 'A frontpage',
-                ),
-                'fields' => array(
-                    'title' => array(
-                        'type' => 'ezstring',
-                        'names' => array(
-                            'eng-GB' => 'Name',
-                        ),
-                        'descriptions' => array(
-                            'eng-GB' => 'Name of the frontpage',
-                        ),
-                        'field_group' => 'content',
-                        'position' => 10,
-                        'is_translatable' => true,
-                        'is_required' => true,
-                        'is_searchable' => true,
-                    ),
-                ),
-            ))
-        );
+        $ct = $this->getFrontpageContentTypeObject();
+        return $manager->create($ct);
     }
 
     protected function createOrUpdate(ContentTypeManager $manager)
     {
-        return $manager->createOrUpdate(
-            new ContentTypeObject(array(
-                'group_identifier' => 'Content',
-                'identifier' => 'frontpage',
-                'main_language_code' => 'eng-GB',
-                'name_schema' => '<name>',
-                'url_alias_schema' => '<name>',
-                'names' => array(
-                    'eng-GB' => 'Frontpage',
-                ),
-                'descriptions' => array(
-                    'eng-GB' => 'A frontpage',
-                ),
-                'fields' => array(
-                    'title' => array(
-                        'type' => 'ezstring',
-                        'names' => array(
-                            'eng-GB' => 'Name',
-                        ),
-                        'descriptions' => array(
-                            'eng-GB' => 'Name of the frontpage',
-                        ),
-                        'field_group' => 'content',
-                        'position' => 10,
-                        'is_translatable' => true,
-                        'is_required' => true,
-                        'is_searchable' => true,
-                    ),
-                    'description' => array(
-                        'type' => 'ezstring',
-                        'names' => array(
-                            'eng-GB' => 'Description',
-                        ),
-                        'descriptions' => array(
-                            'eng-GB' => 'Description of the frontpage',
-                        ),
-                        'field_group' => 'content',
-                        'position' => 20,
-                        'is_translatable' => true,
-                        'is_required' => false,
-                        'is_searchable' => true,
-                    ),
-                ),
-            ))
-        );
+        $ct = $this->getFrontpageContentTypeObject();
+        return $manager->createOrUpdate($ct);
     }
 
     protected function update(ContentTypeManager $manager)
     {
-        return $manager->update(
-            new ContentTypeObject(array(
-                'group_identifier' => 'Content',
-                'identifier' => 'frontpage',
-                'main_language_code' => 'eng-GB',
-                'name_schema' => '<name>',
-                'url_alias_schema' => '<name>',
-                'names' => array(
-                    'eng-GB' => 'Frontpage',
-                ),
-                'descriptions' => array(
-                    'eng-GB' => 'A frontpage',
-                ),
-                'fields' => array(
-                    'title' => array(
-                        'type' => 'ezstring',
-                        'names' => array(
-                            'eng-GB' => 'Name',
-                        ),
-                        'descriptions' => array(
-                            'eng-GB' => 'Name of the frontpage',
-                        ),
-                        'field_group' => 'content',
-                        'position' => 10,
-                        'is_translatable' => true,
-                        'is_required' => true,
-                        'is_searchable' => true,
-                    ),
-                    'description' => array(
-                        'type' => 'ezstring',
-                        'names' => array(
-                            'eng-GB' => 'Description',
-                        ),
-                        'descriptions' => array(
-                            'eng-GB' => 'Description of the frontpage',
-                        ),
-                        'field_group' => 'content',
-                        'position' => 20,
-                        'is_translatable' => true,
-                        'is_required' => false,
-                        'is_searchable' => true,
-                    ),
-                ),
-            ))
-        );
+        $ct = $this->getUpdatedFrontpageContentTypeObject();
+        return $manager->update($ct);
     }
 
     protected function find(ContentTypeManager $manager)
@@ -200,10 +119,79 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
     protected function delete(ContentTypeManager $manager)
     {
-        $manager->remove(
-            new ContentTypeObject(array(
-                'identifier' => 'frontpage',
-            ))
+        $manager->removeByIdentifier(
+            $this->getFrontpageContentTypeObject()->getIdentifier()
         );
     }
+
+    /**
+     * @return ContentTypeObject
+     */
+    protected function getFrontpageContentTypeObject()
+    {
+        $ct = new ContentTypeObject('frontpage');
+        $ct->mainLanguageCode = 'eng-GB';
+        $ct->addContentTypeGroup('Content');
+        $ct->nameSchema = '<name>';
+        $ct->urlAliasSchema = '<name>';
+        $ct->isContainer = true;
+        $ct->setNames(array('eng-GB' => 'Frontpage'));
+        $ct->setDescriptions(array('eng-GB' => 'A frontpage'));
+
+        $field = new FieldDefinitionObject('name');
+        $field->type = 'ezstring';
+        $field->setNames(array('eng-GB' => 'Name'));
+        $field->setDescriptions(array('eng-GB' => 'Name of the frontpage'));
+        $field->fieldGroup = 'content';
+        $field->position = 10;
+        $field->isTranslatable = true;
+        $field->isRequired = true;
+        $field->isSearchable = true;
+        $field->isInfoCollector = false;
+        $ct->addFieldDefinition($field);
+
+        $field = new FieldDefinitionObject('description');
+        $field->type = 'ezstring';
+        $field->setNames(array('eng-GB' => 'Description'));
+        $field->setDescriptions(array('eng-GB' => 'Description of the frontpage'));
+        $field->fieldGroup = 'content';
+        $field->position = 20;
+        $field->isTranslatable = true;
+        $field->isRequired = false;
+        $field->isSearchable = true;
+        $field->isInfoCollector = false;
+        $ct->addFieldDefinition($field);
+
+        return $ct;
+    }
+
+    /**
+     * @return ContentTypeObject
+     */
+    protected function getUpdatedFrontpageContentTypeObject()
+    {
+        $ct = new ContentTypeObject('frontpage');
+        $ct->isContainer = false;
+        $ct->setNames(array('eng-GB' => 'Updated frontpage'));
+        $ct->setDescriptions(array('eng-GB' => 'Updated frontpage description'));
+
+        $field = new FieldDefinitionObject('name');
+        $field->type = 'ezstring';
+        $field->setNames(array('eng-GB' => 'Name'));
+        $field->setDescriptions(array('eng-GB' => 'Updated name description'));
+        $field->fieldGroup = 'content';
+        $field->position = 10;
+        $field->isTranslatable = false;
+        $field->isRequired = false;
+        $field->isSearchable = false;
+        $field->isInfoCollector = false;
+        $ct->addFieldDefinition($field);
+
+        $field = new FieldDefinitionObject('short_description');
+        $field->setNames(array('eng-GB' => 'Short description'));
+        $ct->addFieldDefinition($field);
+
+        return $ct;
+    }
+
 }
