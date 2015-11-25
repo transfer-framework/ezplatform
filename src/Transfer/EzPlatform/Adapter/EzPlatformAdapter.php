@@ -110,10 +110,8 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
         $response = new Response();
 
-
         $versionInfo = array();
         foreach ($request as $object) {
-
             if ($object instanceof TreeObject) {
                 $service = $this->treeService;
             } else {
@@ -151,5 +149,4 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
         return $response;
     }
-
 }
