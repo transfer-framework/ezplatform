@@ -10,6 +10,7 @@
 namespace Transfer\EzPlatform\Data;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
 
 /**
@@ -244,9 +245,27 @@ class ContentTypeObject
     }
 
     /**
+     * @param ContentTypeCreateStruct $contentTypeCreateStruct
+     */
+    public function fillContentTypeCreateStruct(ContentTypeCreateStruct &$contentTypeCreateStruct)
+    {
+        $contentTypeCreateStruct->names = $this->getNames();
+        $contentTypeCreateStruct->remoteId = sha1(microtime());
+        $contentTypeCreateStruct->isContainer = $this->isContainer;
+        $contentTypeCreateStruct->mainLanguageCode = $this->mainLanguageCode;
+        $contentTypeCreateStruct->nameSchema = $this->nameSchema;
+        $contentTypeCreateStruct->urlAliasSchema = $this->urlAliasSchema;
+        $contentTypeCreateStruct->descriptions = $this->getDescriptions();
+        $contentTypeCreateStruct->isContainer = $this->isContainer;
+        $contentTypeCreateStruct->defaultAlwaysAvailable = $this->defaultAlwaysAvailable;
+        $contentTypeCreateStruct->defaultSortField = $this->defaultSortField;
+        $contentTypeCreateStruct->defaultSortOrder = $this->defaultSortOrder;
+    }
+
+    /**
      * @param ContentTypeUpdateStruct $contentTypeUpdateStruct
      */
-    public function fillContentTypeStruct(&$contentTypeUpdateStruct)
+    public function fillContentTypeUpdateStruct(ContentTypeUpdateStruct &$contentTypeUpdateStruct)
     {
         $contentTypeUpdateStruct->names = $this->getNames();
         $contentTypeUpdateStruct->descriptions = $this->getDescriptions();
