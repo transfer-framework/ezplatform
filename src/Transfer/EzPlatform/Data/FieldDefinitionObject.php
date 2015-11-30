@@ -157,7 +157,7 @@ class FieldDefinitionObject
     /**
      * @param FieldDefinitionCreateStruct $fieldDefinitionCreateStruct
      */
-    public function dsa(&$fieldDefinitionCreateStruct)
+    public function fillFieldDefinitionCreateStruct(FieldDefinitionCreateStruct &$fieldDefinitionCreateStruct)
     {
         $fieldDefinitionCreateStruct->names = $this->getNames();
         $fieldDefinitionCreateStruct->descriptions = $this->getDescriptions();
@@ -172,7 +172,7 @@ class FieldDefinitionObject
     /**
      * @param FieldDefinitionUpdateStruct $fieldDefinitionUpdateStruct
      */
-    public function fillFieldDefinitionUpdateStruct(&$fieldDefinitionUpdateStruct)
+    public function fillFieldDefinitionUpdateStruct(FieldDefinitionUpdateStruct &$fieldDefinitionUpdateStruct)
     {
         $fieldDefinitionUpdateStruct->names = $this->getNames();
         $fieldDefinitionUpdateStruct->descriptions = $this->getDescriptions();

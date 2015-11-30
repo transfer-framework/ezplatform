@@ -97,30 +97,13 @@ class ContentTypeManager implements LoggerAwareInterface
         }
 
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->getIdentifier());
-        $contentTypeCreateStruct->names = $object->getNames();
-        $contentTypeCreateStruct->remoteId = sha1(microtime());
-        $contentTypeCreateStruct->isContainer = $object->isContainer;
-        $contentTypeCreateStruct->mainLanguageCode = $object->mainLanguageCode;
-        $contentTypeCreateStruct->nameSchema = $object->nameSchema;
-        $contentTypeCreateStruct->urlAliasSchema = $object->urlAliasSchema;
-        $contentTypeCreateStruct->descriptions = $object->getDescriptions();
-        $contentTypeCreateStruct->isContainer = $object->isContainer;
-        $contentTypeCreateStruct->defaultAlwaysAvailable = $object->defaultAlwaysAvailable;
-        $contentTypeCreateStruct->defaultSortField = $object->defaultSortField;
-        $contentTypeCreateStruct->defaultSortOrder = $object->defaultSortOrder;
+        $object->fillContentTypeCreateStruct($contentTypeCreateStruct);
 
         foreach ($object->getFieldDefinitions() as $field) {
             /* @var FieldDefinitionObject $field */
-            $titleFieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
-            $titleFieldCreateStruct->names = $field->getNames();
-            $titleFieldCreateStruct->descriptions = $field->getDescriptions();
-            $titleFieldCreateStruct->fieldGroup = $field->fieldGroup;
-            $titleFieldCreateStruct->position = $field->position;
-            $titleFieldCreateStruct->isTranslatable = $field->isTranslatable;
-            $titleFieldCreateStruct->isRequired = $field->isRequired;
-            $titleFieldCreateStruct->isSearchable = $field->isSearchable;
-            $titleFieldCreateStruct->isInfoCollector = $field->isInfoCollector;
-            $contentTypeCreateStruct->addFieldDefinition($titleFieldCreateStruct);
+            $fieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
+            $field->fillFieldDefinitionCreateStruct($fieldCreateStruct);
+            $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
         }
 
         $contentTypeGroup = $this->contentTypeService->loadContentTypeGroupByIdentifier($object->getMainGroupIdentifier());
@@ -194,7 +177,7 @@ class ContentTypeManager implements LoggerAwareInterface
         }
 
         $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
-        $object->fillContentTypeStruct($contentTypeUpdateStruct);
+        $object->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
         $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
         $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
         if ($this->logger) {
@@ -248,7 +231,7 @@ class ContentTypeManager implements LoggerAwareInterface
     private function createFieldDefinition(FieldDefinitionObject $field)
     {
         $definition = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
-        $field->fillFieldDefinitionUpdateStruct($definition);
+        $field->fillFieldDefinitionCreateStruct($definition);
 
         return $definition;
     }
