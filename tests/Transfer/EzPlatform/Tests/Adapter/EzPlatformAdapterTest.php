@@ -9,16 +9,16 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Repository\Manager\ContentManager;
-use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
+use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
-class EzPlatformAdapterTests extends EzPlatformTestCase
+class EzPlatformAdapterTest extends EzPlatformTestCase
 {
     /**
      * @var EzPlatformAdapter
@@ -28,28 +28,28 @@ class EzPlatformAdapterTests extends EzPlatformTestCase
     public function setUp()
     {
         $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository
+            'repository' => static::$repository,
         ));
     }
 
     public function testSendContentObject()
     {
         $contentObject = new ContentObject(array(
-            'title' => 'Test'
+            'title' => 'Test',
         ));
         $contentObject->setContentType('_test_article');
         $contentObject->setLanguage('eng-GB');
         $contentObject->setRemoteId('test_1');
 
         $this->adapter->send(new Request(array(
-            $contentObject
+            $contentObject,
         )));
     }
 
     public function testSendTreeObject()
     {
         $contentObject = new ContentObject(array(
-            'title' => 'Test'
+            'title' => 'Test',
         ));
         $contentObject->setContentType('_test_article');
         $contentObject->setLanguage('eng-GB');
@@ -59,7 +59,50 @@ class EzPlatformAdapterTests extends EzPlatformTestCase
         $treeObject->setProperty('location_id', 2);
 
         $this->adapter->send(new Request(array(
-            $treeObject
+            $treeObject,
+        )));
+    }
+
+    public function testSendFullContentTypeObject()
+    {
+        $ct = new ContentTypeObject('_test_article');
+        $ct->mainLanguageCode = 'eng-GB';
+        $ct->addName('Article', 'eng-GB');
+        $ct->setNames(array('eng-GB' => 'Article'));
+        $ct->addDescription('Article description');
+        $ct->isContainer = true;
+        $ct->defaultAlwaysAvailable = true;
+        $ct->addContentTypeGroup('Content');
+        $ct->defaultSortField = Location::SORT_FIELD_PUBLISHED;
+        $ct->defaultSortOrder = Location::SORT_ORDER_DESC;
+        $ct->nameSchema = '<name>';
+        $ct->urlAliasSchema = '<name>';
+
+        $f = new FieldDefinitionObject('name');
+        $f->type = 'ezstring';
+        $f->fieldGroup = 'content';
+        $f->addName('Name', 'eng-GB');
+        $f->setNames(array('eng-GB' => 'Name'));
+        $f->addDescription('Name of the article');
+        $f->isRequired = true;
+        $f->isTranslatable = true;
+        $f->isSearchable = true;
+        $f->isInfoCollector = false;
+        $f->defaultValue = '';
+
+        $ct->addFieldDefinition($f);
+        $this->adapter->send(new Request(array(
+            $ct,
+        )));
+    }
+
+    public function testSendMiniContentTypeObject()
+    {
+        $ct = new ContentTypeObject('_test_frontpage');
+        $f = new FieldDefinitionObject('name');
+        $ct->addFieldDefinition($f);
+        $this->adapter->send(new Request(array(
+            $ct,
         )));
     }
 }

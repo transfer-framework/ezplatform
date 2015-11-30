@@ -10,9 +10,7 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
-use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
 /**
@@ -24,19 +22,22 @@ class ContentManagerTest extends EzPlatformTestCase
     {
         $manager = new ContentManager(static::$repository);
 
-        $contentObject = new ContentObject(array(
-            'title' => 'Test title',
-            'description' => 'Test description',
-        ));
-        $contentObject->setContentType('_test_article');
-        $contentObject->setLanguage('eng-GB');
-        $contentObject->setRemoteId('_test_1');
 
-        $manager->create($contentObject);
+            $contentObject = new ContentObject(array(
+                'name' => 'Test title',
+                'title' => 'Test title',
+                'description' => 'Test description',
+            ));
+            $contentObject->setContentType('_test_article');
+            $contentObject->setLanguage('eng-GB');
+            $contentObject->setRemoteId('_test_1');
 
-        $createdContentObject = $manager->findByRemoteId('_test_1');
+            $manager->create($contentObject);
 
-        $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
-        $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
+            $createdContentObject = $manager->findByRemoteId('_test_1');
+
+            $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
+            $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
+
     }
 }
