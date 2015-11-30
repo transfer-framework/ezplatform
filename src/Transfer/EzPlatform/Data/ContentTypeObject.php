@@ -98,7 +98,8 @@ class ContentTypeObject
      */
     public function isValid()
     {
-        return strlen(trim($this->identifier)) > 0 && count($this->getFieldDefinitions()) > 0;
+        return strlen(trim($this->identifier)) > 0 &&
+            count($this->getFieldDefinitions()) > 0;
     }
 
     /**
@@ -250,12 +251,11 @@ class ContentTypeObject
     public function fillContentTypeCreateStruct(ContentTypeCreateStruct &$contentTypeCreateStruct)
     {
         $contentTypeCreateStruct->names = $this->getNames();
+        $contentTypeCreateStruct->descriptions = $this->getDescriptions();
         $contentTypeCreateStruct->remoteId = sha1(microtime());
-        $contentTypeCreateStruct->isContainer = $this->isContainer;
         $contentTypeCreateStruct->mainLanguageCode = $this->mainLanguageCode;
         $contentTypeCreateStruct->nameSchema = $this->nameSchema;
         $contentTypeCreateStruct->urlAliasSchema = $this->urlAliasSchema;
-        $contentTypeCreateStruct->descriptions = $this->getDescriptions();
         $contentTypeCreateStruct->isContainer = $this->isContainer;
         $contentTypeCreateStruct->defaultAlwaysAvailable = $this->defaultAlwaysAvailable;
         $contentTypeCreateStruct->defaultSortField = $this->defaultSortField;

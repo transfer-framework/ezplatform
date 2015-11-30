@@ -80,6 +80,7 @@ class FieldDefinitionObject
     public function __construct($identifier)
     {
         $this->identifier = $identifier;
+        $this->names = array('eng-GB' => $this->identifierToReadable($identifier));
     }
 
     /**
@@ -99,7 +100,7 @@ class FieldDefinitionObject
      *
      * @return string
      */
-    protected function stringToReadable($string)
+    protected function identifierToReadable($string)
     {
         return ucwords(str_replace('_', ' ', $string));
     }
