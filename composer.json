@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": ">=5.4.4",
-        "transfer/transfer": "~1.0.0"
+        "transfer/transfer": "~1.0.0",
+        "ezsystems/ezpublish-kernel": "dev-master"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.7",
-        "ezsystems/ezpublish-kernel": "dev-master"
+        "phpunit/phpunit": "^4.7"
     },
     "autoload": {
         "psr-4": { "Transfer\\EzPlatform\\": "src/Transfer/EzPlatform/" }
