@@ -37,11 +37,10 @@ Handling the following type of data:
 
 - [x] Content and Locations
 - [x] ContentType and FieldTypes
+- [ ] ContentTypeGroups
 - [ ] Languages
-- [ ] Trash
-- [ ] Sections
 - [ ] User
-- [ ] UrlAlias and UrlWildcards
+- [ ] Roles
 - [ ] Documentation
 
 All of these might not be implemented before the first stable tagged release.
