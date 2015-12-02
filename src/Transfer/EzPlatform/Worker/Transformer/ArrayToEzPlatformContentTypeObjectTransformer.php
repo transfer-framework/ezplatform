@@ -27,16 +27,11 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
         $a = $array[$identifier];
 
         if (!is_string($identifier)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidDataStructureException(
                 sprintf('Expected identifier to be of type string, got "%s".', gettype($identifier))
             );
         }
-        if (!array_key_exists('fields', $a)) {
-            throw new InvalidDataStructureException(
-                sprintf('Missing key "%s" in identifier "%s".', 'fields', $identifier)
-            );
-        }
-        if (count($a['fields']) == 0) {
+        if (!array_key_exists('fields', $a) || count($a['fields']) == 0) {
             throw new InvalidDataStructureException(
                 sprintf('Atleast one field must be defined for identifier "%s".', $identifier)
             );
@@ -48,37 +43,36 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
             $ct->mainLanguageCode = $a['main_language_code'];
         }
 
-        if (isset($a['main_group_identifier'])) {
-            $ct->setContentTypeGroups(array($a['main_group_identifier']));
-        }
-
         if (isset($a['contenttype_groups']) && is_array($a['contenttype_groups'])) {
+            $ct->setContentTypeGroups($a['contenttype_groups']);
+        } elseif (isset($a['contenttype_group'])) {
             foreach ($a['contenttype_groups'] as $contenttypeGroup) {
                 $ct->addContentTypeGroup($contenttypeGroup);
             }
         }
+
         if (isset($a['names'])) {
             $ct->setNames($a['names']);
-        } elseif ($a['name']) {
+        } elseif (isset($a['name'])) {
             $ct->addName($a['name'], $ct->mainLanguageCode);
         }
 
         if (isset($a['descriptions'])) {
             $ct->setDescriptions($a['descriptions']);
-        } elseif ($a['description']) {
+        } elseif (isset($a['description'])) {
             $ct->addDescription($a['description'], $ct->mainLanguageCode);
         }
 
-        if (isset($ct['name_schema'])) {
+        if (isset($a['name_schema'])) {
             $ct->nameSchema = $a['name_schema'];
         }
 
-        if (isset($ct['url_alias_schema'])) {
+        if (isset($a['url_alias_schema'])) {
             $ct->urlAliasSchema = $a['url_alias_schema'];
         }
 
-        if (isset($ct['container'])) {
-            $ct->isContainer = $a['container'];
+        if (isset($a['is_container'])) {
+            $ct->isContainer = $a['is_container'];
         }
 
         $positions = array(0);
@@ -96,7 +90,7 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
             }
             if (isset($field['descriptions'])) {
                 $fieldDefinition->setDescriptions($field['descriptions']);
-            } elseif ($field['description']) {
+            } elseif (isset($field['description'])) {
                 $fieldDefinition->addDescription($field['description'], $ct->mainLanguageCode);
             }
             if (isset($field['field_group'])) {
@@ -105,22 +99,25 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
             $position = isset($field['position']) ? $field['position'] : max($positions) + 10;
             $positions[] = $fieldDefinition->position = $position;
 
-            if (isset($field['translatable'])) {
-                $fieldDefinition->isTranslatable = $field['translatable'];
+            if (isset($field['default_value'])) {
+                $fieldDefinition->defaultValue = $field['default_value'];
             }
-            if (isset($field['required'])) {
-                $fieldDefinition->isRequired = $field['required'];
+            if (isset($field['is_translatable'])) {
+                $fieldDefinition->isTranslatable = $field['is_translatable'];
             }
-            if (isset($field['searchable'])) {
-                $fieldDefinition->isSearchable = $field['searchable'];
+            if (isset($field['is_required'])) {
+                $fieldDefinition->isRequired = $field['is_required'];
             }
-            if (isset($field['info_collector'])) {
-                $fieldDefinition->isInfoCollector = $field['info_collector'];
+            if (isset($field['is_searchable'])) {
+                $fieldDefinition->isSearchable = $field['is_searchable'];
+            }
+            if (isset($field['is_info_collector'])) {
+                $fieldDefinition->isInfoCollector = $field['is_info_collector'];
             }
 
-            $ct->addFieldDefinition($field);
+            $ct->addFieldDefinition($fieldDefinition);
         }
 
-        return new ContentTypeObject($ct);
+        return $ct;
     }
 }
