@@ -38,6 +38,7 @@ class FieldDefinitionRepository
 
     /**
      * @param ValueObject $fieldDefinitionStruct
+     *
      * @return ValueObject
      */
     protected function populateStruct(ValueObject $fieldDefinitionStruct)
