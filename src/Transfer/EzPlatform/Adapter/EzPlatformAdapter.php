@@ -17,7 +17,6 @@ use Transfer\Adapter\TargetAdapterInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Adapter\Transaction\Response;
 use Transfer\Data\TreeObject;
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
@@ -126,13 +125,12 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
             }
 
             try {
-
                 if ($object instanceof ContentTypeObject) {
                     $objects[] = $this->contentTypeManager->createOrUpdate($object);
                 } else {
                     $objects[] = $service->create($object);
                 }
-                if(!empty($objects)) {
+                if (!empty($objects)) {
                     $response->setData(new \ArrayIterator($objects));
                 }
             } catch (\Exception $e) {
@@ -142,7 +140,6 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
                 throw $e;
             }
-
         }
 
         $repository->commit();
