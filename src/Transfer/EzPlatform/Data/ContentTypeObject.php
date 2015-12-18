@@ -94,15 +94,6 @@ class ContentTypeObject
     }
 
     /**
-     * @return bool
-     */
-    public function isValid()
-    {
-        return strlen(trim($this->identifier)) > 0 &&
-            count($this->getFieldDefinitions()) > 0;
-    }
-
-    /**
      * @return string
      */
     public function getMainGroupIdentifier()

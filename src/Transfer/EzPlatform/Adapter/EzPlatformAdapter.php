@@ -48,6 +48,9 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     protected $options;
 
+    /**
+     * @var ContentTypeManager
+     */
     protected $contentTypeManager;
 
     /**
@@ -110,7 +113,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
         $response = new Response();
 
-        $versionInfo = array();
+        $objects = array();
         foreach ($request as $object) {
             if ($object instanceof TreeObject) {
                 $service = $this->treeService;
@@ -122,27 +125,24 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
                 $service->setCurrentUser($this->options['repository_current_user']);
             }
 
-            if ($object instanceof ContentTypeObject) {
-                $response->setData(new \ArrayIterator($this->contentTypeManager->createOrUpdate($object)));
-            } else {
-                try {
-                    $object = $service->create($object);
-                    $versionInfo[] = $object;
-                } catch (\Exception $e) {
-                    if ($this->logger) {
-                        $this->logger->error($e->getMessage());
-                    }
+            try {
 
-                    throw $e;
+                if ($object instanceof ContentTypeObject) {
+                    $objects[] = $this->contentTypeManager->createOrUpdate($object);
+                } else {
+                    $objects[] = $service->create($object);
+                }
+                if(!empty($objects)) {
+                    $response->setData(new \ArrayIterator($objects));
+                }
+            } catch (\Exception $e) {
+                if ($this->logger) {
+                    $this->logger->error($e->getMessage());
                 }
 
-                $versionInfoObjects = array();
-                foreach ($versionInfo as $versionInfoElement) {
-                    $versionInfoObjects[] = new ValueObject($versionInfoElement);
-                }
-
-                $response->setData(new \ArrayIterator($versionInfoObjects));
+                throw $e;
             }
+
         }
 
         $repository->commit();
