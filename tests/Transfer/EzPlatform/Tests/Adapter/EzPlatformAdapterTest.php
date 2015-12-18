@@ -101,6 +101,10 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
         $ct = new ContentTypeObject('_test_frontpage');
         $f = new FieldDefinitionObject('name');
         $ct->addFieldDefinition($f);
+
+        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
+        $this->adapter->setLogger($mockLogger);
+
         $this->adapter->send(new Request(array(
             $ct,
         )));
