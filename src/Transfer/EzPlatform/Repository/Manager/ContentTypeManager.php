@@ -102,7 +102,7 @@ class ContentTypeManager implements LoggerAwareInterface
         foreach ($object->getFieldDefinitions() as $field) {
             /* @var FieldDefinitionObject $field */
             $fieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
-            $field->fillFieldDefinitionCreateStruct($fieldCreateStruct);
+            $field->getRepository()->populateCreateStruct($fieldCreateStruct);
             $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
         }
 
@@ -206,7 +206,7 @@ class ContentTypeManager implements LoggerAwareInterface
     }
 
     /**
-     * @param string$identifier
+     * @param string $identifier
      *
      * @return bool
      */
@@ -231,7 +231,7 @@ class ContentTypeManager implements LoggerAwareInterface
     private function createFieldDefinition(FieldDefinitionObject $field)
     {
         $definition = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
-        $field->fillFieldDefinitionCreateStruct($definition);
+        $field->getRepository()->populateCreateStruct($definition);
 
         return $definition;
     }
@@ -244,7 +244,7 @@ class ContentTypeManager implements LoggerAwareInterface
     private function updateFieldDefinition(FieldDefinitionObject $field)
     {
         $definition = $this->contentTypeService->newFieldDefinitionUpdateStruct();
-        $field->fillFieldDefinitionUpdateStruct($definition);
+        $field->getRepository()->populateUpdateStruct($definition);
 
         return $definition;
     }
