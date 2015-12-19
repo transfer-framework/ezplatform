@@ -76,7 +76,7 @@ abstract class EzPlatformTestCase extends KernelTestCase
         $_fd_name->position = 10;
         $_fd_name->isRequired = true;
         $_fd_name->isTranslatable = true;
-        $_fd_name->isSearchable= true;
+        $_fd_name->isSearchable = true;
         $_fd_name->isInfoCollector = false;
         $_ct_article->addFieldDefinition($_fd_name);
 
@@ -87,7 +87,7 @@ abstract class EzPlatformTestCase extends KernelTestCase
         $_fd_desc->position = 20;
         $_fd_desc->isRequired = false;
         $_fd_desc->isTranslatable = true;
-        $_fd_desc->isSearchable= true;
+        $_fd_desc->isSearchable = true;
         $_fd_desc->isInfoCollector = false;
         $_ct_article->addFieldDefinition($_fd_desc);
 
