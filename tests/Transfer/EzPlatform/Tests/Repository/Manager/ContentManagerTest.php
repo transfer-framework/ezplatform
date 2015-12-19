@@ -22,22 +22,20 @@ class ContentManagerTest extends EzPlatformTestCase
     {
         $manager = new ContentManager(static::$repository);
 
-
-            $contentObject = new ContentObject(array(
+        $contentObject = new ContentObject(array(
                 'name' => 'Test title',
                 'title' => 'Test title',
                 'description' => 'Test description',
             ));
-            $contentObject->setContentType('_test_article');
-            $contentObject->setLanguage('eng-GB');
-            $contentObject->setRemoteId('_test_1');
+        $contentObject->setContentType('_test_article');
+        $contentObject->setLanguage('eng-GB');
+        $contentObject->setRemoteId('_test_1');
 
-            $manager->create($contentObject);
+        $manager->create($contentObject);
 
-            $createdContentObject = $manager->findByRemoteId('_test_1');
+        $createdContentObject = $manager->findByRemoteId('_test_1');
 
-            $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
-            $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
-
+        $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
+        $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
     }
 }

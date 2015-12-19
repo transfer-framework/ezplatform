@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of Transfer.
+ *
+ * For the full copyright and license information, please view the LICENSE file located
+ * in the root directory.
+ */
+
 namespace Transfer\EzPlatform\Worker\Transformer;
 
 use Transfer\EzPlatform\Data\ContentTypeObject;
@@ -8,7 +15,9 @@ use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\Worker\WorkerInterface;
 
 /**
- * Class ArrayToEzPlatformContentTypeObjectTransformer.
+ * Transforms array to Transfer eZ Platform Content Type object.
+ *
+ * @author Harald Tollefsen <harald@netmaking.no>
  */
 class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
 {

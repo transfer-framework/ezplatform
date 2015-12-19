@@ -5,48 +5,9 @@ use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTra
 
 class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testFull()
     {
-        $array = array('article' => array(
-            'main_language_code' => 'eng-GB',
-            'contenttype_groups' => array('Content'),
-            'names' => array('eng-GB' => 'Article'),
-            'descriptions' => array('eng-GB' => 'Article description'),
-            'name_schema' => '<title>',
-            'url_alias_schema' => '<title>',
-            'is_container' => true,
-            'default_always_available' => true,
-            'default_sort_field' => Location::SORT_FIELD_PUBLISHED,
-            'default_sort_order' => Location::SORT_ORDER_ASC,
-            'fields' => array(
-                'title' => array(
-                    'type' => 'ezstring',
-                    'field_group' => 'content',
-                    'position' => 0,
-                    'names' => array('eng-GB' => 'Title'),
-                    'descriptions' => array('eng-GB' => 'Title of the article'),
-                    'default_value' => 'My Article',
-                    'is_required' => true,
-                    'is_translatable' => true,
-                    'is_searchable' => true,
-                    'is_info_collector' => false,
-                ),
-                'content' => array(
-                    'type' => 'ezrichtext',
-                    'field_group' => 'content',
-                    'position' => 10,
-                    'names' => array('eng-GB' => 'Content'),
-                    'descriptions' => array('eng-GB' => 'Content of the article'),
-                    'default_value' => '',
-                    'is_required' => false,
-                    'is_translatable' => true,
-                    'is_searchable' => true,
-                    'is_info_collector' => false,
-                ),
-
-            ),
-        ));
+        $array = $this->getDetailedArrayExample();
 
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
@@ -100,17 +61,11 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($f2->isTranslatable);
         $this->assertTrue($f2->isSearchable);
         $this->assertFalse($f2->isInfoCollector);
-
     }
 
     public function testMini()
     {
-        $array = array('article' => array(
-            'fields' => array(
-                'title' => array(),
-                'content' => array(),
-            )
-        ));
+        $array = $this->getMiniArrayExample();
 
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
@@ -161,7 +116,58 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($f2->isTranslatable);
         $this->assertTrue($f2->isSearchable);
         $this->assertFalse($f2->isInfoCollector);
-
     }
 
+    protected function getMiniArrayExample()
+    {
+        return array('article' => array(
+            'fields' => array(
+                'title' => array(),
+                'content' => array(),
+            ),
+        ));
+    }
+
+    protected function getDetailedArrayExample()
+    {
+        return array('article' => array(
+            'main_language_code' => 'eng-GB',
+            'contenttype_groups' => array('Content'),
+            'names' => array('eng-GB' => 'Article'),
+            'descriptions' => array('eng-GB' => 'Article description'),
+            'name_schema' => '<title>',
+            'url_alias_schema' => '<title>',
+            'is_container' => true,
+            'default_always_available' => true,
+            'default_sort_field' => Location::SORT_FIELD_PUBLISHED,
+            'default_sort_order' => Location::SORT_ORDER_ASC,
+            'fields' => array(
+                'title' => array(
+                    'type' => 'ezstring',
+                    'field_group' => 'content',
+                    'position' => 0,
+                    'names' => array('eng-GB' => 'Title'),
+                    'descriptions' => array('eng-GB' => 'Title of the article'),
+                    'default_value' => 'My Article',
+                    'is_required' => true,
+                    'is_translatable' => true,
+                    'is_searchable' => true,
+                    'is_info_collector' => false,
+                ),
+                'content' => array(
+                    'type' => 'ezrichtext',
+                    'field_group' => 'content',
+                    'position' => 10,
+                    'names' => array('eng-GB' => 'Content'),
+                    'descriptions' => array('eng-GB' => 'Content of the article'),
+                    'default_value' => '',
+                    'is_required' => false,
+                    'is_translatable' => true,
+                    'is_searchable' => true,
+                    'is_info_collector' => false,
+                ),
+
+            ),
+        ));
+    }
 }
