@@ -11,7 +11,6 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
-use Transfer\EzPlatform\Repository\Content\FieldDefinitionRepository;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -20,7 +19,6 @@ use Transfer\EzPlatform\Tests\EzPlatformTestCase;
  */
 class ContentTypeManagerTest extends EzPlatformTestCase
 {
-
     public function testDeleteNotFound()
     {
         $manager = new ContentTypeManager(static::$repository);
@@ -167,7 +165,6 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $this->assertFalse($contentFieldDefinition->isRequired);
         $this->assertTrue($contentFieldDefinition->isSearchable);
         $this->assertFalse($contentFieldDefinition->isInfoCollector);
-
     }
 
     public function testUpdateWithLogger()
@@ -201,18 +198,21 @@ class ContentTypeManagerTest extends EzPlatformTestCase
     protected function create(ContentTypeManager $manager)
     {
         $ct = $this->getFrontpageContentTypeObject();
+
         return $manager->create($ct);
     }
 
     protected function createOrUpdate(ContentTypeManager $manager)
     {
         $ct = $this->getFrontpageContentTypeObject();
+
         return $manager->createOrUpdate($ct);
     }
 
     protected function update(ContentTypeManager $manager)
     {
         $ct = $this->getUpdatedFrontpageContentTypeObject();
+
         return $manager->update($ct);
     }
 
@@ -297,5 +297,4 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
         return $ct;
     }
-
 }

@@ -14,6 +14,11 @@ use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
 use eZ\Publish\API\Repository\Values\ValueObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 
+/**
+ * Field definition repository
+ *
+ * @author Harald Tollefsen <harald@netmaking.no>
+ */
 class FieldDefinitionRepository
 {
     /**
@@ -21,16 +26,25 @@ class FieldDefinitionRepository
      */
     public $fieldDefinitionObject;
 
+    /**
+     * @param FieldDefinitionObject $fieldDefinitionObject
+     */
     public function __construct(FieldDefinitionObject $fieldDefinitionObject)
     {
         $this->fieldDefinitionObject = $fieldDefinitionObject;
     }
 
+    /**
+     * @param FieldDefinitionCreateStruct $fieldDefinitionStruct
+     */
     public function populateCreateStruct(FieldDefinitionCreateStruct $fieldDefinitionStruct)
     {
         $this->populateStruct($fieldDefinitionStruct);
     }
 
+    /**
+     * @param FieldDefinitionUpdateStruct $fieldDefinitionStruct
+     */
     public function populateUpdateStruct(FieldDefinitionUpdateStruct $fieldDefinitionStruct)
     {
         $this->populateStruct($fieldDefinitionStruct);

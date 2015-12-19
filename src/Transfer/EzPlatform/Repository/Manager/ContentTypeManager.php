@@ -128,6 +128,8 @@ class ContentTypeManager implements LoggerAwareInterface
      * @param ContentTypeObject $object
      *
      * @return ContentType|false|null
+     *
+     * @throws \Exception
      */
     public function update(ContentTypeObject $object)
     {
@@ -136,6 +138,10 @@ class ContentTypeManager implements LoggerAwareInterface
         }
 
         $contentType = $this->findByIdentifier($object->getIdentifier());
+
+        if (!$contentType) {
+            throw new \Exception('Content type not found');
+        }
 
         try {
             $contentTypeDraft = $this->contentTypeService->loadContentTypeDraft($contentType->id);

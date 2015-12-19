@@ -5,7 +5,6 @@ use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTra
 
 class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testFull()
     {
         $array = $this->getDetailedArrayExample();
@@ -62,7 +61,6 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($f2->isTranslatable);
         $this->assertTrue($f2->isSearchable);
         $this->assertFalse($f2->isInfoCollector);
-
     }
 
     public function testMini()
@@ -118,7 +116,6 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($f2->isTranslatable);
         $this->assertTrue($f2->isSearchable);
         $this->assertFalse($f2->isInfoCollector);
-
     }
 
     protected function getMiniArrayExample()
@@ -127,7 +124,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
             'fields' => array(
                 'title' => array(),
                 'content' => array(),
-            )
+            ),
         ));
     }
 
@@ -173,5 +170,4 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
             ),
         ));
     }
-
 }
