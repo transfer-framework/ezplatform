@@ -9,8 +9,7 @@
 
 namespace Transfer\EzPlatform\Data;
 
-use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
-use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
+use Transfer\EzPlatform\Repository\Content\FieldDefinitionRepository;
 
 /**
  * Content type object.
@@ -71,6 +70,11 @@ class FieldDefinitionObject
      * @var array
      */
     protected $descriptions = array();
+
+    /**
+     * @var FieldDefinitionRepository
+     */
+    protected $repository;
 
     /**
      * FieldDefinitionObject constructor.
@@ -156,32 +160,14 @@ class FieldDefinitionObject
     }
 
     /**
-     * @param FieldDefinitionCreateStruct $fieldDefinitionCreateStruct
+     * @return FieldDefinitionRepository
      */
-    public function fillFieldDefinitionCreateStruct(FieldDefinitionCreateStruct &$fieldDefinitionCreateStruct)
+    public function getRepository()
     {
-        $fieldDefinitionCreateStruct->names = $this->getNames();
-        $fieldDefinitionCreateStruct->descriptions = $this->getDescriptions();
-        $fieldDefinitionCreateStruct->fieldGroup = $this->fieldGroup;
-        $fieldDefinitionCreateStruct->position = $this->position;
-        $fieldDefinitionCreateStruct->isTranslatable = $this->isTranslatable;
-        $fieldDefinitionCreateStruct->isRequired = $this->isRequired;
-        $fieldDefinitionCreateStruct->isInfoCollector = $this->isInfoCollector;
-        $fieldDefinitionCreateStruct->isSearchable = $this->isSearchable;
-    }
+        if (!$this->repository) {
+            $this->repository = new FieldDefinitionRepository($this);
+        }
 
-    /**
-     * @param FieldDefinitionUpdateStruct $fieldDefinitionUpdateStruct
-     */
-    public function fillFieldDefinitionUpdateStruct(FieldDefinitionUpdateStruct &$fieldDefinitionUpdateStruct)
-    {
-        $fieldDefinitionUpdateStruct->names = $this->getNames();
-        $fieldDefinitionUpdateStruct->descriptions = $this->getDescriptions();
-        $fieldDefinitionUpdateStruct->fieldGroup = $this->fieldGroup;
-        $fieldDefinitionUpdateStruct->position = $this->position;
-        $fieldDefinitionUpdateStruct->isTranslatable = $this->isTranslatable;
-        $fieldDefinitionUpdateStruct->isRequired = $this->isRequired;
-        $fieldDefinitionUpdateStruct->isInfoCollector = $this->isInfoCollector;
-        $fieldDefinitionUpdateStruct->isSearchable = $this->isSearchable;
+        return $this->repository;
     }
 }
