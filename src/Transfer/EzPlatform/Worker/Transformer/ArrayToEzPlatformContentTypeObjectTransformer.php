@@ -32,101 +32,135 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
             );
         }
 
-        $identifier = key($array);
-        $a = $array[$identifier];
-
-        if (!is_string($identifier)) {
-            throw new InvalidDataStructureException(
-                sprintf('Expected identifier to be of type string, got "%s".', gettype($identifier))
-            );
-        }
-        if (!array_key_exists('fields', $a) || count($a['fields']) == 0) {
-            throw new InvalidDataStructureException(
-                sprintf('Atleast one field must be defined for identifier "%s".', $identifier)
-            );
-        }
-
-        $ct = new ContentTypeObject($identifier);
-
-        if (isset($a['main_language_code'])) {
-            $ct->mainLanguageCode = $a['main_language_code'];
-        }
-
-        if (isset($a['contenttype_groups']) && is_array($a['contenttype_groups'])) {
-            $ct->setContentTypeGroups($a['contenttype_groups']);
-        } elseif (isset($a['contenttype_group'])) {
-            foreach ($a['contenttype_groups'] as $contenttypeGroup) {
-                $ct->addContentTypeGroup($contenttypeGroup);
+        foreach ($array as $identifier => $contenttype) {
+            if (!is_string($identifier)) {
+                throw new InvalidDataStructureException(
+                    sprintf('Expected identifier to be of type string, got "%s".', gettype($identifier))
+                );
             }
-        }
-
-        if (isset($a['names'])) {
-            $ct->setNames($a['names']);
-        } elseif (isset($a['name'])) {
-            $ct->addName($a['name'], $ct->mainLanguageCode);
-        }
-
-        if (isset($a['descriptions'])) {
-            $ct->setDescriptions($a['descriptions']);
-        } elseif (isset($a['description'])) {
-            $ct->addDescription($a['description'], $ct->mainLanguageCode);
-        }
-
-        if (isset($a['name_schema'])) {
-            $ct->nameSchema = $a['name_schema'];
-        }
-
-        if (isset($a['url_alias_schema'])) {
-            $ct->urlAliasSchema = $a['url_alias_schema'];
-        }
-
-        if (isset($a['is_container'])) {
-            $ct->isContainer = $a['is_container'];
-        }
-
-        $positions = array(0);
-        foreach ($a['fields'] as $fieldId => $field) {
-            $fieldDefinition = new FieldDefinitionObject($fieldId);
-
-            if (isset($field['type'])) {
-                $fieldDefinition->type = $field['type'];
+            if (!array_key_exists('fields', $contenttype) || count($contenttype['fields']) == 0) {
+                throw new InvalidDataStructureException(
+                    sprintf('Atleast one field must be defined for identifier "%s".', $identifier)
+                );
             }
 
-            if (isset($field['names'])) {
-                $fieldDefinition->setNames($field['names']);
-            } elseif (isset($field['name'])) {
-                $fieldDefinition->addName($field['name'], $ct->mainLanguageCode);
-            }
-            if (isset($field['descriptions'])) {
-                $fieldDefinition->setDescriptions($field['descriptions']);
-            } elseif (isset($field['description'])) {
-                $fieldDefinition->addDescription($field['description'], $ct->mainLanguageCode);
-            }
-            if (isset($field['field_group'])) {
-                $fieldDefinition->fieldGroup = $field['field_group'];
-            }
-            $position = isset($field['position']) ? $field['position'] : max($positions) + 10;
-            $positions[] = $fieldDefinition->position = $position;
+            $ct = new ContentTypeObject($identifier);
 
-            if (isset($field['default_value'])) {
-                $fieldDefinition->defaultValue = $field['default_value'];
-            }
-            if (isset($field['is_translatable'])) {
-                $fieldDefinition->isTranslatable = $field['is_translatable'];
-            }
-            if (isset($field['is_required'])) {
-                $fieldDefinition->isRequired = $field['is_required'];
-            }
-            if (isset($field['is_searchable'])) {
-                $fieldDefinition->isSearchable = $field['is_searchable'];
-            }
-            if (isset($field['is_info_collector'])) {
-                $fieldDefinition->isInfoCollector = $field['is_info_collector'];
+            foreach ($contenttype as $key => $attribute) {
+                switch ($key) {
+                    case 'main_language_code':
+                        $ct->mainLanguageCode = $attribute;
+                        break;
+
+                    case 'contenttype_groups':
+                        $ct->setContentTypeGroups($attribute);
+                        break;
+
+                    case 'contenttype_group':
+                        $ct->addContentTypeGroup($attribute);
+                        break;
+
+                    case 'names':
+                        $ct->setNames($attribute);
+                        break;
+
+                    case 'name':
+                        $ct->addName($attribute);
+                        break;
+
+                    case 'descriptions':
+                        $ct->setDescriptions($attribute);
+                        break;
+
+                    case 'description':
+                        $ct->addDescription($attribute);
+                        break;
+
+                    case 'name_schema':
+                        $ct->nameSchema = $attribute;
+                        break;
+
+                    case 'url_alias_schema':
+                        $ct->urlAliasSchema = $attribute;
+                        break;
+
+                    case 'is_container':
+                        $ct->isContainer = $attribute;
+                        break;
+
+                    case 'fields':
+
+                        $positions = array(0);
+
+                        foreach ($attribute as $fieldIdentifier => $fieldDefinition) {
+                            $fd = new FieldDefinitionObject($fieldIdentifier);
+
+                            foreach ($fieldDefinition as $key => $value) {
+                                switch ($key) {
+                                    case 'type':
+                                        $fd->type = $value;
+                                        break;
+
+                                    case 'names':
+                                        $fd->setNames($value);
+                                        break;
+
+                                    case 'name':
+                                        $fd->addName($value);
+                                        break;
+
+                                    case 'descriptions':
+                                        $fd->setDescriptions($value);
+                                        break;
+
+                                    case 'description':
+                                        $fd->addDescription($value);
+                                        break;
+
+                                    case 'field_group':
+                                        $fd->fieldGroup = $value;
+                                        break;
+
+                                    case 'position':
+                                        $fd->position = $value;
+                                        break;
+
+                                    case 'default_value':
+                                        $fd->defaultValue = $value;
+                                        break;
+
+                                    case 'is_translatable':
+                                        $fd->isTranslatable = $value;
+                                        break;
+
+                                    case 'is_required':
+                                        $fd->isRequired = $value;
+                                        break;
+
+                                    case 'is_searchable':
+                                        $fd->isSearchable = $value;
+                                        break;
+
+                                    case 'is_info_collector':
+                                        $fd->isInfoCollector = $value;
+                                        break;
+
+                                }
+                            }
+
+                            if (null === $fd->position) {
+                                $fd->position = max($positions) + 10;
+                            }
+                            $positions[] = $fd->position;
+
+                            $ct->addFieldDefinition($fd);
+                        }
+                }
             }
 
-            $ct->addFieldDefinition($fieldDefinition);
+            return $ct;
         }
 
-        return $ct;
+        return;
     }
 }
