@@ -8,22 +8,19 @@ Notice
 
 This extension is still under development. There is currently no stable release.
 
-It will stay that way until as stable 6.x release of [ezpublish-kernel](https://github.com/ezsystems/ezpublish-kernel/releases) is tagged.
-
 Installation
 ------------
 
 Install the latest version with:
 
-    $ composer require transfer/ezplatform 
+    $ composer require transfer/ezplatform
 
 This requires [Composer](https://getcomposer.org/download/) to be installed globally in your system.
-
 
 Usage
 ------------
 
-Docs is coming..
+Docs is coming.
 
 Contribution
 ------------
@@ -44,3 +41,4 @@ Handling the following type of data:
 - [ ] Documentation
 
 All of these might not be implemented before the first stable tagged release.
+
