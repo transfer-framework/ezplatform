@@ -19,6 +19,29 @@ use Transfer\EzPlatform\Tests\EzPlatformTestCase;
  */
 class ContentTypeManagerTest extends EzPlatformTestCase
 {
+    public function testCreateMultipleContentTypeGroups()
+    {
+        $manager = new ContentTypeManager(static::$repository);
+        $ct = $this->getFrontpageContentTypeObject();
+        $ct->addContentTypeGroup('MyGroup1');
+        $ct->addContentTypeGroup('MyGroup2');
+        $manager->createOrUpdate($ct);
+        $contentType = $manager->findByIdentifier('frontpage');
+        $this->assertEquals('Content', $contentType->contentTypeGroups[0]->identifier);
+        $this->assertEquals('MyGroup1', $contentType->contentTypeGroups[1]->identifier);
+        $this->assertEquals('MyGroup2', $contentType->contentTypeGroups[2]->identifier);
+    }
+
+    public function testCreateContentTypeGroup()
+    {
+        $manager = new ContentTypeManager(static::$repository);
+        $ct = $this->getFrontpageContentTypeObject();
+        $ct->setContentTypeGroups(array('FrontpageGroup'));
+        $manager->createOrUpdate($ct);
+        $contentType = $manager->findByIdentifier('frontpage');
+        $this->assertEquals('FrontpageGroup', $contentType->contentTypeGroups[0]->identifier);
+    }
+
     public function testDeleteNotFound()
     {
         $manager = new ContentTypeManager(static::$repository);
@@ -193,6 +216,14 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $this->create($manager);
 
         $this->update($manager);
+    }
+
+    public function testUpdateNotFound()
+    {
+        $this->setExpectedException('\Exception', 'Contenttype "_update_not_found" not found.');
+        $manager = new ContentTypeManager(static::$repository);
+        $ct = new ContentTypeObject('_update_not_found');
+        $manager->update($ct);
     }
 
     protected function create(ContentTypeManager $manager)

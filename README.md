@@ -34,7 +34,7 @@ Handling the following type of data:
 
 - [x] Content and Locations
 - [x] ContentType and FieldTypes
-- [ ] ContentTypeGroups
+- [x] ContentTypeGroups
 - [ ] Languages
 - [ ] Users
 - [ ] Roles and policies
