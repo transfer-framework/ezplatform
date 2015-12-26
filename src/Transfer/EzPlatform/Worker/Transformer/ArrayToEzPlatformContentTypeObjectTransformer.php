@@ -26,24 +26,9 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
      */
     public function handle($array)
     {
-        if (!is_array($array)) {
-            throw new \InvalidArgumentException(
-                sprintf('Expected argument #1 to be of type array, got %s', gettype($array))
-            );
-        }
+        $this->isValid($array);
 
         foreach ($array as $identifier => $contenttype) {
-            if (!is_string($identifier)) {
-                throw new InvalidDataStructureException(
-                    sprintf('Expected identifier to be of type string, got "%s".', gettype($identifier))
-                );
-            }
-            if (!array_key_exists('fields', $contenttype) || count($contenttype['fields']) == 0) {
-                throw new InvalidDataStructureException(
-                    sprintf('Atleast one field must be defined for identifier "%s".', $identifier)
-                );
-            }
-
             $ct = new ContentTypeObject($identifier);
 
             foreach ($contenttype as $key => $attribute) {
@@ -89,72 +74,10 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
                         break;
 
                     case 'fields':
-
-                        $positions = array(0);
-
-                        foreach ($attribute as $fieldIdentifier => $fieldDefinition) {
-                            $fd = new FieldDefinitionObject($fieldIdentifier);
-
-                            foreach ($fieldDefinition as $key => $value) {
-                                switch ($key) {
-                                    case 'type':
-                                        $fd->type = $value;
-                                        break;
-
-                                    case 'names':
-                                        $fd->setNames($value);
-                                        break;
-
-                                    case 'name':
-                                        $fd->addName($value);
-                                        break;
-
-                                    case 'descriptions':
-                                        $fd->setDescriptions($value);
-                                        break;
-
-                                    case 'description':
-                                        $fd->addDescription($value);
-                                        break;
-
-                                    case 'field_group':
-                                        $fd->fieldGroup = $value;
-                                        break;
-
-                                    case 'position':
-                                        $fd->position = $value;
-                                        break;
-
-                                    case 'default_value':
-                                        $fd->defaultValue = $value;
-                                        break;
-
-                                    case 'is_translatable':
-                                        $fd->isTranslatable = $value;
-                                        break;
-
-                                    case 'is_required':
-                                        $fd->isRequired = $value;
-                                        break;
-
-                                    case 'is_searchable':
-                                        $fd->isSearchable = $value;
-                                        break;
-
-                                    case 'is_info_collector':
-                                        $fd->isInfoCollector = $value;
-                                        break;
-
-                                }
-                            }
-
-                            if (null === $fd->position) {
-                                $fd->position = max($positions) + 10;
-                            }
-                            $positions[] = $fd->position;
-
+                        foreach ($this->getFieldDefinitions($attribute) as $fd) {
                             $ct->addFieldDefinition($fd);
                         }
+                        break;
                 }
             }
 
@@ -162,5 +85,155 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
         }
 
         return;
+    }
+
+    /**
+     * @param array $fieldDefinitions
+     *
+     * @return FieldDefinitionObject[]
+     */
+    private function getFieldDefinitions($fieldDefinitions)
+    {
+        $cts = array();
+        $positions = array(0);
+
+        foreach ($fieldDefinitions as $fieldIdentifier => $fieldDefinition) {
+            $fd = $this->getFieldDefinitionFromData($fieldIdentifier, $fieldDefinition);
+
+            if (null === $fd->position) {
+                $fd->position = max($positions) + 10;
+            }
+            $positions[] = $fd->position;
+
+            $cts[] = $fd;
+        }
+
+        return $cts;
+    }
+
+    /**
+     * @param $fieldIdentifier
+     * @param $fieldDefinitionData
+     *
+     * @return FieldDefinitionObject
+     */
+    private function getFieldDefinitionFromData($fieldIdentifier, $fieldDefinitionData)
+    {
+        $fd = new FieldDefinitionObject($fieldIdentifier);
+        foreach ($fieldDefinitionData as $key => $value) {
+            switch ($key) {
+                case 'type':
+                    $fd->type = $value;
+                    break;
+
+                case 'names':
+                    $fd->setNames($value);
+                    break;
+
+                case 'name':
+                    $fd->addName($value);
+                    break;
+
+                case 'descriptions':
+                    $fd->setDescriptions($value);
+                    break;
+
+                case 'description':
+                    $fd->addDescription($value);
+                    break;
+
+                case 'field_group':
+                    $fd->fieldGroup = $value;
+                    break;
+
+                case 'position':
+                    $fd->position = $value;
+                    break;
+
+                case 'default_value':
+                    $fd->defaultValue = $value;
+                    break;
+
+                case 'is_translatable':
+                    $fd->isTranslatable = $value;
+                    break;
+
+                case 'is_required':
+                    $fd->isRequired = $value;
+                    break;
+
+                case 'is_searchable':
+                    $fd->isSearchable = $value;
+                    break;
+
+                case 'is_info_collector':
+                    $fd->isInfoCollector = $value;
+                    break;
+
+            }
+        }
+
+        return $fd;
+    }
+
+    /**
+     * Throws exceptions on error.
+     *
+     * @param array $array
+     *
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
+     * @throws InvalidDataStructureException
+     */
+    private function isValid($array)
+    {
+        if (!is_array($array)) {
+            throw new \InvalidArgumentException(
+                sprintf('Expected argument #1 to be of type array, got %s', gettype($array))
+            );
+        }
+
+        return $this->hasValidFields($array) && $this->hasValidIdentifiers(array_keys($array));
+    }
+
+    /**
+     * @param $array
+     *
+     * @return bool
+     *
+     * @throws InvalidDataStructureException
+     */
+    private function hasValidFields($array)
+    {
+        foreach ($array as $identifier => $contenttype) {
+            if (!array_key_exists('fields', $contenttype) || count($contenttype['fields']) == 0) {
+                throw new InvalidDataStructureException(
+                    sprintf('Atleast one field must be defined for identifier "%s".', $identifier)
+                );
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string[] $identifiers
+     *
+     * @return bool
+     *
+     * @throws InvalidDataStructureException
+     */
+    private function hasValidIdentifiers($identifiers)
+    {
+        foreach ($identifiers as $identifier) {
+            if (!is_string($identifier)) {
+                throw new InvalidDataStructureException(
+                    sprintf('Expected identifier to be of type string, got "%s".', gettype($identifier))
+                );
+            }
+        }
+
+        return true;
     }
 }
