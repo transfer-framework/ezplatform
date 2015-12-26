@@ -112,7 +112,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('title', $f1->getIdentifier());
         $this->assertEquals('ezstring', $f1->type);
         $this->assertEquals('content', $f1->fieldGroup);
-        $this->assertEquals(0, $f1->position);
+        $this->assertEquals(1, $f1->position);
         $this->assertArrayHasKey('eng-GB', $f1->getNames());
         $this->assertEquals('Title', $f1->getNames()['eng-GB']);
         $this->assertArrayHasKey('eng-GB', $f1->getDescriptions());
@@ -169,7 +169,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('title', $f1->getIdentifier());
         $this->assertEquals('ezstring', $f1->type);
         $this->assertEquals('content', $f1->fieldGroup);
-        $this->assertEquals(10, $f1->position);
+        $this->assertEquals(1, $f1->position);
         $this->assertArrayHasKey('eng-GB', $f1->getNames());
         $this->assertEquals('Title', $f1->getNames()['eng-GB']);
         $this->assertCount(0, $f1->getDescriptions());
@@ -185,7 +185,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('content', $f2->getIdentifier());
         $this->assertEquals('ezstring', $f2->type);
         $this->assertEquals('content', $f2->fieldGroup);
-        $this->assertEquals(20, $f2->position);
+        $this->assertEquals(1, $f2->position);
         $this->assertArrayHasKey('eng-GB', $f2->getNames());
         $this->assertEquals('Content', $f2->getNames()['eng-GB']);
         $this->assertCount(0, $f2->getDescriptions());
@@ -224,7 +224,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
                 'title' => array(
                     'type' => 'ezstring',
                     'field_group' => 'content',
-                    'position' => 0,
+                    'position' => 1,
                     'name' => 'Title',
                     'description' => 'Title of the article',
                     'default_value' => 'My Article',

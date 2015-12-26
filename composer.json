@@ -3,7 +3,6 @@
     "type": "transfer-extension",
     "description": "eZ Platform extension for Transfer",
     "keywords": ["transfer", "ezpublish", "ezplatform"],
-    "minimun-stability": "dev",
     "license": "MIT",
     "author": [
         {
@@ -17,8 +16,8 @@
     ],
     "require": {
         "php": "~5.5|~7.0",
-        "transfer/transfer": "~1.0.0",
-        "ezsystems/ezpublish-kernel": "~6.0.0"
+        "transfer/transfer": "~1.0",
+        "ezsystems/ezpublish-kernel": "~6.0.0|2014.11.*"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.7"
