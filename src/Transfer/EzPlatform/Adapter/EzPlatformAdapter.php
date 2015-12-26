@@ -20,6 +20,7 @@ use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
+use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\ObjectService;
 
 /**
@@ -52,6 +53,8 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     protected $contentTypeManager;
 
+    protected $languageManager;
+
     /**
      * Constructor.
      *
@@ -65,8 +68,9 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
         $this->options = $resolver->resolve($options);
 
         $this->objectService = new ObjectService($this->options['repository']);
+        $this->languageManager = new LanguageManager($this->options['repository']);
         $this->treeService = new ContentTreeService($this->options['repository'], $this->objectService);
-        $this->contentTypeManager = new ContentTypeManager($this->options['repository']);
+        $this->contentTypeManager = new ContentTypeManager($this->options['repository'], $this->languageManager);
     }
 
     /**
@@ -108,6 +112,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
             $this->treeService->setLogger($this->logger);
             $this->objectService->setLogger($this->logger);
             $this->contentTypeManager->setLogger($this->logger);
+            $this->languageManager->setLogger($this->logger);
         }
 
         $response = new Response();

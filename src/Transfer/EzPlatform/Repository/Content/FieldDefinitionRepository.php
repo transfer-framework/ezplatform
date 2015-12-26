@@ -15,7 +15,7 @@ use eZ\Publish\API\Repository\Values\ValueObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 
 /**
- * Field definition repository
+ * Field definition repository.
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
