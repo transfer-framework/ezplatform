@@ -13,6 +13,8 @@ use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
 use Psr\Log\LoggerAwareInterface;
@@ -97,7 +99,7 @@ class ContentTypeManager implements LoggerAwareInterface
         }
 
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->getIdentifier());
-        $object->fillContentTypeCreateStruct($contentTypeCreateStruct);
+        $object->getRepository()->fillContentTypeCreateStruct($contentTypeCreateStruct);
 
         foreach ($object->getFieldDefinitions() as $field) {
             /* @var FieldDefinitionObject $field */
@@ -106,8 +108,8 @@ class ContentTypeManager implements LoggerAwareInterface
             $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
         }
 
-        $contentTypeGroup = $this->contentTypeService->loadContentTypeGroupByIdentifier($object->getMainGroupIdentifier());
-        $contentTypeDraft = $this->contentTypeService->createContentType($contentTypeCreateStruct, array($contentTypeGroup));
+        $contentTypeGroups = $this->loadContentTypeGroupsByIdentifiers($object->getContentTypeGroups());
+        $contentTypeDraft = $this->contentTypeService->createContentType($contentTypeCreateStruct, $contentTypeGroups);
 
         if ($this->logger) {
             $this->logger->info(sprintf('Created contenttype draft %s.', $object->getIdentifier()));
@@ -116,6 +118,8 @@ class ContentTypeManager implements LoggerAwareInterface
         if ($this->logger) {
             $this->logger->info(sprintf('Published contenttype draft %s.', $object->getIdentifier()));
         }
+
+        $this->updateContentTypeGroupsAssignment($object);
 
         return $this->findByIdentifier($object->getIdentifier());
     }
@@ -140,7 +144,7 @@ class ContentTypeManager implements LoggerAwareInterface
         $contentType = $this->findByIdentifier($object->getIdentifier());
 
         if (!$contentType) {
-            throw new \Exception('Content type not found');
+            throw new \Exception(sprintf('Contenttype "%s" not found.', $object->getIdentifier()));
         }
 
         try {
@@ -183,13 +187,18 @@ class ContentTypeManager implements LoggerAwareInterface
         }
 
         $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
-        $object->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
+        $object->getRepository()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
+
         $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
         $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
+
+        $this->updateContentTypeGroupsAssignment($object);
+
         if ($this->logger) {
             $this->logger->info(sprintf('Updated contenttype %s.', $object->getIdentifier()));
         }
 
+        // Reload and return contenttype
         return $this->findByIdentifier($object->getIdentifier());
     }
 
@@ -253,5 +262,105 @@ class ContentTypeManager implements LoggerAwareInterface
         $field->getRepository()->populateUpdateStruct($definition);
 
         return $definition;
+    }
+
+    /**
+     * @param array $identifiers
+     *
+     * @return ContentTypeGroup[]
+     */
+    protected function loadContentTypeGroupsByIdentifiers(array $identifiers)
+    {
+        $contentTypeGroups = array_map(
+            function ($identifier) {
+                try {
+                    return $this->contentTypeService->loadContentTypeGroupByIdentifier($identifier);
+                } catch (NotFoundException $notFoundException) {
+                    return $this->createContentTypeGroupByIdentifier($identifier);
+                }
+            },
+            $identifiers
+        );
+
+        return $contentTypeGroups;
+    }
+
+    /**
+     * @param string $contentTypeGroupIdentifier
+     *
+     * @return ContentTypeGroup
+     */
+    protected function createContentTypeGroupByIdentifier($contentTypeGroupIdentifier)
+    {
+        $contentTypeGroupCreateStruct = new ContentTypeGroupCreateStruct();
+        $contentTypeGroupCreateStruct->identifier = $contentTypeGroupIdentifier;
+
+        return $this->contentTypeService->createContentTypeGroup($contentTypeGroupCreateStruct);
+    }
+
+    /**
+     * @param ContentTypeObject $object
+     *
+     * @return bool
+     *
+     * @throws NotFoundException
+     * @throws \Exception
+     */
+    protected function updateContentTypeGroupsAssignment(ContentTypeObject $object)
+    {
+        // Load contenttype
+        $contentType = $this->contentTypeService->loadContentTypeByIdentifier($object->getIdentifier());
+
+        // Get identifiers of current contenttypegroups
+        $currentContentTypeGroupIdentifiers = array_map(
+            function (ContentTypeGroup $contentTypeGroup) {
+                return $contentTypeGroup->identifier;
+            },
+            $contentType->getContentTypeGroups()
+        );
+
+        // Get new contenttypegroup identifiers
+        $newContentTypeGroupIdentifiers = $object->getContentTypeGroups();
+
+        // Compare identifiers to identify which once to add/remove/keep
+        $remove = array_diff($currentContentTypeGroupIdentifiers, $newContentTypeGroupIdentifiers);
+        $add = array_diff($newContentTypeGroupIdentifiers, $currentContentTypeGroupIdentifiers);
+
+        $this->attachContentTypeGroupsByIdentifiers($contentType, $add);
+        $this->detachContentTypeGroupsByIdentifiers($contentType, $remove);
+
+        return true;
+    }
+
+    /**
+     * Load (and create if not exists) new contenttype groups, and assign them to a contenttype.
+     *
+     * @param ContentType $contentType
+     * @param array       $contentTypeGroupsIdentifiers
+     *
+     * @throws NotFoundException
+     */
+    protected function attachContentTypeGroupsByIdentifiers(ContentType $contentType, array $contentTypeGroupsIdentifiers)
+    {
+        $contentTypeGroups = $this->loadContentTypeGroupsByIdentifiers($contentTypeGroupsIdentifiers);
+        foreach ($contentTypeGroups as $contentTypeGroup) {
+            $this->contentTypeService->assignContentTypeGroup($contentType, $contentTypeGroup);
+        }
+    }
+
+    /**
+     * Load contenttype groups, and unassign them from a contenttype.
+     *
+     * @param ContentType $contentType
+     * @param array       $contentTypeGroupsIdentifiers
+     *
+     * @throws NotFoundException
+     */
+    protected function detachContentTypeGroupsByIdentifiers(ContentType $contentType, array $contentTypeGroupsIdentifiers)
+    {
+        $contentTypeGroups = $this->loadContentTypeGroupsByIdentifiers($contentTypeGroupsIdentifiers);
+        foreach ($contentTypeGroups as $contentTypeGroup) {
+            $this->contentTypeService->unassignContentTypeGroup($contentType, $contentTypeGroup);
+        }
     }
 }
