@@ -19,6 +19,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
+use Transfer\EzPlatform\Data\LanguageObject;
 
 /**
  * Content type manager.
@@ -43,12 +44,19 @@ class ContentTypeManager implements LoggerAwareInterface
     private $contentTypeService;
 
     /**
-     * @param Repository $repository
+     * @var LanguageManager
      */
-    public function __construct(Repository $repository)
+    private $languageManager;
+
+    /**
+     * @param Repository      $repository
+     * @param LanguageManager $languageManager
+     */
+    public function __construct(Repository $repository, LanguageManager $languageManager)
     {
         $this->repository = $repository;
         $this->contentTypeService = $repository->getContentTypeService();
+        $this->languageManager = $languageManager;
     }
 
     /**
@@ -96,6 +104,8 @@ class ContentTypeManager implements LoggerAwareInterface
             $this->logger->info(sprintf('Creating contenttype %s.', $object->getIdentifier()));
         }
 
+        $this->updateContentTypeLanguages($object);
+
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->getIdentifier());
         $object->fillContentTypeCreateStruct($contentTypeCreateStruct);
 
@@ -142,6 +152,8 @@ class ContentTypeManager implements LoggerAwareInterface
         if (!$contentType) {
             throw new \Exception('Content type not found');
         }
+
+        $this->updateContentTypeLanguages($object);
 
         try {
             $contentTypeDraft = $this->contentTypeService->loadContentTypeDraft($contentType->id);
@@ -253,5 +265,16 @@ class ContentTypeManager implements LoggerAwareInterface
         $field->getRepository()->populateUpdateStruct($definition);
 
         return $definition;
+    }
+
+    /**
+     * @param ContentTypeObject $object
+     */
+    private function updateContentTypeLanguages(ContentTypeObject $object)
+    {
+        $languageCodes = $object->getLanguageCodes();
+        foreach ($languageCodes as $languageCode) {
+            $this->languageManager->add(new LanguageObject($languageCode));
+        }
     }
 }

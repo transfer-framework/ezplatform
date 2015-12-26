@@ -19,16 +19,44 @@ use Transfer\EzPlatform\Tests\EzPlatformTestCase;
  */
 class ContentTypeManagerTest extends EzPlatformTestCase
 {
+    public function testUnknownLanguage()
+    {
+        $manager = static::$contentTypeManager;
+
+        $this->setExpectedException('\Exception', 'Default languagename for code "test-TEST" not found.');
+        $frontpage = $this->getFrontpageContentTypeObject();
+        $frontpage->addName('My test language', 'test-TEST');
+        $manager->createOrUpdate($frontpage);
+    }
+
+    public function testSeveralLanguages()
+    {
+        $manager = static::$contentTypeManager;
+
+        $frontpage = $this->getFrontpageContentTypeObject();
+        $frontpage->addName('Titelseite', 'ger-DE');
+        $frontpage->addDescription('Beschreibung', 'ger-DE');
+        $frontpage->addName('Forside', 'nor-NO');
+        $frontpage->addDescription('Forsidebeskrivelse', 'nor-NO');
+        $manager->createOrUpdate($frontpage);
+
+        $ct = $manager->findByIdentifier('frontpage');
+        $this->assertEquals('Titelseite', $ct->getName('ger-DE'));
+        $this->assertEquals('Beschreibung', $ct->getDescription('ger-DE'));
+        $this->assertEquals('Forside', $ct->getName('nor-NO'));
+        $this->assertEquals('Forsidebeskrivelse', $ct->getDescription('nor-NO'));
+    }
+
     public function testDeleteNotFound()
     {
-        $manager = new ContentTypeManager(static::$repository);
+        $manager = static::$contentTypeManager;
         $this->assertTrue($manager->removeByIdentifier(null));
         $this->assertTrue($manager->removeByIdentifier('_i_dont_exist'));
     }
 
     public function testDuplicateField()
     {
-        $manager = new ContentTypeManager(static::$repository);
+        $manager = static::$contentTypeManager;
 
         $this->createOrUpdate($manager);
         $this->delete($manager);
@@ -94,21 +122,21 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
     public function testLogger()
     {
-        $manager = new ContentTypeManager(static::$repository);
+        $manager = static::$contentTypeManager;
         $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
         $manager->setLogger($mockLogger);
     }
 
     public function testfindNotFound()
     {
-        $manager = new ContentTypeManager(static::$repository);
+        $manager = static::$contentTypeManager;
         $result = $manager->findByIdentifier(null);
         $this->assertFalse($result);
     }
 
     public function testCreate()
     {
-        $manager = new ContentTypeManager(static::$repository);
+        $manager = static::$contentTypeManager;
 
         $this->createOrUpdate($manager);
         $this->delete($manager);
@@ -169,7 +197,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
     public function testUpdateWithLogger()
     {
-        $manager = new ContentTypeManager(static::$repository);
+        $manager = static::$contentTypeManager;
         $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
         $manager->setLogger($mockLogger);
 
@@ -184,7 +212,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
     public function testUpdate()
     {
-        $manager = new ContentTypeManager(static::$repository);
+        $manager = static::$contentTypeManager;
 
         $this->createOrUpdate($manager);
 
