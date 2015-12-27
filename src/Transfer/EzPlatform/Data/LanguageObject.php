@@ -9,6 +9,8 @@
 
 namespace Transfer\EzPlatform\Data;
 
+use Transfer\EzPlatform\Exception\LanguageNotFoundException;
+
 /**
  * Content type object.
  */
@@ -54,7 +56,7 @@ class LanguageObject
             if (isset($this->defaultNameMapping[$this->code])) {
                 $name = $this->defaultNameMapping[$this->code];
             } else {
-                throw new \Exception(sprintf('Default languagename for code "%s" not found.', $this->code));
+                throw new LanguageNotFoundException(sprintf('Default language name for code "%s" not found.', $this->code));
             }
         }
         $this->name = $name;

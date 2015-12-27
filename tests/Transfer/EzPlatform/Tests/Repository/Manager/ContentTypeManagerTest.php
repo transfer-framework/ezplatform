@@ -23,7 +23,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
     {
         $manager = static::$contentTypeManager;
 
-        $this->setExpectedException('\Exception', 'Default languagename for code "test-TEST" not found.');
+        $this->setExpectedException('Transfer\EzPlatform\Exception\LanguageNotFoundException', 'Default language name for code "test-TEST" not found.');
         $frontpage = $this->getFrontpageContentTypeObject();
         $frontpage->addName('My test language', 'test-TEST');
         $manager->createOrUpdate($frontpage);
