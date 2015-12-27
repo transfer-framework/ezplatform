@@ -5,6 +5,19 @@ use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTra
 
 class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 {
+
+    public function testEmptyField()
+    {
+        $array = array('article' => array(
+            'fields' => array(
+                'title' => '',
+            ),
+        ));
+
+        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
+        $transformer->handle($array);
+    }
+
     public function testEmptyArray()
     {
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
