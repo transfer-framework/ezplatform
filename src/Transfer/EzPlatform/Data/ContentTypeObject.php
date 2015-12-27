@@ -10,8 +10,7 @@
 namespace Transfer\EzPlatform\Data;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
-use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
-use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
+use Transfer\EzPlatform\Repository\Content\ContentTypeRepository;
 
 /**
  * Content type object.
@@ -83,6 +82,11 @@ class ContentTypeObject
     protected $fieldDefinitions = array();
 
     /**
+     * @var ContentTypeRepository
+     */
+    protected $repository;
+
+    /**
      * ContentTypeObject constructor.
      *
      * @param string $identifier
@@ -125,7 +129,9 @@ class ContentTypeObject
      */
     public function addContentTypeGroup($contentTypeGroup)
     {
-        $this->contentTypeGroups[] = $contentTypeGroup;
+        if (!in_array($contentTypeGroup, $this->contentTypeGroups)) {
+            $this->contentTypeGroups[] = $contentTypeGroup;
+        }
     }
 
     /**
@@ -251,35 +257,14 @@ class ContentTypeObject
     }
 
     /**
-     * @param ContentTypeCreateStruct $contentTypeCreateStruct
+     * @return ContentTypeRepository
      */
-    public function fillContentTypeCreateStruct(ContentTypeCreateStruct &$contentTypeCreateStruct)
+    public function getRepository()
     {
-        $contentTypeCreateStruct->names = $this->getNames();
-        $contentTypeCreateStruct->descriptions = $this->getDescriptions();
-        $contentTypeCreateStruct->remoteId = sha1(microtime());
-        $contentTypeCreateStruct->mainLanguageCode = $this->mainLanguageCode;
-        $contentTypeCreateStruct->nameSchema = $this->nameSchema;
-        $contentTypeCreateStruct->urlAliasSchema = $this->urlAliasSchema;
-        $contentTypeCreateStruct->isContainer = $this->isContainer;
-        $contentTypeCreateStruct->defaultAlwaysAvailable = $this->defaultAlwaysAvailable;
-        $contentTypeCreateStruct->defaultSortField = $this->defaultSortField;
-        $contentTypeCreateStruct->defaultSortOrder = $this->defaultSortOrder;
-    }
+        if (!$this->repository) {
+            $this->repository = new ContentTypeRepository($this);
+        }
 
-    /**
-     * @param ContentTypeUpdateStruct $contentTypeUpdateStruct
-     */
-    public function fillContentTypeUpdateStruct(ContentTypeUpdateStruct &$contentTypeUpdateStruct)
-    {
-        $contentTypeUpdateStruct->names = $this->getNames();
-        $contentTypeUpdateStruct->descriptions = $this->getDescriptions();
-        $contentTypeUpdateStruct->mainLanguageCode = $this->mainLanguageCode;
-        $contentTypeUpdateStruct->nameSchema = $this->nameSchema;
-        $contentTypeUpdateStruct->urlAliasSchema = $this->urlAliasSchema;
-        $contentTypeUpdateStruct->isContainer = $this->isContainer;
-        $contentTypeUpdateStruct->defaultAlwaysAvailable = $this->defaultAlwaysAvailable;
-        $contentTypeUpdateStruct->defaultSortField = $this->defaultSortField;
-        $contentTypeUpdateStruct->defaultSortOrder = $this->defaultSortOrder;
+        return $this->repository;
     }
 }
