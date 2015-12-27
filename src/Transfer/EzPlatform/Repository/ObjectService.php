@@ -11,7 +11,11 @@ namespace Transfer\EzPlatform\Repository;
 
 use Transfer\Data\ObjectInterface;
 use Transfer\EzPlatform\Data\ContentObject;
+use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
+use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
+use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
 
 /**
@@ -28,6 +32,16 @@ class ObjectService extends AbstractRepositoryService
      * @var LocationManager Location manager.
      */
     private $locationManager;
+
+    /**
+     * @var ContentTypeManager
+     */
+    private $contentTypeManager;
+
+    /**
+     * @var LanguageManager
+     */
+    private $languageManager;
 
     /**
      * Returns content manager.
@@ -61,9 +75,49 @@ class ObjectService extends AbstractRepositoryService
         }
 
         $this->locationManager = new Manager\LocationManager($this->repository);
-        $this->locationManager->setLogger($this->logger);
+        if ($this->logger) {
+            $this->locationManager->setLogger($this->logger);
+        }
 
         return $this->locationManager;
+    }
+
+    /**
+     * Returns contenttype manager.
+     *
+     * @return ContentTypeManager
+     */
+    public function getContentTypeManager()
+    {
+        if ($this->contentTypeManager != null) {
+            return $this->contentTypeManager;
+        }
+
+        $this->contentTypeManager = new Manager\ContentTypeManager($this->repository, $this->getLanguageManager());
+        if ($this->logger) {
+            $this->contentTypeManager->setLogger($this->logger);
+        }
+
+        return $this->contentTypeManager;
+    }
+
+    /**
+     * Returns language manager.
+     *
+     * @return LanguageManager
+     */
+    public function getLanguageManager()
+    {
+        if ($this->languageManager != null) {
+            return $this->languageManager;
+        }
+
+        $this->languageManager = new Manager\LanguageManager($this->repository);
+        if ($this->logger) {
+            $this->languageManager->setLogger($this->logger);
+        }
+
+        return $this->languageManager;
     }
 
     /**
@@ -73,6 +127,10 @@ class ObjectService extends AbstractRepositoryService
     {
         if ($object instanceof ContentObject) {
             return $this->getContentManager()->createOrUpdate($object);
+        } elseif ($object instanceof ContentTypeObject) {
+            return $this->getContentTypeManager()->createOrUpdate($object);
+        } elseif ($object instanceof LanguageObject) {
+            return $this->getLanguageManager()->add($object);
         }
     }
 
