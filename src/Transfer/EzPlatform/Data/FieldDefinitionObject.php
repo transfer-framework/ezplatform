@@ -34,7 +34,7 @@ class FieldDefinitionObject
     /**
      * @var int
      */
-    public $position;
+    public $position = 1;
 
     /**
      * @var bool
