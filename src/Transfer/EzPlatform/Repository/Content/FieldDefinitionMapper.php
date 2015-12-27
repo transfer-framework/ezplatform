@@ -17,6 +17,8 @@ use Transfer\EzPlatform\Data\FieldDefinitionObject;
 /**
  * Field definition mapper.
  *
+ * @internal
+ *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
 class FieldDefinitionMapper

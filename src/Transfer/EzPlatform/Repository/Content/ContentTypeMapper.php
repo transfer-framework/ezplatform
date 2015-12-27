@@ -17,6 +17,8 @@ use Transfer\EzPlatform\Data\ContentTypeObject;
 /**
  * Contenttype mapper.
  *
+ * @internal
+ *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
 class ContentTypeMapper

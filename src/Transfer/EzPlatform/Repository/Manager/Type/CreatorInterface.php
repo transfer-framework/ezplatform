@@ -13,6 +13,8 @@ use Transfer\Data\ObjectInterface;
 
 /**
  * Creator interface.
+ *
+ * @internal
  */
 interface CreatorInterface
 {
