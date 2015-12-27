@@ -15,11 +15,11 @@ use eZ\Publish\API\Repository\Values\ValueObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 
 /**
- * Field definition repository.
+ * Field definition mapper.
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class FieldDefinitionRepository
+class FieldDefinitionMapper
 {
     /**
      * @var FieldDefinitionObject
