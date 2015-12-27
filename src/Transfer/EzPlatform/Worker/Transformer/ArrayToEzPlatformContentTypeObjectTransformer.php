@@ -112,14 +112,18 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
     }
 
     /**
-     * @param $fieldIdentifier
-     * @param $fieldDefinitionData
+     * @param string     $fieldIdentifier
+     * @param array|null $fieldDefinitionData
      *
      * @return FieldDefinitionObject
      */
-    private function getFieldDefinitionFromData($fieldIdentifier, $fieldDefinitionData)
+    private function getFieldDefinitionFromData($fieldIdentifier, $fieldDefinitionData = null)
     {
         $fd = new FieldDefinitionObject($fieldIdentifier);
+        if (!is_array($fieldDefinitionData) || empty($fieldDefinitionData)) {
+            return $fd;
+        }
+
         foreach ($fieldDefinitionData as $key => $value) {
             switch ($key) {
                 case 'type':
