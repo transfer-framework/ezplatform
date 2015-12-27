@@ -283,7 +283,7 @@ class ContentTypeManager implements LoggerAwareInterface
     {
         $languageCodes = $object->getLanguageCodes();
         foreach ($languageCodes as $languageCode) {
-            $this->languageManager->add(new LanguageObject($languageCode));
+            $this->languageManager->create(new LanguageObject(array('code' => $languageCode)));
         }
     }
 

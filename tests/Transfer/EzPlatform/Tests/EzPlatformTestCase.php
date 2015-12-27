@@ -45,6 +45,11 @@ abstract class EzPlatformTestCase extends KernelTestCase
     protected static $contentTypeManager;
 
     /**
+     * @var LanguageManager
+     */
+    protected static $languageManager;
+
+    /**
      * @var bool
      */
     protected static $hasDatabase;
@@ -57,7 +62,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
 
         $setupFactory = new SetupFactory();
         static::$repository = $setupFactory->getRepository();
-        static::$contentTypeManager = new ContentTypeManager(static::$repository, new LanguageManager(static::$repository));
+        static::$languageManager = new LanguageManager(static::$repository);
+        static::$contentTypeManager = new ContentTypeManager(static::$repository, static::$languageManager);
 
         static::setUpContentTypes();
 
