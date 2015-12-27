@@ -9,60 +9,17 @@
 
 namespace Transfer\EzPlatform\Data;
 
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 
 /**
  * Content type object.
  */
-class LanguageObject
+class LanguageObject extends ValueObject
 {
     /**
-     * @var string
-     */
-    public $code;
-
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * LanguageObject constructor.
+     * Because a name is required.
      *
-     * @param string $code
-     */
-    public function __construct($code)
-    {
-        $this->code = $code;
-        $this->setName();
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @throws \Exception
-     */
-    protected function setName($name = '')
-    {
-        if (empty($name)) {
-            if (isset($this->defaultNameMapping[$this->code])) {
-                $name = $this->defaultNameMapping[$this->code];
-            } else {
-                throw new LanguageNotFoundException(sprintf('Default language name for code "%s" not found.', $this->code));
-            }
-        }
-        $this->name = $name;
-    }
-
-    /**
      * @var array
      */
     protected $defaultNameMapping = array(
@@ -110,4 +67,35 @@ class LanguageObject
         'tur-TR' => 'Turkish',
         'ukr-UA' => 'Ukrainian',
     );
+
+    /**
+     * LanguageObject constructor.
+     *
+     * @param array $data
+     *
+     * @throws LanguageNotFoundException
+     */
+    public function __construct($data)
+    {
+        parent::__construct($data);
+        if (!isset($this->data['name'])) {
+            $this->data['name'] = $this->getDefaultName($this->data['code']);
+        }
+    }
+
+    /**
+     * @param string $code
+     *
+     * @return string
+     *
+     * @throws LanguageNotFoundException
+     */
+    public function getDefaultName($code)
+    {
+        if (!array_key_exists($code, $this->defaultNameMapping)) {
+            throw new LanguageNotFoundException(sprintf('Default language name for code "%s" not found.', $code));
+        }
+
+        return $this->defaultNameMapping[$code];
+    }
 }

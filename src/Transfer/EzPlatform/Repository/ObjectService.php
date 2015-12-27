@@ -130,7 +130,7 @@ class ObjectService extends AbstractRepositoryService
         } elseif ($object instanceof ContentTypeObject) {
             return $this->getContentTypeManager()->createOrUpdate($object);
         } elseif ($object instanceof LanguageObject) {
-            return $this->getLanguageManager()->add($object);
+            return $this->getLanguageManager()->createOrUpdate($object);
         }
     }
 
