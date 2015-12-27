@@ -31,6 +31,8 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 /**
  * Content type manager.
  *
+ * @internal
+ *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
 class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
