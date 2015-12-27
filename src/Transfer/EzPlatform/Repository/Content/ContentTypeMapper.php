@@ -15,11 +15,11 @@ use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 
 /**
- * Contenttype repository.
+ * Contenttype mapper.
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class ContentTypeRepository
+class ContentTypeMapper
 {
     /**
      * @var ContentTypeObject

@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\Data;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Transfer\EzPlatform\Repository\Content\ContentTypeRepository;
+use Transfer\EzPlatform\Repository\Content\ContentTypeMapper;
 
 /**
  * Content type object.
@@ -82,9 +82,9 @@ class ContentTypeObject
     protected $fieldDefinitions = array();
 
     /**
-     * @var ContentTypeRepository
+     * @var ContentTypeMapper
      */
-    protected $repository;
+    protected $mapper;
 
     /**
      * ContentTypeObject constructor.
@@ -243,14 +243,14 @@ class ContentTypeObject
     }
 
     /**
-     * @return ContentTypeRepository
+     * @return ContentTypeMapper
      */
     public function getRepository()
     {
-        if (!$this->repository) {
-            $this->repository = new ContentTypeRepository($this);
+        if (!$this->mapper) {
+            $this->mapper = new ContentTypeMapper($this);
         }
 
-        return $this->repository;
+        return $this->mapper;
     }
 }

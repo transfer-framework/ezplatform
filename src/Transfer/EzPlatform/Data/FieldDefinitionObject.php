@@ -9,7 +9,7 @@
 
 namespace Transfer\EzPlatform\Data;
 
-use Transfer\EzPlatform\Repository\Content\FieldDefinitionRepository;
+use Transfer\EzPlatform\Repository\Content\FieldDefinitionMapper;
 
 /**
  * Content type object.
@@ -72,9 +72,9 @@ class FieldDefinitionObject
     protected $descriptions = array();
 
     /**
-     * @var FieldDefinitionRepository
+     * @var FieldDefinitionMapper
      */
-    protected $repository;
+    protected $mapper;
 
     /**
      * FieldDefinitionObject constructor.
@@ -160,14 +160,14 @@ class FieldDefinitionObject
     }
 
     /**
-     * @return FieldDefinitionRepository
+     * @return FieldDefinitionMapper
      */
     public function getRepository()
     {
-        if (!$this->repository) {
-            $this->repository = new FieldDefinitionRepository($this);
+        if (!$this->mapper) {
+            $this->mapper = new FieldDefinitionMapper($this);
         }
 
-        return $this->repository;
+        return $this->mapper;
     }
 }
