@@ -203,6 +203,20 @@ class ContentTypeObject
     }
 
     /**
+     * @return array
+     */
+    public function getLanguageCodes()
+    {
+        return array_unique(
+            array_merge(
+                array($this->mainLanguageCode),
+                array_keys($this->names),
+                array_keys($this->descriptions)
+            )
+        );
+    }
+
+    /**
      * @param FieldDefinitionObject $field
      */
     public function addFieldDefinition(FieldDefinitionObject $field)
