@@ -17,6 +17,7 @@ use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
+use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 
 /**
  * Common eZ Platform test case.
@@ -39,6 +40,16 @@ abstract class EzPlatformTestCase extends KernelTestCase
     protected static $repository;
 
     /**
+     * @var ContentTypeManager
+     */
+    protected static $contentTypeManager;
+
+    /**
+     * @var LanguageManager
+     */
+    protected static $languageManager;
+
+    /**
      * @var bool
      */
     protected static $hasDatabase;
@@ -51,6 +62,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
 
         $setupFactory = new SetupFactory();
         static::$repository = $setupFactory->getRepository();
+        static::$languageManager = new LanguageManager(static::$repository);
+        static::$contentTypeManager = new ContentTypeManager(static::$repository, static::$languageManager);
 
         static::setUpContentTypes();
 
@@ -59,8 +72,6 @@ abstract class EzPlatformTestCase extends KernelTestCase
 
     public static function setUpContentTypes()
     {
-        $manager = new ContentTypeManager(static::$repository);
-
         $_ct_article = new ContentTypeObject('_test_article');
         $_ct_article->mainLanguageCode = 'eng-GB';
         $_ct_article->addContentTypeGroup('Content');
@@ -91,6 +102,6 @@ abstract class EzPlatformTestCase extends KernelTestCase
         $_fd_desc->isInfoCollector = false;
         $_ct_article->addFieldDefinition($_fd_desc);
 
-        $manager->createOrUpdate($_ct_article);
+        static::$contentTypeManager->createOrUpdate($_ct_article);
     }
 }
