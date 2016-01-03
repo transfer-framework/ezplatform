@@ -5,7 +5,6 @@ use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTra
 
 class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testEmptyField()
     {
         $array = array('article' => array(
@@ -72,13 +71,12 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
                         ),
                     ),
                 ),
-            )
+            ),
         ));
 
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
         $ct = $ct[0];
-        print_r($ct->data);
 
         $this->assertArrayHasKey('eng-GB', $ct->data['names']);
         $this->assertEquals('Article', $ct->data['names']['eng-GB']);
@@ -98,28 +96,6 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Tittel', $f1->data['names']['nor-NO']);
         $this->assertArrayHasKey('nor-NO', $f1->data['descriptions']);
         $this->assertEquals('Artikkelens tittel', $f1->data['descriptions']['nor-NO']);
-    }
-
-    public function testInvalidIdentifier()
-    {
-        $this->setExpectedException('Transfer\EzPlatform\Exception\InvalidDataStructureException');
-
-        $array = array(array(
-            'fields' => array(
-                'title' => array(),
-                'content' => array(),
-            ),
-        ));
-
-        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
-        $transformer->handle($array);
-    }
-
-    public function testInvalidArgument()
-    {
-        $this->setExpectedException('\InvalidArgumentException');
-        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
-        $transformer->handle('a string');
     }
 
     public function testFull()

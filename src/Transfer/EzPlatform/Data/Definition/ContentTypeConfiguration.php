@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class ContentTypeConfiguration implements ConfigurationInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      **/
     public function getConfigTreeBuilder()
     {
@@ -18,6 +18,7 @@ class ContentTypeConfiguration implements ConfigurationInterface
         $node
             ->children()
                 ->arrayNode('names')
+                    ->normalizeKeys(false)
                     ->prototype('scalar')->end()
                     ->beforeNormalization()
                     ->ifString()
@@ -25,6 +26,7 @@ class ContentTypeConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('descriptions')
+                    ->normalizeKeys(false)
                     ->prototype('scalar')->end()
                     ->beforeNormalization()
                     ->ifString()
@@ -59,6 +61,7 @@ class ContentTypeConfiguration implements ConfigurationInterface
                     ->min(0)->max(1)
                 ->end()
                 ->arrayNode('fields')
+                    ->fixXmlConfig('name')
                     ->requiresAtLeastOneElement()
                     ->prototype('array')
                         ->children()
@@ -69,13 +72,16 @@ class ContentTypeConfiguration implements ConfigurationInterface
                                 ->defaultValue(10)
                             ->end()
                             ->arrayNode('names')
-                                ->prototype('scalar')->end()
+                                ->normalizeKeys(false)
                                 ->beforeNormalization()
                                 ->ifString()
                                     ->then(function ($v) { return array('eng-GB' => $v); })
                                 ->end()
+                                ->prototype('scalar')->end()
+
                             ->end()
                             ->arrayNode('descriptions')
+                                ->normalizeKeys(false)
                                 ->prototype('scalar')->end()
                                 ->beforeNormalization()
                                 ->ifString()
@@ -108,110 +114,4 @@ class ContentTypeConfiguration implements ConfigurationInterface
 
         return $treeBuilder;
     }
-
-
-    /*
-     * KEEP THIS COPY, WHICH HANDLES SEVERAL
-     *
-    public function getConfigTreeBuilder()
-    {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('contenttype');
-        $node
-            ->prototype('array')
-                ->children()
-                    ->arrayNode('names')
-                        ->prototype('scalar')->end()
-                        ->validate()
-                        ->ifString()
-                            ->then(function ($v) { return array('eng-GB' => $v); })
-                        ->end()
-                    ->end()
-                    ->arrayNode('descriptions')
-                        ->prototype('scalar')->end()
-                        ->validate()
-                        ->ifString()
-                            ->then(function ($v) { return array('eng-GB' => $v); })
-                        ->end()
-                    ->end()
-                    ->scalarNode('main_language_code')
-                        ->defaultValue('eng-GB')
-                    ->end()
-                    ->arrayNode('contenttype_groups')
-                        ->prototype('scalar')->end()
-                        ->defaultValue(array('Content'))
-                        ->validate()
-                        ->ifString()
-                            ->then(function ($v) { return array(ucfirst($v)); })
-                        ->end()
-                    ->end()
-                    ->scalarNode('name_schema')->end()
-                    ->scalarNode('url_alias_schema')->end()
-                    ->booleanNode('is_container')
-                        ->defaultTrue()
-                    ->end()
-                    ->booleanNode('default_always_available')
-                        ->defaultFalse()
-                    ->end()
-                    ->integerNode('default_sort_field')
-                        ->defaultValue(Location::SORT_FIELD_NAME)
-                        ->min(1)->max(12)
-                    ->end()
-                    ->integerNode('default_sort_order')
-                        ->defaultValue(Location::SORT_ORDER_ASC)
-                        ->min(0)->max(1)
-                    ->end()
-                    ->arrayNode('fields')
-                        ->requiresAtLeastOneElement()
-                        ->prototype('array')
-                            ->children()
-                                ->scalarNode('type')
-                                    ->defaultValue('ezstring')
-                                ->end()
-                                ->integerNode('position')
-                                    ->defaultValue(10)
-                                ->end()
-                                ->arrayNode('names')
-                                    ->prototype('scalar')->end()
-                                    ->validate()
-                                    ->ifString()
-                                        ->then(function ($v) { return array('eng-GB' => $v); })
-                                    ->end()
-                                ->end()
-                                ->arrayNode('descriptions')
-                                    ->prototype('scalar')->end()
-                                    ->defaultValue(array('eng-GB' => ''))
-                                    ->validate()
-                                    ->ifString()
-                                        ->then(function ($v) { return array('eng-GB' => $v); })
-                                    ->end()
-                                ->end()
-                                ->scalarNode('field_group')
-                                    ->defaultValue('content')
-                                ->end()
-                                ->scalarNode('default_value')
-                                    ->defaultValue('')
-                                ->end()
-                                ->booleanNode('is_required')
-                                    ->defaultFalse()
-                                ->end()
-                                ->booleanNode('is_translatable')
-                                    ->defaultTrue()
-                                ->end()
-                                ->booleanNode('is_searchable')
-                                    ->defaultTrue()
-                                ->end()
-                                ->booleanNode('is_info_collector')
-                                    ->defaultFalse()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ->end();
-
-        return $treeBuilder;
-    }
-    */
 }
