@@ -36,7 +36,7 @@ class ContentTypeMapper
      */
     public function __construct(ContentTypeObject $contentTypeObject)
     {
-        $this->contentTypeObject = $contentTypeObject;
+        $this->contentTypeObject = &$contentTypeObject;
     }
 
     /**
@@ -44,16 +44,16 @@ class ContentTypeMapper
      */
     public function fillContentTypeCreateStruct(ContentTypeCreateStruct $contentTypeCreateStruct)
     {
-        $contentTypeCreateStruct->names = $this->contentTypeObject->getNames();
-        $contentTypeCreateStruct->descriptions = $this->contentTypeObject->getDescriptions();
+        $contentTypeCreateStruct->names = $this->contentTypeObject->data['names'];
+        $contentTypeCreateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
         $contentTypeCreateStruct->remoteId = sha1(microtime());
-        $contentTypeCreateStruct->mainLanguageCode = $this->contentTypeObject->mainLanguageCode;
-        $contentTypeCreateStruct->nameSchema = $this->contentTypeObject->nameSchema;
-        $contentTypeCreateStruct->urlAliasSchema = $this->contentTypeObject->urlAliasSchema;
-        $contentTypeCreateStruct->isContainer = $this->contentTypeObject->isContainer;
-        $contentTypeCreateStruct->defaultAlwaysAvailable = $this->contentTypeObject->defaultAlwaysAvailable;
-        $contentTypeCreateStruct->defaultSortField = $this->contentTypeObject->defaultSortField;
-        $contentTypeCreateStruct->defaultSortOrder = $this->contentTypeObject->defaultSortOrder;
+        $contentTypeCreateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
+        $contentTypeCreateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
+        $contentTypeCreateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
+        $contentTypeCreateStruct->isContainer = $this->contentTypeObject->data['is_container'];
+        $contentTypeCreateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
+        $contentTypeCreateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
+        $contentTypeCreateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
     }
 
     /**
@@ -61,14 +61,14 @@ class ContentTypeMapper
      */
     public function fillContentTypeUpdateStruct(ContentTypeUpdateStruct $contentTypeUpdateStruct)
     {
-        $contentTypeUpdateStruct->names = $this->contentTypeObject->getNames();
-        $contentTypeUpdateStruct->descriptions = $this->contentTypeObject->getDescriptions();
-        $contentTypeUpdateStruct->mainLanguageCode = $this->contentTypeObject->mainLanguageCode;
-        $contentTypeUpdateStruct->nameSchema = $this->contentTypeObject->nameSchema;
-        $contentTypeUpdateStruct->urlAliasSchema = $this->contentTypeObject->urlAliasSchema;
-        $contentTypeUpdateStruct->isContainer = $this->contentTypeObject->isContainer;
-        $contentTypeUpdateStruct->defaultAlwaysAvailable = $this->contentTypeObject->defaultAlwaysAvailable;
-        $contentTypeUpdateStruct->defaultSortField = $this->contentTypeObject->defaultSortField;
-        $contentTypeUpdateStruct->defaultSortOrder = $this->contentTypeObject->defaultSortOrder;
+        $contentTypeUpdateStruct->names = $this->contentTypeObject->data['names'];
+        $contentTypeUpdateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
+        $contentTypeUpdateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
+        $contentTypeUpdateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
+        $contentTypeUpdateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
+        $contentTypeUpdateStruct->isContainer = $this->contentTypeObject->data['is_container'];
+        $contentTypeUpdateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
+        $contentTypeUpdateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
+        $contentTypeUpdateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
     }
 }
