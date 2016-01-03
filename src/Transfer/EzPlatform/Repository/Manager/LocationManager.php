@@ -46,6 +46,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Remover
     public function __construct(Repository $repository)
     {
         $this->repository = $repository;
+
         $this->locationService = $repository->getLocationService();
     }
 
@@ -82,11 +83,6 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Remover
      */
     public function hide(LocationObject $object)
     {
-        $this->logger->info(
-            sprintf('Hiding location %s', implode('/', $object->data->path)),
-            array('LocationManager::hide')
-        );
-
         return $this->locationService->hideLocation($object->data);
     }
 
@@ -99,11 +95,6 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Remover
      */
     public function unHide(LocationObject $object)
     {
-        $this->logger->info(
-            sprintf('Un-hiding location %s', implode('/', $object->data->path)),
-            array('LocationManager::unHide')
-        );
-
         return $this->locationService->unhideLocation($object->data);
     }
 
@@ -119,17 +110,10 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Remover
         /** @var Location $location */
         $location = $object->data;
 
-        try {
-            if ($location->hidden) {
-                $this->unHide($object);
-            } else {
-                $this->hide($object);
-            }
-        } catch (\Exception $e) {
-            $this->logger->info(
-                sprintf('Could not toggle visibility for location %s', implode('/', $object->data->path)),
-                array('LocationManager::toggleVisibility')
-            );
+        if ($location->hidden) {
+            return $this->unHide($object);
         }
+
+        return $this->hide($object);
     }
 }
