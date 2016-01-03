@@ -10,8 +10,8 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -20,13 +20,31 @@ use Transfer\EzPlatform\Tests\EzPlatformTestCase;
  */
 class ContentTypeManagerTest extends EzPlatformTestCase
 {
+    public function testUpdateNotFound()
+    {
+        $this->setExpectedException('Transfer\EzPlatform\Exception\ContentTypeNotFoundException', 'Contenttype "_update_not_found" not found.');
+        $manager = static::$contentTypeManager;
+
+        $ct = new ContentTypeObject('_update_not_found', $this->getFrontpageContentTypeDataArray());
+        $manager->update($ct);
+    }
+
+    public function testValueObject()
+    {
+        $v = new ValueObject(array());
+        $manager = static::$contentTypeManager;
+        $this->assertNull($manager->create($v));
+        $this->assertNull($manager->update($v));
+        $this->assertNull($manager->createOrUpdate($v));
+        $this->assertNull($manager->remove($v));
+    }
+
     public function testUnknownLanguage()
     {
         $manager = static::$contentTypeManager;
-
         $this->setExpectedException('Transfer\EzPlatform\Exception\LanguageNotFoundException', 'Default language name for code "test-TEST" not found.');
         $frontpage = $this->getFrontpageContentTypeObject();
-        $frontpage->data['names'][] = ['test-TEST'=> 'My test language'];
+        $frontpage->data['names'] = ['test-TEST' => 'My test language'];
         $manager->createOrUpdate($frontpage);
     }
 
@@ -47,7 +65,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         );
         $manager->createOrUpdate($frontpage);
 
-        $ct = $manager->findByIdentifier('frontpage');
+        $ct = $manager->findContentTypeByIdentifier('frontpage');
         $this->assertEquals('Titelseite', $ct->getName('ger-DE'));
         $this->assertEquals('Beschreibung', $ct->getDescription('ger-DE'));
         $this->assertEquals('Forside', $ct->getName('nor-NO'));
@@ -61,7 +79,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $ct->data['contenttype_groups'][] = 'MyGroup1';
         $ct->data['contenttype_groups'][] = 'MyGroup2';
         $manager->createOrUpdate($ct);
-        $contentType = $manager->findByIdentifier('frontpage');
+        $contentType = $manager->findContentTypeByIdentifier('frontpage');
         $this->assertEquals('Content', $contentType->contentTypeGroups[0]->identifier);
         $this->assertEquals('MyGroup1', $contentType->contentTypeGroups[1]->identifier);
         $this->assertEquals('MyGroup2', $contentType->contentTypeGroups[2]->identifier);
@@ -74,15 +92,15 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $ct = $this->getFrontpageContentTypeObject();
         $ct->data['contenttype_groups'] = array('FrontpageGroup');
         $manager->createOrUpdate($ct);
-        $contentType = $manager->findByIdentifier('frontpage');
+        $contentType = $manager->findContentTypeByIdentifier('frontpage');
         $this->assertEquals('FrontpageGroup', $contentType->contentTypeGroups[0]->identifier);
     }
 
     public function testDeleteNotFound()
     {
         $manager = static::$contentTypeManager;
-        $this->assertTrue($manager->removeByIdentifier(null));
-        $this->assertTrue($manager->removeByIdentifier('_i_dont_exist'));
+        $this->assertTrue($manager->removeContentTypeByIdentifier(null));
+        $this->assertTrue($manager->removeContentTypeByIdentifier('_i_dont_exist'));
     }
 
     public function testLogger()
@@ -95,7 +113,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
     public function testfindNotFound()
     {
         $manager = static::$contentTypeManager;
-        $result = $manager->findByIdentifier(null);
+        $result = $manager->findContentTypeByIdentifier(null);
         $this->assertFalse($result);
     }
 
@@ -108,7 +126,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
         $this->create($manager);
 
-        $contentType = $manager->findByIdentifier('frontpage');
+        $contentType = $manager->findContentTypeByIdentifier('frontpage');
         $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\ContentType', $contentType);
         $this->assertEquals('Frontpage', $contentType->getName('eng-GB'));
         $this->assertEquals('Frontpage description', $contentType->getDescription('eng-GB'));
@@ -132,7 +150,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
         $this->update($manager);
 
-        $contentType = $manager->findByIdentifier('frontpage');
+        $contentType = $manager->findContentTypeByIdentifier('frontpage');
         $this->assertEquals('Updated frontpage', $contentType->getName('eng-GB'));
         $this->assertEquals('Updated frontpage description', $contentType->getDescription('eng-GB'));
         $this->assertFalse($contentType->isContainer);
@@ -188,15 +206,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
         $this->update($manager);
     }
-/*
-    public function testUpdateNotFound()
-    {
-        $this->setExpectedException('\Exception', 'Contenttype "_update_not_found" not found.');
-        $manager = static::$contentTypeManager;
-        $ct = new ContentTypeObject('_update_not_found', array());
-        $manager->update($ct);
-    }
-*/
+
     protected function create(ContentTypeManager $manager)
     {
         $ct = $this->getFrontpageContentTypeObject();
@@ -220,7 +230,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
     protected function find(ContentTypeManager $manager)
     {
-        return $manager->findByIdentifier('frontpage');
+        return $manager->findContentTypeByIdentifier('frontpage');
     }
 
     protected function remove(ContentTypeManager $manager)
@@ -233,11 +243,16 @@ class ContentTypeManagerTest extends EzPlatformTestCase
      */
     protected function getFrontpageContentTypeObject()
     {
-        return new ContentTypeObject('frontpage', array(
+        return new ContentTypeObject('frontpage', $this->getFrontpageContentTypeDataArray());
+    }
+
+    protected function getFrontpageContentTypeDataArray()
+    {
+        return array(
             'main_language_code' => 'eng-GB',
             'contenttype_groups' => array('Content'),
-            'names' => array( 'eng-GB' => 'Frontpage'),
-            'descriptions' => array( 'eng-GB' => 'Frontpage description'),
+            'names' => array('eng-GB' => 'Frontpage'),
+            'descriptions' => array('eng-GB' => 'Frontpage description'),
             'name_schema' => '<title>',
             'url_alias_schema' => '<title>',
             'is_container' => false,
@@ -249,7 +264,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
                     'type' => 'ezstring',
                     'field_group' => 'content',
                     'position' => 0,
-                    'names' => array( 'eng-GB' => 'Name'),
+                    'names' => array('eng-GB' => 'Name'),
                     'descriptions' => array('eng-GB' => 'Name description'),
                     'default_value' => null,
                     'is_required' => false,
@@ -270,7 +285,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
                     'is_info_collector' => false,
                 ),
             ),
-        ));
+        );
     }
 
     /**
@@ -300,7 +315,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
                     'type' => 'ezstring',
                     'field_group' => 'content',
                     'position' => 0,
-                    'names' => array( 'eng-GB' => 'Name'),
+                    'names' => array('eng-GB' => 'Name'),
                     'descriptions' => array('eng-GB' => 'Updated name description'),
                     'default_value' => null,
                     'is_required' => false,

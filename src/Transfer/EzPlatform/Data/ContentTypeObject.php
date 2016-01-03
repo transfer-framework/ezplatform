@@ -9,7 +9,6 @@
 
 namespace Transfer\EzPlatform\Data;
 
-use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Content\ContentTypeMapper;
 
@@ -18,7 +17,6 @@ use Transfer\EzPlatform\Repository\Content\ContentTypeMapper;
  */
 class ContentTypeObject extends ValueObject
 {
-
     /**
      * @var ContentTypeMapper
      */
@@ -30,13 +28,13 @@ class ContentTypeObject extends ValueObject
     public $fields;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct($identifier, $data)
     {
         $data['identifier'] = $identifier;
         parent::__construct($data);
-        foreach($data['fields'] as $fieldIdentifier => $field) {
+        foreach ($data['fields'] as $fieldIdentifier => $field) {
             $this->fields[] = new FieldDefinitionObject($fieldIdentifier, $this, $field);
         }
         unset($data['fields']);
@@ -45,31 +43,29 @@ class ContentTypeObject extends ValueObject
 
     private function setMissingDefaults()
     {
-        if($this->notSetOrEmpty($this->data, 'names')) {
+        if ($this->notSetOrEmpty($this->data, 'names')) {
             $this->data['names'] = array(
-                $this->data['main_language_code'] => $this->identifierToReadable($this->data['identifier'])
+                $this->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
             );
         }
 
-        if($this->notSetOrEmpty($this->data, 'name_schema')) {
-            $this->data['name_schema'] = sprintf('<%s>', $this->fields[0]->data['identifier']);
-        }
-
-        if($this->notSetOrEmpty($this->data, 'url_alias_schema')) {
-            $this->data['url_alias_schema'] = sprintf('<%s>', $this->fields[0]->data['identifier']);
+        foreach (array('name_schema', 'url_alias_schema') as $schema) {
+            if ($this->notSetOrEmpty($this->data, $schema)) {
+                $this->data[$schema] = sprintf('<%s>', $this->fields[0]->data['identifier']);
+            }
         }
     }
 
     /**
-     * @param array $array
+     * @param array  $array
      * @param string $key
+     *
      * @return bool
      */
     private function notSetOrEmpty(array $array, $key)
     {
         return !isset($array[$key]) || empty($array[$key]);
     }
-
 
     /**
      * Converts an identifier to one or more words

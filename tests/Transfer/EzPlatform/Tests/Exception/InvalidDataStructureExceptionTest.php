@@ -11,7 +11,7 @@ class InvalidDataStructureExceptionTest extends \PHPUnit_Framework_TestCase
         ));
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
 
-        /**
+        /*
          * @todo Reimplement exception
          */
         //$this->setExpectedException('Transfer\EzPlatform\Exception\InvalidDataStructureException');

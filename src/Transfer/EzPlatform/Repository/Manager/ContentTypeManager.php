@@ -23,6 +23,7 @@ use Transfer\Data\ObjectInterface;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Data\LanguageObject;
+use Transfer\EzPlatform\Exception\ContentTypeNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
@@ -80,7 +81,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      *
      * @return ContentType|false
      */
-    public function findByIdentifier($identifier)
+    public function findContentTypeByIdentifier($identifier)
     {
         if (!is_string($identifier)) {
             return false;
@@ -96,11 +97,11 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function create(ObjectInterface $object)
     {
-        if(!$object instanceof ContentTypeObject) {
+        if (!$object instanceof ContentTypeObject) {
             return;
         }
 
@@ -132,15 +133,15 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
 
         $this->updateContentTypeGroupsAssignment($object);
 
-        return $this->findByIdentifier($object->data['identifier']);
+        return $object;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function update(ObjectInterface $object)
     {
-        if(!$object instanceof ContentTypeObject) {
+        if (!$object instanceof ContentTypeObject) {
             return;
         }
 
@@ -148,10 +149,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             $this->logger->info(sprintf('Updating contenttype %s.', $object->data['identifier']));
         }
 
-        $contentType = $this->findByIdentifier($object->data['identifier']);
+        $contentType = $this->findContentTypeByIdentifier($object->data['identifier']);
 
         if (!$contentType) {
-            throw new \Exception(sprintf('Contenttype "%s" not found.', $object->data['identifier']));
+            throw new ContentTypeNotFoundException(sprintf('Contenttype "%s" not found.', $object->data['identifier']));
         }
 
         $this->updateContentTypeLanguages($object);
@@ -207,20 +208,19 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             $this->logger->info(sprintf('Updated contenttype %s.', $object->data['identifier']));
         }
 
-        // Reload and return contenttype
-        return $this->findByIdentifier($object->data['identifier']);
+        return $object;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function createOrUpdate(ObjectInterface $object)
     {
-        if(!$object instanceof ContentTypeObject) {
+        if (!$object instanceof ContentTypeObject) {
             return;
         }
 
-        $contentObject = $this->findByIdentifier($object->data['identifier']);
+        $contentObject = $this->findContentTypeByIdentifier($object->data['identifier']);
         if (!$contentObject) {
             return $this->create($object);
         } else {
@@ -229,15 +229,15 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function remove(ObjectInterface $object)
     {
-        if(!$object instanceof ContentTypeObject) {
+        if (!$object instanceof ContentTypeObject) {
             return;
         }
 
-        return $this->removeByIdentifier($object->data['identifier']);
+        return $this->removeContentTypeByIdentifier($object->data['identifier']);
     }
 
     /**
@@ -245,9 +245,9 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      *
      * @return bool
      */
-    public function removeByIdentifier($identifier)
+    public function removeContentTypeByIdentifier($identifier)
     {
-        $contentType = $this->findByIdentifier($identifier);
+        $contentType = $this->findContentTypeByIdentifier($identifier);
 
         if (!$contentType) {
             return true;
@@ -394,5 +394,4 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             $this->contentTypeService->unassignContentTypeGroup($contentType, $contentTypeGroup);
         }
     }
-
 }

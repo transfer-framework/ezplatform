@@ -15,7 +15,6 @@ use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
@@ -80,8 +79,8 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
             'fields' => array(
                 'name' => array(
                     'type' => 'ezstring',
-                    'names' => array( 'eng-GB' => 'Name'),
-                    'descriptions' => array( 'eng-GB' => 'Name of the article'),
+                    'names' => array('eng-GB' => 'Name'),
+                    'descriptions' => array('eng-GB' => 'Name of the article'),
                     'field_group' => 'content',
                     'position' => 10,
                     'is_required' => true,
@@ -91,8 +90,8 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
                 ),
                 'description' => array(
                     'type' => 'ezrichtext',
-                    'names' => array( 'eng-GB' => 'Description'),
-                    'descriptions' => array( 'eng-GB' => 'Description of the article'),
+                    'names' => array('eng-GB' => 'Description'),
+                    'descriptions' => array('eng-GB' => 'Description of the article'),
                     'field_group' => 'content',
                     'position' => 20,
                     'is_required' => false,
@@ -100,8 +99,8 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
                     'is_searchable' => true,
                     'is_info_collector' => false,
 
-                )
-            )
+                ),
+            ),
         ));
 
         $this->adapter->send(new Request(array(
@@ -111,7 +110,6 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
 
     public function testSendMiniContentTypeObject()
     {
-
         $array = array('article' => array(
             'fields' => array(
                 'title' => array(),

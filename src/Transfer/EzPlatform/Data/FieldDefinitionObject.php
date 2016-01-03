@@ -17,7 +17,6 @@ use Transfer\EzPlatform\Repository\Content\FieldDefinitionMapper;
  */
 class FieldDefinitionObject extends ValueObject
 {
-
     /**
      * @var ContentTypeObject
      */
@@ -29,7 +28,7 @@ class FieldDefinitionObject extends ValueObject
     private $mapper;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct($identifier, ContentTypeObject $parent, $data = array())
     {
@@ -67,9 +66,9 @@ class FieldDefinitionObject extends ValueObject
 
     private function setMissingDefaults()
     {
-        if(!isset($this->data['names']) || empty($this->data['names'])) {
+        if (!isset($this->data['names']) || empty($this->data['names'])) {
             $this->data['names'] = array(
-                $this->parent->data['main_language_code'] => $this->identifierToReadable($this->data['identifier'])
+                $this->parent->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
             );
         }
     }

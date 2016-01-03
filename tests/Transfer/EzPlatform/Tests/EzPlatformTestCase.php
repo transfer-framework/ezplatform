@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 
@@ -87,8 +86,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
             'fields' => array(
                 'title' => array(
                     'type' => 'ezstring',
-                    'names' => array( 'eng-GB' => 'Title'),
-                    'descriptions' => array( 'eng-GB' => 'Title of the article'),
+                    'names' => array('eng-GB' => 'Title'),
+                    'descriptions' => array('eng-GB' => 'Title of the article'),
                     'field_group' => 'content',
                     'position' => 10,
                     'is_required' => true,
@@ -98,8 +97,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
                 ),
                 'description' => array(
                     'type' => 'ezstring',
-                    'names' => array( 'eng-GB' => 'Description'),
-                    'descriptions' => array( 'eng-GB' => 'Description of the article'),
+                    'names' => array('eng-GB' => 'Description'),
+                    'descriptions' => array('eng-GB' => 'Description of the article'),
                     'field_group' => 'content',
                     'position' => 20,
                     'is_required' => false,
@@ -107,8 +106,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
                     'is_searchable' => true,
                     'is_info_collector' => false,
 
-                )
-            )
+                ),
+            ),
         ));
 
         static::$contentTypeManager->createOrUpdate($_ct_article);
