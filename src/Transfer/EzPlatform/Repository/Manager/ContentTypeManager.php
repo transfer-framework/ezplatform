@@ -109,12 +109,12 @@ class ContentTypeManager implements LoggerAwareInterface
         $this->updateContentTypeLanguages($object);
 
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->getIdentifier());
-        $object->getRepository()->fillContentTypeCreateStruct($contentTypeCreateStruct);
+        $object->getMapper()->fillContentTypeCreateStruct($contentTypeCreateStruct);
 
         foreach ($object->getFieldDefinitions() as $field) {
             /* @var FieldDefinitionObject $field */
             $fieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
-            $field->getRepository()->populateCreateStruct($fieldCreateStruct);
+            $field->getMapper()->populateCreateStruct($fieldCreateStruct);
             $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
         }
 
@@ -199,7 +199,7 @@ class ContentTypeManager implements LoggerAwareInterface
         }
 
         $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
-        $object->getRepository()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
+        $object->getMapper()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
 
         $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
         $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
@@ -258,7 +258,7 @@ class ContentTypeManager implements LoggerAwareInterface
     private function createFieldDefinition(FieldDefinitionObject $field)
     {
         $definition = $this->contentTypeService->newFieldDefinitionCreateStruct($field->getIdentifier(), $field->type);
-        $field->getRepository()->populateCreateStruct($definition);
+        $field->getMapper()->populateCreateStruct($definition);
 
         return $definition;
     }
@@ -271,7 +271,7 @@ class ContentTypeManager implements LoggerAwareInterface
     private function updateFieldDefinition(FieldDefinitionObject $field)
     {
         $definition = $this->contentTypeService->newFieldDefinitionUpdateStruct();
-        $field->getRepository()->populateUpdateStruct($definition);
+        $field->getMapper()->populateUpdateStruct($definition);
 
         return $definition;
     }
