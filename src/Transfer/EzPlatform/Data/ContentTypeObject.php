@@ -259,7 +259,7 @@ class ContentTypeObject
     /**
      * @return ContentTypeMapper
      */
-    public function getRepository()
+    public function getMapper()
     {
         if (!$this->mapper) {
             $this->mapper = new ContentTypeMapper($this);

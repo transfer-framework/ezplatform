@@ -16,6 +16,8 @@ use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
+use Transfer\EzPlatform\Data\UserGroupObject;
+use Transfer\EzPlatform\Data\UserObject;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
 class EzPlatformAdapterTest extends EzPlatformTestCase
@@ -108,5 +110,55 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
         $this->adapter->send(new Request(array(
             $ct,
         )));
+    }
+
+    public function testSendUserObject()
+    {
+        $user = new UserObject(array(
+            'username' => 'test_user',
+            'email' => 'test@example.com',
+            'password' => 'test123',
+            'main_language_code' => 'eng-GB',
+            'enabled' => true,
+            'fields' => array(
+                'first_name' => 'Test',
+                'last_name' => 'User',
+            ),
+        ));
+        $user->parents = array(
+            new UserGroupObject(array(
+                'fields' => array(
+                    'name' => 'Members',
+                ),
+            )),
+        );
+
+        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
+        $this->adapter->setLogger($mockLogger);
+
+        $this->adapter->send(new Request(array(
+            $user,
+        )));
+    }
+
+    public function testSendUserGroup()
+    {
+        $userGroup = new UserGroupObject(array(
+            'fields' => array(
+                'name' => 'Members',
+            ),
+        ));
+
+        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
+        $this->adapter->setLogger($mockLogger);
+
+        $response = $this->adapter->send(new Request(array(
+            $userGroup,
+        )));
+
+        $this->assertInstanceOf('Transfer\Adapter\Transaction\Response', $response);
+        $this->assertCount(1, $response);
+        $object = iterator_to_array($response);
+        $this->assertInstanceOf('Transfer\Ezplatform\Data\UserGroupObject', $object[0]);
     }
 }

@@ -162,7 +162,7 @@ class FieldDefinitionObject
     /**
      * @return FieldDefinitionMapper
      */
-    public function getRepository()
+    public function getMapper()
     {
         if (!$this->mapper) {
             $this->mapper = new FieldDefinitionMapper($this);
