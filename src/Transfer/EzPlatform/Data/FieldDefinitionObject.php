@@ -9,90 +9,33 @@
 
 namespace Transfer\EzPlatform\Data;
 
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Content\FieldDefinitionMapper;
 
 /**
  * Content type object.
  */
-class FieldDefinitionObject
+class FieldDefinitionObject extends ValueObject
 {
     /**
-     * @var string
+     * @var ContentTypeObject
      */
-    protected $identifier;
-
-    /**
-     * @var string
-     */
-    public $type = 'ezstring';
-
-    /**
-     * @var string
-     */
-    public $fieldGroup = 'content';
-
-    /**
-     * @var int
-     */
-    public $position;
-
-    /**
-     * @var bool
-     */
-    public $isRequired = false;
-
-    /**
-     * @var bool
-     */
-    public $isTranslatable = true;
-
-    /**
-     * @var bool
-     */
-    public $isSearchable = true;
-
-    /**
-     * @var bool
-     */
-    public $isInfoCollector = false;
-
-    /**
-     * @var string
-     */
-    public $defaultValue;
-
-    /**
-     * @var array
-     */
-    protected $names = array();
-
-    /**
-     * @var array
-     */
-    protected $descriptions = array();
+    private $parent;
 
     /**
      * @var FieldDefinitionMapper
      */
-    protected $mapper;
+    private $mapper;
 
     /**
-     * FieldDefinitionObject constructor.
-     *
-     * @param string $identifier
+     * {@inheritdoc}
      */
-    public function __construct($identifier)
+    public function __construct($identifier, ContentTypeObject $parent, $data = array())
     {
-        $this->identifier = $identifier;
-        $this->names = array('eng-GB' => $this->identifierToReadable($identifier));
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
+        $data['identifier'] = $identifier;
+        $this->parent = &$parent;
+        parent::__construct($data);
+        $this->setMissingDefaults();
     }
 
     /**
@@ -110,64 +53,23 @@ class FieldDefinitionObject
     }
 
     /**
-     * @param string $description
-     * @param string $languageCode
-     */
-    public function addDescription($description, $languageCode = 'eng-GB')
-    {
-        $this->descriptions[$languageCode] = $description;
-    }
-
-    /**
-     * @param array $descriptions
-     */
-    public function setDescriptions(array $descriptions)
-    {
-        $this->descriptions = $descriptions;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDescriptions()
-    {
-        return $this->descriptions;
-    }
-
-    /**
-     * @param string $name
-     * @param string $languageCode
-     */
-    public function addName($name, $languageCode = 'eng-GB')
-    {
-        $this->names[$languageCode] = $name;
-    }
-
-    /**
-     * @param array $names
-     */
-    public function setNames(array $names)
-    {
-        $this->names = $names;
-    }
-
-    /**
-     * @return array
-     */
-    public function getNames()
-    {
-        return $this->names;
-    }
-
-    /**
      * @return FieldDefinitionMapper
      */
-    public function getRepository()
+    public function getMapper()
     {
         if (!$this->mapper) {
             $this->mapper = new FieldDefinitionMapper($this);
         }
 
         return $this->mapper;
+    }
+
+    private function setMissingDefaults()
+    {
+        if (!isset($this->data['names']) || empty($this->data['names'])) {
+            $this->data['names'] = array(
+                $this->parent->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
+            );
+        }
     }
 }

@@ -15,8 +15,8 @@ use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
 class EzPlatformAdapterTest extends EzPlatformTestCase
 {
@@ -65,32 +65,44 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
 
     public function testSendFullContentTypeObject()
     {
-        $ct = new ContentTypeObject('_test_article');
-        $ct->mainLanguageCode = 'eng-GB';
-        $ct->addName('Article', 'eng-GB');
-        $ct->setNames(array('eng-GB' => 'Article'));
-        $ct->addDescription('Article description');
-        $ct->isContainer = true;
-        $ct->defaultAlwaysAvailable = true;
-        $ct->addContentTypeGroup('Content');
-        $ct->defaultSortField = Location::SORT_FIELD_PUBLISHED;
-        $ct->defaultSortOrder = Location::SORT_ORDER_DESC;
-        $ct->nameSchema = '<name>';
-        $ct->urlAliasSchema = '<name>';
+        $ct = new ContentTypeObject('_test_article', array(
+            'main_language_code' => 'eng-GB',
+            'contenttype_groups' => array('Content'),
+            'name_schema' => '<title>',
+            'url_alias_schema' => '<title>',
+            'names' => array('eng-GB' => 'Article'),
+            'descriptions' => array('eng-GB' => 'Article description'),
+            'is_container' => true,
+            'default_always_available' => false,
+            'default_sort_field' => Location::SORT_FIELD_PUBLISHED,
+            'default_sort_order' => Location::SORT_ORDER_ASC,
+            'fields' => array(
+                'name' => array(
+                    'type' => 'ezstring',
+                    'names' => array('eng-GB' => 'Name'),
+                    'descriptions' => array('eng-GB' => 'Name of the article'),
+                    'field_group' => 'content',
+                    'position' => 10,
+                    'is_required' => true,
+                    'is_translatable' => true,
+                    'is_searchable' => true,
+                    'is_info_collector' => false,
+                ),
+                'description' => array(
+                    'type' => 'ezrichtext',
+                    'names' => array('eng-GB' => 'Description'),
+                    'descriptions' => array('eng-GB' => 'Description of the article'),
+                    'field_group' => 'content',
+                    'position' => 20,
+                    'is_required' => false,
+                    'is_translatable' => true,
+                    'is_searchable' => true,
+                    'is_info_collector' => false,
 
-        $f = new FieldDefinitionObject('name');
-        $f->type = 'ezstring';
-        $f->fieldGroup = 'content';
-        $f->addName('Name', 'eng-GB');
-        $f->setNames(array('eng-GB' => 'Name'));
-        $f->addDescription('Name of the article');
-        $f->isRequired = true;
-        $f->isTranslatable = true;
-        $f->isSearchable = true;
-        $f->isInfoCollector = false;
-        $f->defaultValue = '';
+                ),
+            ),
+        ));
 
-        $ct->addFieldDefinition($f);
         $this->adapter->send(new Request(array(
             $ct,
         )));
@@ -98,9 +110,16 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
 
     public function testSendMiniContentTypeObject()
     {
-        $ct = new ContentTypeObject('_test_frontpage');
-        $f = new FieldDefinitionObject('name');
-        $ct->addFieldDefinition($f);
+        $array = array('article' => array(
+            'fields' => array(
+                'title' => array(),
+                'content' => array(),
+            ),
+        ));
+
+        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
+        $ct = $transformer->handle($array);
+        $ct = $ct[0];
 
         $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
         $this->adapter->setLogger($mockLogger);

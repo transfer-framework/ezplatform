@@ -9,100 +9,62 @@
 
 namespace Transfer\EzPlatform\Data;
 
-use eZ\Publish\API\Repository\Values\Content\Location;
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Content\ContentTypeMapper;
 
 /**
  * Content type object.
  */
-class ContentTypeObject
+class ContentTypeObject extends ValueObject
 {
     /**
-     * @var string
+     * @var ContentTypeMapper
      */
-    protected $identifier;
-
-    /**
-     * @var string
-     */
-    public $mainLanguageCode = 'eng-GB';
-
-    /**
-     * @var array
-     */
-    protected $contentTypeGroups = array('Content');
-
-    /**
-     * @var array
-     */
-    protected $names = array();
-
-    /**
-     * @var array
-     */
-    protected $descriptions = array();
-
-    /**
-     * @var string
-     */
-    public $nameSchema;
-
-    /**
-     * @var string
-     */
-    public $urlAliasSchema;
-
-    /**
-     * @var bool
-     */
-    public $isContainer = true;
-
-    /**
-     * @var bool
-     */
-    public $defaultAlwaysAvailable = true;
-
-    /**
-     * Valid values are found at {@link Location::SORT_FIELD_*}.
-     *
-     * @var int
-     */
-    public $defaultSortField = Location::SORT_FIELD_NAME;
-
-    /**
-     * Valid values are found at {@link Location::SORT_ORDER_*}.
-     *
-     * @var int
-     */
-    public $defaultSortOrder = Location::SORT_ORDER_ASC;
+    private $mapper;
 
     /**
      * @var FieldDefinitionObject[]
      */
-    protected $fieldDefinitions = array();
+    public $fields;
 
     /**
-     * @var ContentTypeMapper
+     * {@inheritdoc}
      */
-    protected $mapper;
-
-    /**
-     * ContentTypeObject constructor.
-     *
-     * @param string $identifier
-     */
-    public function __construct($identifier)
+    public function __construct($identifier, $data)
     {
-        $this->identifier = $identifier;
-        $this->names = array($this->mainLanguageCode => $this->identifierToReadable($identifier));
+        $data['identifier'] = $identifier;
+        parent::__construct($data);
+        foreach ($data['fields'] as $fieldIdentifier => $field) {
+            $this->fields[] = new FieldDefinitionObject($fieldIdentifier, $this, $field);
+        }
+        unset($data['fields']);
+        $this->setMissingDefaults();
+    }
+
+    private function setMissingDefaults()
+    {
+        if ($this->notSetOrEmpty($this->data, 'names')) {
+            $this->data['names'] = array(
+                $this->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
+            );
+        }
+
+        foreach (array('name_schema', 'url_alias_schema') as $schema) {
+            if ($this->notSetOrEmpty($this->data, $schema)) {
+                $this->data[$schema] = sprintf('<%s>', $this->fields[0]->data['identifier']);
+            }
+        }
     }
 
     /**
-     * @return string
+     * @param array  $array
+     * @param string $key
+     *
+     * @return bool
      */
-    public function getMainGroupIdentifier()
+    private function notSetOrEmpty(array $array, $key)
     {
-        return $this->contentTypeGroups[0];
+        return !isset($array[$key]) || empty($array[$key]);
     }
 
     /**
@@ -119,89 +81,6 @@ class ContentTypeObject
         return ucwords(str_replace('_', ' ', $identifier));
     }
 
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * @param string $contentTypeGroup
-     */
-    public function addContentTypeGroup($contentTypeGroup)
-    {
-        if (!in_array($contentTypeGroup, $this->contentTypeGroups)) {
-            $this->contentTypeGroups[] = $contentTypeGroup;
-        }
-    }
-
-    /**
-     * @param array $contentTypeGroups
-     */
-    public function setContentTypeGroups(array $contentTypeGroups)
-    {
-        $this->contentTypeGroups = $contentTypeGroups;
-    }
-
-    /**
-     * @return array
-     */
-    public function getContentTypeGroups()
-    {
-        return $this->contentTypeGroups;
-    }
-
-    /**
-     * @param string $name
-     * @param string $languageCode
-     */
-    public function addName($name, $languageCode = null)
-    {
-        $languageCode = $languageCode !== null ? $languageCode : $this->mainLanguageCode;
-        $this->names[$languageCode] = $name;
-    }
-
-    /**
-     * @param array $names array('eng-GB'=>'My Name')
-     */
-    public function setNames(array $names)
-    {
-        $this->names = $names;
-    }
-
-    /**
-     * @return array
-     */
-    public function getNames()
-    {
-        return $this->names;
-    }
-
-    /**
-     * @param string $description
-     * @param string $languageCode
-     */
-    public function addDescription($description, $languageCode = null)
-    {
-        $languageCode = $languageCode !== null ? $languageCode : $this->mainLanguageCode;
-        $this->descriptions[$languageCode] = $description;
-    }
-
-    /**
-     * @param array $descriptions array('eng-GB' => 'My description')
-     */
-    public function setDescriptions(array $descriptions)
-    {
-        $this->descriptions = $descriptions;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDescriptions()
-    {
-        return $this->descriptions;
-    }
-
     /**
      * @return array
      */
@@ -209,57 +88,17 @@ class ContentTypeObject
     {
         return array_unique(
             array_merge(
-                array($this->mainLanguageCode),
-                array_keys($this->names),
-                array_keys($this->descriptions)
+                array($this->data['main_language_code']),
+                array_keys($this->data['names']),
+                array_keys($this->data['descriptions'])
             )
         );
     }
 
     /**
-     * @param FieldDefinitionObject $field
-     */
-    public function addFieldDefinition(FieldDefinitionObject $field)
-    {
-        if (count($this->fieldDefinitions) > 0) {
-            foreach ($this->fieldDefinitions as $index => $fieldDefinition) {
-                if ($fieldDefinition->getIdentifier() == $field->getIdentifier()) {
-                    $this->fieldDefinitions[$index] = $field;
-
-                    return;
-                }
-            }
-        } else {
-            if (empty($this->nameSchema)) {
-                $this->nameSchema = sprintf('<%s>', $field->getIdentifier());
-            }
-            if (empty($this->urlAliasSchema)) {
-                $this->urlAliasSchema = sprintf('<%s>', $field->getIdentifier());
-            }
-        }
-        $this->fieldDefinitions[] = $field;
-    }
-
-    /**
-     * @param FieldDefinitionObject[] $fields
-     */
-    public function setFieldDefinitions(array $fields)
-    {
-        $this->fieldDefinitions = $fields;
-    }
-
-    /**
-     * @return FieldDefinitionObject[]
-     */
-    public function getFieldDefinitions()
-    {
-        return $this->fieldDefinitions;
-    }
-
-    /**
      * @return ContentTypeMapper
      */
-    public function getRepository()
+    public function getMapper()
     {
         if (!$this->mapper) {
             $this->mapper = new ContentTypeMapper($this);
