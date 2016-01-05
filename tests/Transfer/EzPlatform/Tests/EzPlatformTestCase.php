@@ -10,12 +10,12 @@
 namespace Transfer\EzPlatform\Tests;
 
 use eZ\Publish\API\Repository\Repository;
+use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\Core\Repository\Tests\Service\Integration\Legacy\SetupFactory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 
@@ -72,35 +72,43 @@ abstract class EzPlatformTestCase extends KernelTestCase
 
     public static function setUpContentTypes()
     {
-        $_ct_article = new ContentTypeObject('_test_article');
-        $_ct_article->mainLanguageCode = 'eng-GB';
-        $_ct_article->addContentTypeGroup('Content');
-        $_ct_article->nameSchema = '<title>';
-        $_ct_article->urlAliasSchema = '<title>';
-        $_ct_article->addName('Article');
-        $_ct_article->addDescription('An article');
+        $_ct_article = new ContentTypeObject('_test_article', array(
+            'main_language_code' => 'eng-GB',
+            'contenttype_groups' => array('Content'),
+            'name_schema' => '<title>',
+            'url_alias_schema' => '<title>',
+            'names' => array('eng-GB' => 'Article'),
+            'descriptions' => array('eng-GB' => 'An article'),
+            'is_container' => true,
+            'default_always_available' => false,
+            'default_sort_field' => Location::SORT_FIELD_PUBLISHED,
+            'default_sort_order' => Location::SORT_ORDER_ASC,
+            'fields' => array(
+                'title' => array(
+                    'type' => 'ezstring',
+                    'names' => array('eng-GB' => 'Title'),
+                    'descriptions' => array('eng-GB' => 'Title of the article'),
+                    'field_group' => 'content',
+                    'position' => 10,
+                    'is_required' => true,
+                    'is_translatable' => true,
+                    'is_searchable' => true,
+                    'is_info_collector' => false,
+                ),
+                'description' => array(
+                    'type' => 'ezstring',
+                    'names' => array('eng-GB' => 'Description'),
+                    'descriptions' => array('eng-GB' => 'Description of the article'),
+                    'field_group' => 'content',
+                    'position' => 20,
+                    'is_required' => false,
+                    'is_translatable' => true,
+                    'is_searchable' => true,
+                    'is_info_collector' => false,
 
-        $_fd_name = new FieldDefinitionObject('title');
-        $_fd_name->addName('Title');
-        $_fd_name->addDescription('Title of the article');
-        $_fd_name->fieldGroup = 'content';
-        $_fd_name->position = 10;
-        $_fd_name->isRequired = true;
-        $_fd_name->isTranslatable = true;
-        $_fd_name->isSearchable = true;
-        $_fd_name->isInfoCollector = false;
-        $_ct_article->addFieldDefinition($_fd_name);
-
-        $_fd_desc = new FieldDefinitionObject('description');
-        $_fd_desc->addName('Description');
-        $_fd_desc->addDescription('Description of the article');
-        $_fd_desc->fieldGroup = 'content';
-        $_fd_desc->position = 20;
-        $_fd_desc->isRequired = false;
-        $_fd_desc->isTranslatable = true;
-        $_fd_desc->isSearchable = true;
-        $_fd_desc->isInfoCollector = false;
-        $_ct_article->addFieldDefinition($_fd_desc);
+                ),
+            ),
+        ));
 
         static::$contentTypeManager->createOrUpdate($_ct_article);
     }

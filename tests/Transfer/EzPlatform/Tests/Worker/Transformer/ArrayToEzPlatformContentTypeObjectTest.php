@@ -5,12 +5,11 @@ use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTra
 
 class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testEmptyField()
     {
         $array = array('article' => array(
             'fields' => array(
-                'title' => '',
+                'title' => null,
             ),
         ));
 
@@ -26,25 +25,50 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testMultilingual()
     {
-        $array = array('article' => array(
-            'names' => array(
-                'eng-GB' => 'Article',
-                'nor-NO' => 'Artikkel',
-            ),
-            'descriptions' => array(
-                'eng-GB' => 'Article description',
-                'nor-NO' => 'Artikkelbeskrivelse',
-            ),
-            'fields' => array(
-                'title' => array(
-                    'type' => 'ezstring',
-                    'names' => array(
-                        'eng-GB' => 'Title',
-                        'nor-NO' => 'Tittel',
+        $array = array('contenttypes' => array(
+            'article' => array(
+                'names' => array(
+                    'eng-GB' => 'Article',
+                    'nor-NO' => 'Artikkel',
+                ),
+                'descriptions' => array(
+                    'eng-GB' => 'Article description',
+                    'nor-NO' => 'Artikkelbeskrivelse',
+                ),
+                'fields' => array(
+                    'title' => array(
+                        'type' => 'ezstring',
+                        'names' => array(
+                            'eng-GB' => 'Title',
+                            'nor-NO' => 'Tittel',
+                        ),
+                        'descriptions' => array(
+                            'eng-GB' => 'Title of the article',
+                            'nor-NO' => 'Artikkelens tittel',
+                        ),
                     ),
-                    'descriptions' => array(
-                        'eng-GB' => 'Title of the article',
-                        'nor-NO' => 'Artikkelens tittel',
+                ),
+            ),
+            'frontpage' => array(
+                'names' => array(
+                    'eng-GB' => 'Frontpage',
+                    'nor-NO' => 'Forside',
+                ),
+                'descriptions' => array(
+                    'eng-GB' => 'Article description',
+                    'nor-NO' => 'Artikkelbeskrivelse',
+                ),
+                'fields' => array(
+                    'title' => array(
+                        'type' => 'ezstring',
+                        'names' => array(
+                            'eng-GB' => 'Title',
+                            'nor-NO' => 'Tittel',
+                        ),
+                        'descriptions' => array(
+                            'eng-GB' => 'Title of the article',
+                            'nor-NO' => 'Artikkelens tittel',
+                        ),
                     ),
                 ),
             ),
@@ -52,47 +76,26 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
+        $ct = $ct[0];
 
-        $this->assertArrayHasKey('eng-GB', $ct->getNames());
-        $this->assertEquals('Article', $ct->getNames()['eng-GB']);
-        $this->assertArrayHasKey('eng-GB', $ct->getDescriptions());
-        $this->assertEquals('Article description', $ct->getDescriptions()['eng-GB']);
-        $this->assertArrayHasKey('nor-NO', $ct->getNames());
-        $this->assertEquals('Artikkel', $ct->getNames()['nor-NO']);
-        $this->assertArrayHasKey('nor-NO', $ct->getDescriptions());
-        $this->assertEquals('Artikkelbeskrivelse', $ct->getDescriptions()['nor-NO']);
+        $this->assertArrayHasKey('eng-GB', $ct->data['names']);
+        $this->assertEquals('Article', $ct->data['names']['eng-GB']);
+        $this->assertArrayHasKey('eng-GB', $ct->data['descriptions']);
+        $this->assertEquals('Article description', $ct->data['descriptions']['eng-GB']);
+        $this->assertArrayHasKey('nor-NO', $ct->data['names']);
+        $this->assertEquals('Artikkel', $ct->data['names']['nor-NO']);
+        $this->assertArrayHasKey('nor-NO', $ct->data['descriptions']);
+        $this->assertEquals('Artikkelbeskrivelse', $ct->data['descriptions']['nor-NO']);
 
-        $f1 = $ct->getFieldDefinitions()[0];
-        $this->assertArrayHasKey('eng-GB', $f1->getNames());
-        $this->assertEquals('Title', $f1->getNames()['eng-GB']);
-        $this->assertArrayHasKey('eng-GB', $f1->getDescriptions());
-        $this->assertEquals('Title of the article', $f1->getDescriptions()['eng-GB']);
-        $this->assertArrayHasKey('nor-NO', $f1->getNames());
-        $this->assertEquals('Tittel', $f1->getNames()['nor-NO']);
-        $this->assertArrayHasKey('nor-NO', $f1->getDescriptions());
-        $this->assertEquals('Artikkelens tittel', $f1->getDescriptions()['nor-NO']);
-    }
-
-    public function testInvalidIdentifier()
-    {
-        $this->setExpectedException('Transfer\EzPlatform\Exception\InvalidDataStructureException');
-
-        $array = array(array(
-            'fields' => array(
-                'title' => array(),
-                'content' => array(),
-            ),
-        ));
-
-        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
-        $transformer->handle($array);
-    }
-
-    public function testInvalidArgument()
-    {
-        $this->setExpectedException('\InvalidArgumentException');
-        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
-        $transformer->handle('a string');
+        $f1 = $ct->fields[0];
+        $this->assertArrayHasKey('eng-GB', $f1->data['names']);
+        $this->assertEquals('Title', $f1->data['names']['eng-GB']);
+        $this->assertArrayHasKey('eng-GB', $f1->data['descriptions']);
+        $this->assertEquals('Title of the article', $f1->data['descriptions']['eng-GB']);
+        $this->assertArrayHasKey('nor-NO', $f1->data['names']);
+        $this->assertEquals('Tittel', $f1->data['names']['nor-NO']);
+        $this->assertArrayHasKey('nor-NO', $f1->data['descriptions']);
+        $this->assertEquals('Artikkelens tittel', $f1->data['descriptions']['nor-NO']);
     }
 
     public function testFull()
@@ -102,56 +105,55 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
 
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\ContentTypeObject', $ct);
-        $this->assertEquals('article', $ct->getIdentifier());
-        $this->assertEquals('Content', $ct->getMainGroupIdentifier());
-        $this->assertCount(2, $ct->getContentTypeGroups());
-        $this->assertEquals('Content', $ct->getContentTypeGroups()[0]);
-        $this->assertEquals('Full', $ct->getContentTypeGroups()[1]);
-        $this->assertArrayHasKey('eng-GB', $ct->getNames());
-        $this->assertEquals('Article', $ct->getNames()['eng-GB']);
-        $this->assertArrayHasKey('eng-GB', $ct->getDescriptions());
-        $this->assertEquals('Article description', $ct->getDescriptions()['eng-GB']);
-        $this->assertEquals('<title>', $ct->nameSchema);
-        $this->assertEquals('<title>', $ct->urlAliasSchema);
-        $this->assertTrue($ct->isContainer);
-        $this->assertTrue($ct->defaultAlwaysAvailable);
-        $this->assertEquals(Location::SORT_FIELD_NAME, $ct->defaultSortField);
-        $this->assertEquals(Location::SORT_ORDER_ASC, $ct->defaultSortOrder);
+        $ct0 = $ct[0];
 
-        $this->assertCount(2, $ct->getFieldDefinitions());
-        $f1 = $ct->getFieldDefinitions()[0];
+        $this->assertInstanceOf('Transfer\EzPlatform\Data\ContentTypeObject', $ct0);
+        $this->assertEquals('article', $ct0->data['identifier']);
+        $this->assertEquals('Content', $ct0->data['contenttype_groups'][0]);
+        $this->assertArrayHasKey('eng-GB', $ct0->data['names']);
+        $this->assertEquals('Article', $ct0->data['names']['eng-GB']);
+        $this->assertArrayHasKey('eng-GB', $ct0->data['descriptions']);
+        $this->assertEquals('Article description', $ct0->data['descriptions']['eng-GB']);
+        $this->assertEquals('<title>', $ct0->data['name_schema']);
+        $this->assertEquals('<title>', $ct0->data['url_alias_schema']);
+        $this->assertTrue($ct0->data['is_container']);
+        $this->assertTrue($ct0->data['default_always_available']);
+        $this->assertEquals(Location::SORT_FIELD_PUBLISHED, $ct0->data['default_sort_field']);
+        $this->assertEquals(Location::SORT_ORDER_ASC, $ct0->data['default_sort_order']);
+
+        $this->assertCount(2, $ct0->fields);
+        $f0 = $ct0->fields[0];
+        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f0);
+        $this->assertEquals('title', $f0->data['identifier']);
+        $this->assertEquals('ezstring', $f0->data['type']);
+        $this->assertEquals('content', $f0->data['field_group']);
+        $this->assertEquals(0, $f0->data['position']);
+        $this->assertArrayHasKey('eng-GB', $f0->data['names']);
+        $this->assertEquals('Title', $f0->data['names']['eng-GB']);
+        $this->assertArrayHasKey('eng-GB', $f0->data['descriptions']);
+        $this->assertEquals('Title of the article', $f0->data['descriptions']['eng-GB']);
+        $this->assertEquals('My Article', $f0->data['default_value']);
+        $this->assertTrue($f0->data['is_required']);
+        $this->assertTrue($f0->data['is_translatable']);
+        $this->assertTrue($f0->data['is_searchable']);
+        $this->assertFalse($f0->data['is_info_collector']);
+
+        $f1 = $ct0->fields[1];
         $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f1);
-        $this->assertEquals('title', $f1->getIdentifier());
-        $this->assertEquals('ezstring', $f1->type);
-        $this->assertEquals('content', $f1->fieldGroup);
-        $this->assertEquals(0, $f1->position);
-        $this->assertArrayHasKey('eng-GB', $f1->getNames());
-        $this->assertEquals('Title', $f1->getNames()['eng-GB']);
-        $this->assertArrayHasKey('eng-GB', $f1->getDescriptions());
-        $this->assertEquals('Title of the article', $f1->getDescriptions()['eng-GB']);
-        $this->assertEquals('My Article', $f1->defaultValue);
-        $this->assertTrue($f1->isRequired);
-        $this->assertTrue($f1->isTranslatable);
-        $this->assertTrue($f1->isSearchable);
-        $this->assertFalse($f1->isInfoCollector);
+        $this->assertEquals('content', $f1->data['identifier']);
+        $this->assertEquals('ezrichtext', $f1->data['type']);
+        $this->assertEquals('content', $f1->data['field_group']);
+        $this->assertEquals(10, $f1->data['position']);
 
-        $this->assertCount(2, $ct->getFieldDefinitions());
-        $f2 = $ct->getFieldDefinitions()[1];
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f2);
-        $this->assertEquals('content', $f2->getIdentifier());
-        $this->assertEquals('ezrichtext', $f2->type);
-        $this->assertEquals('content', $f2->fieldGroup);
-        $this->assertEquals(10, $f2->position);
-        $this->assertArrayHasKey('eng-GB', $f2->getNames());
-        $this->assertEquals('Content', $f2->getNames()['eng-GB']);
-        $this->assertArrayHasKey('eng-GB', $f2->getDescriptions());
-        $this->assertEquals('Content of the article', $f2->getDescriptions()['eng-GB']);
-        $this->assertEquals('', $f2->defaultValue);
-        $this->assertFalse($f2->isRequired);
-        $this->assertTrue($f2->isTranslatable);
-        $this->assertTrue($f2->isSearchable);
-        $this->assertFalse($f2->isInfoCollector);
+        $this->assertArrayHasKey('eng-GB', $f1->data['names']);
+        $this->assertEquals('Content', $f1->data['names']['eng-GB']);
+        $this->assertArrayHasKey('eng-GB', $f1->data['descriptions']);
+        $this->assertEquals('Content of the article', $f1->data['descriptions']['eng-GB']);
+        $this->assertEquals('', $f1->data['default_value']);
+        $this->assertFalse($f1->data['is_required']);
+        $this->assertTrue($f1->data['is_translatable']);
+        $this->assertTrue($f1->data['is_searchable']);
+        $this->assertFalse($f1->data['is_info_collector']);
     }
 
     public function testMini()
@@ -161,52 +163,53 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
 
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\ContentTypeObject', $ct);
-        $this->assertEquals('article', $ct->getIdentifier());
-        $this->assertEquals('Content', $ct->getMainGroupIdentifier());
-        $this->assertCount(1, $ct->getContentTypeGroups());
-        $this->assertEquals('Content', $ct->getContentTypeGroups()[0]);
-        $this->assertArrayHasKey('eng-GB', $ct->getNames());
-        $this->assertEquals('Article', $ct->getNames()['eng-GB']);
-        $this->assertCount(0, $ct->getDescriptions());
-        $this->assertEquals('<title>', $ct->nameSchema);
-        $this->assertEquals('<title>', $ct->urlAliasSchema);
-        $this->assertTrue($ct->isContainer);
-        $this->assertTrue($ct->defaultAlwaysAvailable);
-        $this->assertEquals(Location::SORT_FIELD_NAME, $ct->defaultSortField);
-        $this->assertEquals(Location::SORT_ORDER_ASC, $ct->defaultSortOrder);
+        $ct0 = $ct[0];
 
-        $this->assertCount(2, $ct->getFieldDefinitions());
-        $f1 = $ct->getFieldDefinitions()[0];
+        $this->assertInstanceOf('Transfer\EzPlatform\Data\ContentTypeObject', $ct0);
+        $this->assertEquals('article', $ct0->data['identifier']);
+        $this->assertCount(1, $ct0->data['contenttype_groups']);
+        $this->assertEquals('Content', $ct0->data['contenttype_groups'][0]);
+        $this->assertArrayHasKey('eng-GB', $ct0->data['names']);
+        $this->assertEquals('Article', $ct0->data['names']['eng-GB']);
+        $this->assertCount(0, $ct0->data['descriptions']);
+        $this->assertEquals('<title>', $ct0->data['name_schema']);
+        $this->assertEquals('<title>', $ct0->data['url_alias_schema']);
+        $this->assertTrue($ct0->data['is_container']);
+        $this->assertFalse($ct0->data['default_always_available']);
+        $this->assertEquals(Location::SORT_FIELD_NAME, $ct0->data['default_sort_field']);
+        $this->assertEquals(Location::SORT_ORDER_ASC, $ct0->data['default_sort_order']);
+
+        $this->assertCount(2, $ct0->fields);
+        $f0 = $ct0->fields[0];
+
+        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f0);
+        $this->assertEquals('title', $f0->data['identifier']);
+        $this->assertEquals('ezstring', $f0->data['type']);
+        $this->assertEquals('content', $f0->data['field_group']);
+        $this->assertEquals(10, $f0->data['position']);
+        $this->assertArrayHasKey('eng-GB', $f0->data['names']);
+        $this->assertEquals('Title', $f0->data['names']['eng-GB']);
+        $this->assertCount(0, $f0->data['descriptions']);
+        $this->assertNull($f0->data['default_value']);
+        $this->assertFalse($f0->data['is_required']);
+        $this->assertTrue($f0->data['is_translatable']);
+        $this->assertTrue($f0->data['is_searchable']);
+        $this->assertFalse($f0->data['is_info_collector']);
+
+        $f1 = $ct0->fields[1];
         $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f1);
-        $this->assertEquals('title', $f1->getIdentifier());
-        $this->assertEquals('ezstring', $f1->type);
-        $this->assertEquals('content', $f1->fieldGroup);
-        $this->assertEquals(10, $f1->position);
-        $this->assertArrayHasKey('eng-GB', $f1->getNames());
-        $this->assertEquals('Title', $f1->getNames()['eng-GB']);
-        $this->assertCount(0, $f1->getDescriptions());
-        $this->assertNull($f1->defaultValue);
-        $this->assertFalse($f1->isRequired);
-        $this->assertTrue($f1->isTranslatable);
-        $this->assertTrue($f1->isSearchable);
-        $this->assertFalse($f1->isInfoCollector);
-
-        $this->assertCount(2, $ct->getFieldDefinitions());
-        $f2 = $ct->getFieldDefinitions()[1];
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f2);
-        $this->assertEquals('content', $f2->getIdentifier());
-        $this->assertEquals('ezstring', $f2->type);
-        $this->assertEquals('content', $f2->fieldGroup);
-        $this->assertEquals(20, $f2->position);
-        $this->assertArrayHasKey('eng-GB', $f2->getNames());
-        $this->assertEquals('Content', $f2->getNames()['eng-GB']);
-        $this->assertCount(0, $f2->getDescriptions());
-        $this->assertNull($f2->defaultValue);
-        $this->assertFalse($f2->isRequired);
-        $this->assertTrue($f2->isTranslatable);
-        $this->assertTrue($f2->isSearchable);
-        $this->assertFalse($f2->isInfoCollector);
+        $this->assertEquals('content', $f1->data['identifier']);
+        $this->assertEquals('ezstring', $f1->data['type']);
+        $this->assertEquals('content', $f1->data['field_group']);
+        $this->assertEquals(10, $f1->data['position']);
+        $this->assertArrayHasKey('eng-GB', $f1->data['names']);
+        $this->assertEquals('Content', $f1->data['names']['eng-GB']);
+        $this->assertCount(0, $f1->data['descriptions']);
+        $this->assertNull($f1->data['default_value']);
+        $this->assertFalse($f1->data['is_required']);
+        $this->assertTrue($f1->data['is_translatable']);
+        $this->assertTrue($f1->data['is_searchable']);
+        $this->assertFalse($f1->data['is_info_collector']);
     }
 
     protected function getMiniArrayExample()
@@ -223,10 +226,9 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
     {
         return array('article' => array(
             'main_language_code' => 'eng-GB',
-            'contenttype_groups' => array('Content'),
-            'contenttype_group' => 'Full',
-            'name' => 'Article',
-            'description' => 'Article description',
+            'contenttype_groups' => 'Content',
+            'names' => 'Article',
+            'descriptions' => 'Article description',
             'name_schema' => '<title>',
             'url_alias_schema' => '<title>',
             'is_container' => true,
@@ -238,8 +240,8 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
                     'type' => 'ezstring',
                     'field_group' => 'content',
                     'position' => 0,
-                    'name' => 'Title',
-                    'description' => 'Title of the article',
+                    'names' => 'Title',
+                    'descriptions' => 'Title of the article',
                     'default_value' => 'My Article',
                     'is_required' => true,
                     'is_translatable' => true,
