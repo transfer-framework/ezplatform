@@ -13,6 +13,8 @@ use Transfer\Data\ObjectInterface;
 
 /**
  * Updater interface.
+ *
+ * @internal
  */
 interface UpdaterInterface
 {

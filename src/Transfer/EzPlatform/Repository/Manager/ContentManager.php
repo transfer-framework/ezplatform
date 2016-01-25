@@ -21,7 +21,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Exception\MalformedObjectDataException;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
@@ -29,6 +28,8 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 
 /**
  * Content manager.
+ *
+ * @internal
  */
 class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
 {
@@ -100,6 +101,9 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $object = new ContentObject($content->fields);
         $object->setContentInfo($content->contentInfo);
 
+        $type = $this->contentTypeService->loadContentType($content->contentInfo->contentTypeId);
+        $object->setContentType($type->identifier);
+
         return $object;
     }
 
@@ -109,7 +113,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            return;
+            throw new \InvalidArgumentException('Object is not supported for creation.');
         }
 
         $createStruct = $this->contentService->newContentCreateStruct(
@@ -131,8 +135,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $this->created[] = $object;
 
-        // @TODO Return ContentObject
-        return;
+        return $object;
     }
 
     /**
@@ -141,7 +144,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            return;
+            throw new \InvalidArgumentException('Object is not supported for update.');
         }
 
         $contentDraft = $this->contentService->createContentDraft($object->getProperty('content_info'));
@@ -152,13 +155,14 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $contentDraft = $this->contentService->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
         $content = $this->contentService->publishVersion($contentDraft->versionInfo);
 
-        $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::update'));
+        if ($this->logger) {
+            $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::update'));
+        }
 
         $object->setVersionInfo($content->versionInfo);
         $object->setContentInfo($content->contentInfo);
 
-        // @TODO Return ContentObject
-        return;
+        return $object;
     }
 
     /**
@@ -167,7 +171,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            return;
+            throw new \InvalidArgumentException('Object is not supported for creation or update.');
         }
 
         if (!$object->getProperty('content_id') && !$object->getProperty('remote_id')) {
@@ -175,17 +179,15 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         }
 
         if ($existingObject = $this->findByRemoteId($object->getRemoteId())) {
-            if ($object->getProperty('update') === false) {
-                return;
+            if ($this->logger) {
+                $this->logger->info(
+                    sprintf('Found existing content object with ID %d for %s',
+                        $existingObject->getProperty('content_info')->id,
+                        $existingObject->getProperty('name')
+                    ),
+                    array('ContentManager::createOrUpdate')
+                );
             }
-
-            $this->logger->info(
-                sprintf('Found existing content object with ID %d for %s',
-                    $existingObject->getProperty('content_info')->id,
-                    $existingObject->getProperty('name')
-                ),
-                array('ContentManager::createOrUpdate')
-            );
 
             return $this->update($existingObject);
         } else {
@@ -209,12 +211,12 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            return false;
+            throw new \InvalidArgumentException('Object is not supported for deletion.');
         }
 
         $object = $this->findByRemoteId($object->getRemoteId());
 
-        if ($object->getProperty('content_info')) {
+        if ($object instanceof ContentObject && $object->getProperty('content_info')) {
             $this->contentService->deleteContent($object->getProperty('content_info'));
 
             return true;
@@ -239,30 +241,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $object->setMainLocationId($location->id);
 
-        if ($object->getContentInfo() == null) {
-            return;
-        }
-
         return $this->contentService->updateContentMetadata($object->getContentInfo(), $contentMetadataUpdateStruct);
-    }
-
-    /**
-     * Tests if a content object is new.
-     *
-     * @param ContentObject $object Content object to test
-     *
-     * @return bool True, if new
-     */
-    public function isNew(ContentObject $object)
-    {
-        /** @var ContentObject $createdObject */
-        foreach ($this->created as $createdObject) {
-            if ($createdObject == $object || $createdObject->getRemoteId() == $object->getRemoteId()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -271,14 +250,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      * @param ContentObject       $object       Content object to map from
      * @param ContentCreateStruct $createStruct Content create struct to map to
      *
-     * @throws MalformedObjectDataException
+     * @throws \InvalidArgumentException
      */
     private function mapObjectToStruct(ContentObject $object, ContentCreateStruct $createStruct)
     {
-        if (!is_array($object->data)) {
-            throw new MalformedObjectDataException();
-        }
-
         $this->assignStructFieldValues($object, $createStruct);
 
         if ($object->getProperty('language')) {
@@ -288,10 +263,6 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         if ($object->getProperty('remote_id')) {
             $createStruct->remoteId = $object->getProperty('remote_id');
         }
-
-        if ($object->getProperty('modification_date')) {
-            $createStruct->modificationDate = $object->getProperty('modification_date');
-        }
     }
 
     /**
@@ -300,19 +271,11 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      * @param ContentObject       $object              Content object to map from
      * @param ContentUpdateStruct $contentUpdateStruct Content update struct to map to
      *
-     * @throws MalformedObjectDataException
+     * @throws \InvalidArgumentException
      */
     private function mapObjectToUpdateStruct(ContentObject $object, ContentUpdateStruct $contentUpdateStruct)
     {
-        if (!is_array($object->data)) {
-            throw new MalformedObjectDataException();
-        }
-
         $this->assignStructFieldValues($object, $contentUpdateStruct);
-
-        if ($object->getProperty('language')) {
-            $contentUpdateStruct->initialLanguageCode = $object->getProperty('language');
-        }
     }
 
     /**
@@ -324,6 +287,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     private function assignStructFieldValues(ContentObject $object, $struct)
     {
         foreach ($object->data as $key => $value) {
+            if (is_array($value)) {
+                $value = end($value);
+            }
+
             $struct->setField($key, $value);
         }
     }

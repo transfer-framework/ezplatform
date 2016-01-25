@@ -20,6 +20,8 @@ use Transfer\Data\ObjectInterface;
 
 /**
  * Abstract repository service.
+ *
+ * @internal
  */
 abstract class AbstractRepositoryService implements LoggerAwareInterface
 {

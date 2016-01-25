@@ -125,28 +125,19 @@ class ObjectService extends AbstractRepositoryService
      */
     public function create($object)
     {
-        if ($object instanceof ContentObject) {
-            return $this->getContentManager()->createOrUpdate($object);
-        } elseif ($object instanceof ContentTypeObject) {
-            return $this->getContentTypeManager()->createOrUpdate($object);
-        } elseif ($object instanceof LanguageObject) {
-            return $this->getLanguageManager()->createOrUpdate($object);
-        }
-    }
+        $map = array(
+            'Transfer\EzPlatform\Data\ContentObject' => array($this, 'getContentManager'),
+            'Transfer\EzPlatform\Data\ContentTypeObject' => array($this, 'getContentTypeManager'),
+            'Transfer\EzPlatform\Data\LanguageObject' => array($this, 'getLanguageManager'),
+        );
 
-    /**
-     * Tests whether an object is new.
-     *
-     * @param ObjectInterface $object Object to test.
-     *
-     * @return bool True, if new
-     */
-    public function isNew($object)
-    {
-        if ($object instanceof ContentObject) {
-            return $this->getContentManager()->isNew($object);
+        foreach ($map as $class => $callable) {
+            if ($object instanceof $class) {
+                $manager = call_user_func($callable);
+                return $manager->createOrUpdate($object);
+            }
         }
 
-        return false;
+        throw new \InvalidArgumentException('Object is not supported for creation.');
     }
 }

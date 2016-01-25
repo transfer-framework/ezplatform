@@ -13,6 +13,8 @@ use Transfer\Data\ObjectInterface;
 
 /**
  * Remover interface.
+ *
+ * @internal
  */
 interface RemoverInterface
 {
