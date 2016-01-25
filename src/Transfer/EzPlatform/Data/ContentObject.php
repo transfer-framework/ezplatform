@@ -53,16 +53,6 @@ class ContentObject extends ValueObject
     }
 
     /**
-     * Returns language.
-     *
-     * @return string
-     */
-    public function getLanguage()
-    {
-        return $this->getProperty('language');
-    }
-
-    /**
      * Sets priority.
      *
      * @param int $priority Priority
@@ -103,16 +93,6 @@ class ContentObject extends ValueObject
     }
 
     /**
-     * Adds a location ID.
-     *
-     * @param int $id Location ID
-     */
-    public function addLocationId($id)
-    {
-        $this->setProperty('location_id', array_merge((array) $this->getProperty('location_id'), array($id)));
-    }
-
-    /**
      * Sets version info.
      *
      * @param VersionInfo $versionInfo Version info
@@ -120,16 +100,6 @@ class ContentObject extends ValueObject
     public function setVersionInfo($versionInfo)
     {
         $this->setProperty('version_info', $versionInfo);
-    }
-
-    /**
-     * Returns version info.
-     *
-     * @return null|VersionInfo
-     */
-    public function getVersionInfo()
-    {
-        return $this->getProperty('version_info');
     }
 
     /**
@@ -145,7 +115,7 @@ class ContentObject extends ValueObject
     /**
      * Returns content info.
      *
-     * @return null|ContentInfo
+     * @return ContentInfo
      */
     public function getContentInfo()
     {
@@ -160,16 +130,6 @@ class ContentObject extends ValueObject
     public function setMainLocationId($id)
     {
         $this->setProperty('main_location_id', $id);
-    }
-
-    /**
-     * Returns man location ID.
-     *
-     * @return int
-     */
-    public function getMainLocationId()
-    {
-        return $this->getProperty('main_location_id');
     }
 
     /**
