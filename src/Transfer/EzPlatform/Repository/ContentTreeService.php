@@ -12,13 +12,14 @@ namespace Transfer\EzPlatform\Repository;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\LocationList;
-use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
 
 /**
  * Content tree service.
+ *
+ * @internal
  */
 class ContentTreeService extends AbstractRepositoryService
 {
@@ -43,6 +44,10 @@ class ContentTreeService extends AbstractRepositoryService
      */
     public function create($object)
     {
+        if (!($object instanceof TreeObject)) {
+            throw new \InvalidArgumentException('Invalid argument, expected object of type Transfer\Data\TreeObject');
+        }
+
         $this->publishContentObjects($object);
         $this->publishLocations($object, $this->getLocationService()->loadLocation(
             $object->getProperty('location_id')
@@ -52,29 +57,18 @@ class ContentTreeService extends AbstractRepositoryService
     /**
      * Publishes content objects.
      *
-     * @param ObjectInterface $object
+     * @param TreeObject $object
      *
      * @throws \InvalidArgumentException
      */
-    private function publishContentObjects(ObjectInterface $object)
+    private function publishContentObjects(TreeObject $object)
     {
-        if (!($object instanceof TreeObject)) {
-            throw new \InvalidArgumentException('Invalid argument, expected object of type Transfer\Data\TreeObject');
-        }
-
         $this->objectService->create($object->data);
 
-        /** @var ContentObject $subObject */
         foreach ($object->getNodes() as $subObject) {
             if ($subObject instanceof TreeObject) {
-                /* @var TreeObject $subObject */
                 $this->publishContentObjects($subObject);
             } else {
-                if ($subObject->getProperty('create_if_parent_is_new') &&
-                    !$this->objectService->isNew($object->data)) {
-                    continue;
-                }
-
                 $this->objectService->create($subObject);
             }
         }
@@ -83,30 +77,20 @@ class ContentTreeService extends AbstractRepositoryService
     /**
      * Publishes locations.
      *
-     * @param ObjectInterface $object
-     * @param Location        $parentLocation
+     * @param TreeObject $object
+     * @param Location   $parentLocation
      *
      * @throws \InvalidArgumentException
      */
-    private function publishLocations(ObjectInterface $object, Location $parentLocation)
+    private function publishLocations(TreeObject $object, Location $parentLocation)
     {
-        if (!($object instanceof TreeObject)) {
-            throw new \InvalidArgumentException('Invalid argument, expected object of type Transfer\Data\TreeObject');
-        }
-
         /** @var Location $location */
         $location = $this->publishLocation($object->data, $parentLocation);
 
-        /** @var ContentObject $subObject */
         foreach ($object->getNodes() as $subObject) {
             if ($subObject instanceof TreeObject) {
                 $this->publishLocations($subObject, $location);
             } else {
-                if ($subObject->getProperty('create_if_parent_is_new') &&
-                    !$this->objectService->isNew($object->data)) {
-                    continue;
-                }
-
                 $this->publishLocation($subObject, $location);
             }
         }
@@ -122,18 +106,16 @@ class ContentTreeService extends AbstractRepositoryService
      */
     private function publishLocation(ContentObject $object, Location $parentLocation)
     {
-        if ($object->getContentInfo() == null) {
-            return;
-        }
-
         /** @var LocationList $existingLocations */
         $existingLocations = $this->getLocationService()->loadLocationChildren($parentLocation);
         foreach ($existingLocations->locations as $location) {
             if ($location->contentInfo->id == $object->getContentInfo()->id) {
-                $this->logger->info(
-                    sprintf('Found existing location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)),
-                    array('SubtreeService::publishLocation')
-                );
+                if ($this->logger) {
+                    $this->logger->info(
+                        sprintf('Found existing location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)),
+                        array('SubtreeService::publishLocation')
+                    );
+                }
 
                 $this->ensureLocationState($object, $location);
 
@@ -148,15 +130,9 @@ class ContentTreeService extends AbstractRepositoryService
         }
 
         $location = $this->getLocationService()->createLocation($object->getContentInfo(), $locationStruct);
-        if ($location != null) {
-            if ($this->logger) {
-                $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array('SubtreeService::publishLocation'));
-            }
-        } else {
-            $this->logger->error(
-                sprintf('Failed creating location for %s', $object->getProperty('name')),
-                array('SubtreeService::publishLocation')
-            );
+
+        if ($this->logger) {
+            $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array('SubtreeService::publishLocation'));
         }
 
         $this->ensureLocationState($object, $location);

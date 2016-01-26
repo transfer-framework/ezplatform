@@ -91,7 +91,6 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     public function send(Request $request)
     {
-
         /** @var Repository $repository */
         $repository = $this->options['repository'];
         $repository->beginTransaction();
@@ -115,17 +114,9 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
                 $service->setCurrentUser($this->options['repository_current_user']);
             }
 
-            try {
-                $objects[] = $service->create($object);
-                if (!empty($objects)) {
-                    $response->setData(new \ArrayIterator($objects));
-                }
-            } catch (\Exception $e) {
-                if ($this->logger) {
-                    $this->logger->error($e->getMessage());
-                }
-
-                throw $e;
+            $objects[] = $service->create($object);
+            if (!empty($objects)) {
+                $response->setData(new \ArrayIterator($objects));
             }
         }
 

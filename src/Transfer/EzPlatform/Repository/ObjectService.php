@@ -9,12 +9,6 @@
 
 namespace Transfer\EzPlatform\Repository;
 
-use Transfer\Data\ObjectInterface;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\LanguageObject;
-use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\Data\UserObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
@@ -177,32 +171,22 @@ class ObjectService extends AbstractRepositoryService
      */
     public function create($object)
     {
-        if ($object instanceof ContentObject) {
-            return $this->getContentManager()->createOrUpdate($object);
-        } elseif ($object instanceof ContentTypeObject) {
-            return $this->getContentTypeManager()->createOrUpdate($object);
-        } elseif ($object instanceof LanguageObject) {
-            return $this->getLanguageManager()->createOrUpdate($object);
-        } elseif ($object instanceof UserGroupObject) {
-            return $this->getUserGroupManager()->createOrUpdate($object);
-        } elseif ($object instanceof UserObject) {
-            return $this->getUserManager()->createOrUpdate($object);
-        }
-    }
+        $map = array(
+            'Transfer\EzPlatform\Data\ContentObject' => array($this, 'getContentManager'),
+            'Transfer\EzPlatform\Data\ContentTypeObject' => array($this, 'getContentTypeManager'),
+            'Transfer\EzPlatform\Data\LanguageObject' => array($this, 'getLanguageManager'),
+            'Transfer\EzPlatform\Data\UserObject' => array($this, 'getUserManager'),
+            'Transfer\EzPlatform\Data\UserGroupObject' => array($this, 'getUserGroupManager'),
+        );
 
-    /**
-     * Tests whether an object is new.
-     *
-     * @param ObjectInterface $object Object to test.
-     *
-     * @return bool True, if new
-     */
-    public function isNew($object)
-    {
-        if ($object instanceof ContentObject) {
-            return $this->getContentManager()->isNew($object);
+        foreach ($map as $class => $callable) {
+            if ($object instanceof $class) {
+                $manager = call_user_func($callable);
+
+                return $manager->createOrUpdate($object);
+            }
         }
 
-        return false;
+        throw new \InvalidArgumentException('Object is not supported for creation.');
     }
 }

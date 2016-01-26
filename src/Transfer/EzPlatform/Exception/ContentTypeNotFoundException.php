@@ -10,12 +10,8 @@
 namespace Transfer\EzPlatform\Exception;
 
 /**
- * Exception class for cases when object data is malformed.
+ * Exception class for cases when contenttype is not found.
  */
-class MalformedObjectDataException extends \Exception
+class ContentTypeNotFoundException extends \Exception
 {
-    public function __construct()
-    {
-        parent::__construct('Malformed object data');
-    }
 }
