@@ -17,6 +17,8 @@ use Transfer\EzPlatform\Data\FieldDefinitionObject;
 /**
  * Field definition mapper.
  *
+ * @internal
+ *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
 class FieldDefinitionMapper
@@ -37,7 +39,7 @@ class FieldDefinitionMapper
     /**
      * @param FieldDefinitionCreateStruct $fieldDefinitionStruct
      */
-    public function populateCreateStruct(FieldDefinitionCreateStruct $fieldDefinitionStruct)
+    public function populateFieldDefinitionCreateStruct(FieldDefinitionCreateStruct $fieldDefinitionStruct)
     {
         $this->populateStruct($fieldDefinitionStruct);
     }
@@ -45,7 +47,7 @@ class FieldDefinitionMapper
     /**
      * @param FieldDefinitionUpdateStruct $fieldDefinitionStruct
      */
-    public function populateUpdateStruct(FieldDefinitionUpdateStruct $fieldDefinitionStruct)
+    public function populateFieldDefinitionUpdateStruct(FieldDefinitionUpdateStruct $fieldDefinitionStruct)
     {
         $this->populateStruct($fieldDefinitionStruct);
     }
@@ -57,14 +59,14 @@ class FieldDefinitionMapper
      */
     protected function populateStruct(ValueObject $fieldDefinitionStruct)
     {
-        $fieldDefinitionStruct->names = $this->fieldDefinitionObject->getNames();
-        $fieldDefinitionStruct->descriptions = $this->fieldDefinitionObject->getDescriptions();
-        $fieldDefinitionStruct->fieldGroup = $this->fieldDefinitionObject->fieldGroup;
-        $fieldDefinitionStruct->position = $this->fieldDefinitionObject->position;
-        $fieldDefinitionStruct->isTranslatable = $this->fieldDefinitionObject->isTranslatable;
-        $fieldDefinitionStruct->isRequired = $this->fieldDefinitionObject->isRequired;
-        $fieldDefinitionStruct->isInfoCollector = $this->fieldDefinitionObject->isInfoCollector;
-        $fieldDefinitionStruct->isSearchable = $this->fieldDefinitionObject->isSearchable;
+        $fieldDefinitionStruct->names = $this->fieldDefinitionObject->data['names'];
+        $fieldDefinitionStruct->descriptions = $this->fieldDefinitionObject->data['descriptions'];
+        $fieldDefinitionStruct->fieldGroup = $this->fieldDefinitionObject->data['field_group'];
+        $fieldDefinitionStruct->position = $this->fieldDefinitionObject->data['position'];
+        $fieldDefinitionStruct->isTranslatable = $this->fieldDefinitionObject->data['is_translatable'];
+        $fieldDefinitionStruct->isRequired = $this->fieldDefinitionObject->data['is_required'];
+        $fieldDefinitionStruct->isInfoCollector = $this->fieldDefinitionObject->data['is_info_collector'];
+        $fieldDefinitionStruct->isSearchable = $this->fieldDefinitionObject->data['is_searchable'];
 
         return $fieldDefinitionStruct;
     }

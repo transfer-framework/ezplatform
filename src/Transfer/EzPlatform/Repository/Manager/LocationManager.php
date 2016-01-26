@@ -22,6 +22,8 @@ use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 
 /**
  * Location manager.
+ *
+ * @internal
  */
 class LocationManager implements LoggerAwareInterface, CreatorInterface, RemoverInterface
 {
