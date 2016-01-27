@@ -26,6 +26,8 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 
 /**
  * User Group manager.
+ *
+ * @internal
  */
 class UserGroupManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
 {

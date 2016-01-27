@@ -25,6 +25,8 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 
 /**
  * User manager.
+ *
+ * @internal
  */
 class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
 {
