@@ -12,6 +12,7 @@ namespace Transfer\EzPlatform\Repository\Manager;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\UserService;
 use eZ\Publish\API\Repository\Values\User\User;
+use eZ\Publish\API\Repository\Values\User\UserGroup;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
@@ -146,25 +147,10 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
         $ezuser = $this->userService->updateUser($user, $userUpdateStruct);
 
         // Assign user to usergroups
-        $ezUserGroups = [];
-        foreach ($object->parents as $userGroup) {
-            $userGroup = $this->userGroupManager->createOrUpdate($userGroup);
-            if ($userGroup instanceof UserGroupObject) {
-                $ezUserGroup = $this->userGroupManager->find($userGroup->data['id']);
-                if ($ezUserGroup) {
-                    $ezUserGroups[$ezUserGroup->id] = $ezUserGroup;
-                    $this->userService->assignUserToUserGroup($ezuser, $ezUserGroup);
-                }
-            }
-        }
+        $ezUserGroups = $this->assignUserToUserGroups($ezuser, $object->parents);
 
         // Unassign user from usergroups
-        $existingUserGroups = $this->userService->loadUserGroupsOfUser($ezuser);
-        foreach ($existingUserGroups as $existingUserGroup) {
-            if (!array_key_exists($existingUserGroup->id, $ezUserGroups)) {
-                $this->userService->unAssignUserFromUserGroup($ezuser, $existingUserGroup);
-            }
-        }
+        $this->unassignUserFromUserGroups($ezuser, $ezUserGroups);
 
         return $object;
     }
@@ -201,5 +187,46 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
         }
 
         return true;
+    }
+
+    /**
+     * Assigns a collection of Transfer user groups from an eZ user, and returns the once who were added.
+     *
+     * @param User              $user
+     * @param UserGroupObject[] $userGroupObjects
+     *
+     * @return UserGroup[]
+     */
+    protected function assignUserToUserGroups(User $user, array $userGroupObjects)
+    {
+        $ezUserGroups = [];
+        foreach ($userGroupObjects as $userGroup) {
+            $userGroup = $this->userGroupManager->createOrUpdate($userGroup);
+            if ($userGroup instanceof UserGroupObject) {
+                $ezUserGroup = $this->userGroupManager->find($userGroup->data['id']);
+                if ($ezUserGroup) {
+                    $ezUserGroups[$ezUserGroup->id] = $ezUserGroup;
+                    $this->userService->assignUserToUserGroup($user, $ezUserGroup);
+                }
+            }
+        }
+
+        return $ezUserGroups;
+    }
+
+    /**
+     * Unassigns a collection of eZ UserGroups from an eZ User.
+     *
+     * @param User        $user
+     * @param UserGroup[] $userGroups
+     */
+    protected function unassignUserFromUserGroups(User $user, array $userGroups)
+    {
+        $existingUserGroups = $this->userService->loadUserGroupsOfUser($user);
+        foreach ($existingUserGroups as $existingUserGroup) {
+            if (!array_key_exists($existingUserGroup->id, $userGroups)) {
+                $this->userService->unAssignUserFromUserGroup($user, $existingUserGroup);
+            }
+        }
     }
 }
