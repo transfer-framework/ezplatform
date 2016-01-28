@@ -14,7 +14,6 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LanguageService;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Language;
-use eZ\Publish\API\Repository\Values\Content\LanguageCreateStruct;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
@@ -106,7 +105,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             $language = $this->findByCode($object->data['code']);
             $this->languageService->enableLanguage($language);
         } catch (NotFoundException $notFoundException) {
-            $languageCreateStruct = new LanguageCreateStruct();
+            $languageCreateStruct = $this->languageService->newLanguageCreateStruct();
             $languageCreateStruct->languageCode = $object->data['code'];
             $languageCreateStruct->name = $object->data['name'];
             $this->languageService->createLanguage($languageCreateStruct);
