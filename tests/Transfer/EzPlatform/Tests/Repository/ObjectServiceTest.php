@@ -10,7 +10,6 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Repository;
-use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Repository\ObjectService;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -44,10 +43,18 @@ class ObjectServiceTest extends EzPlatformTestCase
         $this->service->getLanguageManager();
         $languageManager = $this->service->getLanguageManager();
 
+        $this->service->getUserManager();
+        $userManager = $this->service->getUserManager();
+
+        $this->service->getUserGroupManager();
+        $userGroupManager = $this->service->getUserGroupManager();
+
         $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\ContentManager', $contentManager);
         $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\LocationManager', $locationManager);
         $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\ContentTypeManager', $contentTypeManager);
         $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\LanguageManager', $languageManager);
+        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\UserManager', $userManager);
+        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\UserGroupManager', $userGroupManager);
     }
 
     public function testCreateWithNullArgument()

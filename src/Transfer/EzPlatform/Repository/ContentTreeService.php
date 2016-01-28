@@ -12,7 +12,6 @@ namespace Transfer\EzPlatform\Repository;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\LocationList;
-use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
@@ -79,7 +78,7 @@ class ContentTreeService extends AbstractRepositoryService
      * Publishes locations.
      *
      * @param TreeObject $object
-     * @param Location        $parentLocation
+     * @param Location   $parentLocation
      *
      * @throws \InvalidArgumentException
      */

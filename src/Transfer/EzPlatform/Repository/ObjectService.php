@@ -9,14 +9,12 @@
 
 namespace Transfer\EzPlatform\Repository;
 
-use Transfer\Data\ObjectInterface;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
+use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
+use Transfer\EzPlatform\Repository\Manager\UserManager;
 
 /**
  * Object service.
@@ -42,6 +40,16 @@ class ObjectService extends AbstractRepositoryService
      * @var LanguageManager
      */
     private $languageManager;
+
+    /**
+     * @var UserGroupManager
+     */
+    private $userGroupManager;
+
+    /**
+     * @var UserManager
+     */
+    private $userManager;
 
     /**
      * Returns content manager.
@@ -121,6 +129,44 @@ class ObjectService extends AbstractRepositoryService
     }
 
     /**
+     * Returns user group manager.
+     *
+     * @return UserGroupManager
+     */
+    public function getUserGroupManager()
+    {
+        if ($this->userGroupManager != null) {
+            return $this->userGroupManager;
+        }
+
+        $this->userGroupManager = new Manager\UserGroupManager($this->repository);
+        if ($this->logger) {
+            $this->userGroupManager->setLogger($this->logger);
+        }
+
+        return $this->userGroupManager;
+    }
+
+    /**
+     * Returns user manager.
+     *
+     * @return UserManager
+     */
+    public function getUserManager()
+    {
+        if ($this->userManager != null) {
+            return $this->userManager;
+        }
+
+        $this->userManager = new Manager\UserManager($this->repository, $this->getUserGroupManager());
+        if ($this->logger) {
+            $this->userManager->setLogger($this->logger);
+        }
+
+        return $this->userManager;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function create($object)
@@ -129,11 +175,14 @@ class ObjectService extends AbstractRepositoryService
             'Transfer\EzPlatform\Data\ContentObject' => array($this, 'getContentManager'),
             'Transfer\EzPlatform\Data\ContentTypeObject' => array($this, 'getContentTypeManager'),
             'Transfer\EzPlatform\Data\LanguageObject' => array($this, 'getLanguageManager'),
+            'Transfer\EzPlatform\Data\UserObject' => array($this, 'getUserManager'),
+            'Transfer\EzPlatform\Data\UserGroupObject' => array($this, 'getUserGroupManager'),
         );
 
         foreach ($map as $class => $callable) {
             if ($object instanceof $class) {
                 $manager = call_user_func($callable);
+
                 return $manager->createOrUpdate($object);
             }
         }

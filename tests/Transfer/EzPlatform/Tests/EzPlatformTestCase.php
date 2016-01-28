@@ -18,6 +18,8 @@ use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
+use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
+use Transfer\EzPlatform\Repository\Manager\UserManager;
 
 /**
  * Common eZ Platform test case.
@@ -50,6 +52,16 @@ abstract class EzPlatformTestCase extends KernelTestCase
     protected static $languageManager;
 
     /**
+     * @var UserGroupManager
+     */
+    protected static $userGroupManager;
+
+    /**
+     * @var UserManager
+     */
+    protected static $userManager;
+
+    /**
      * @var bool
      */
     protected static $hasDatabase;
@@ -64,6 +76,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
         static::$repository = $setupFactory->getRepository();
         static::$languageManager = new LanguageManager(static::$repository);
         static::$contentTypeManager = new ContentTypeManager(static::$repository, static::$languageManager);
+        static::$userGroupManager = new UserGroupManager(static::$repository);
+        static::$userManager = new UserManager(static::$repository, static::$userGroupManager);
 
         static::setUpContentTypes();
 
