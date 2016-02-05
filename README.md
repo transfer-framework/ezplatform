@@ -11,9 +11,9 @@ This extension is still under development. There is currently no stable release.
 Installation
 ------------
 
-Install the latest version with:
+Install the latest *development* version with:
 
-    $ composer require transfer/ezplatform
+    $ composer require transfer/ezplatform:1.0.x-dev
 
 This requires [Composer](https://getcomposer.org/download/) to be installed globally in your system.
 
