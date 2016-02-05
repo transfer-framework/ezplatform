@@ -147,6 +147,11 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new \InvalidArgumentException('Object is not supported for update.');
         }
 
+        $existingContent = $this->findByRemoteId($object->getRemoteId());
+        if (null === $object->getProperty('content_info')) {
+            $object->setProperty('content_info', $existingContent->getContentInfo());
+        }
+
         $contentDraft = $this->contentService->createContentDraft($object->getProperty('content_info'));
 
         $contentUpdateStruct = $this->contentService->newContentUpdateStruct();
@@ -178,29 +183,9 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new MissingIdentificationPropertyException($object);
         }
 
-        if ($existingObject = $this->findByRemoteId($object->getRemoteId())) {
-            if ($this->logger) {
-                $this->logger->info(
-                    sprintf('Found existing content object with ID %d for %s',
-                        $existingObject->getProperty('content_info')->id,
-                        $existingObject->getProperty('name')
-                    ),
-                    array('ContentManager::createOrUpdate')
-                );
-            }
-
-            return $this->update($existingObject);
+        if ($this->findByRemoteId($object->getRemoteId())) {
+            return $this->update($object);
         } else {
-            if ($this->logger) {
-                $this->logger->info(
-                    sprintf(
-                        'No existing content object for %s. Creating new content object...',
-                        $object->getProperty('name')
-                    ),
-                    array('ContentManager::createOrUpdate')
-                );
-            }
-
             return $this->create($object);
         }
     }

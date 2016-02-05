@@ -114,7 +114,13 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
                 $service->setCurrentUser($this->options['repository_current_user']);
             }
 
-            $objects[] = $service->create($object);
+            try {
+                $objects[] = $service->create($object);
+            } catch(\Exception $e) {
+                $repository->rollback();
+                throw $e;
+            }
+
             if (!empty($objects)) {
                 $response->setData(new \ArrayIterator($objects));
             }

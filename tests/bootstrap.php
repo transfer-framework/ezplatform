@@ -17,4 +17,4 @@ if (!file_exists($configDir.'/config.php')) {
 
 $loader = require __DIR__.'/../vendor/autoload.php';
 $loader->addPsr4('Transfer\\EzPlatform\\', __DIR__.'/../src/Transfer/EzPlatform');
-$loader->addPsr4('Transfer\\EzPlatform\\Tests\\', __DIR__.'/Transfer/EzPlatform/Tests');
+$loader->addPsr4('Transfer\\EzPlatform\\Tests\\', __DIR__.'/unit/Transfer/EzPlatform/Tests');
