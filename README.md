@@ -36,8 +36,8 @@ Handling the following type of data:
 - [x] ContentType and FieldTypes
 - [x] ContentTypeGroups
 - [x] Languages
-- [ ] Users
-- [ ] Roles and policies
+- [x] Users and UserGroups
+- [ ] Roles and Policies
 - [ ] Documentation
 
 All of these might not be implemented before the first stable tagged release.
