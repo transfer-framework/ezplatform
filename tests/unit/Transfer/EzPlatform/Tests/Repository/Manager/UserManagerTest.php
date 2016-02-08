@@ -146,7 +146,16 @@ class UserManagerTest extends EzPlatformTestCase
 
     protected function getUser()
     {
-        $user = new UserObject(array(
+        return new UserObject(array(
+            'username' => 'test_user',
+            'email' => 'test@example.com',
+            'password' => 'test123',
+            'main_language_code' => 'eng-GB',
+            'enabled' => true,
+            'fields' => array(
+                'first_name' => 'Test',
+                'last_name' => 'User',
+            ),
             'parents' => array(
                 new UserGroupObject(array(
                     'parent_id' => 12,
@@ -157,25 +166,7 @@ class UserManagerTest extends EzPlatformTestCase
                     ),
                 )),
             ),
-            'username' => 'test_user',
-            'email' => 'test@example.com',
-            'password' => 'test123',
-            'main_language_code' => 'eng-GB',
-            'enabled' => true,
-            'fields' => array(
-                'first_name' => 'Test',
-                'last_name' => 'User',
-            ),
         ));
-        $user->parents = array(
-            new UserGroupObject(array(
-                'fields' => array(
-                    'name' => 'Members',
-                ),
-            )),
-        );
-
-        return $user;
     }
 
     protected function getUpdateUser()

@@ -166,7 +166,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             return;
         }
 
-        if (isset($object->data['id'])) {
+        if (array_key_exists('id', $object->data)) {
             $userGroup = $this->find($object->data['id']);
         }
         if (!isset($userGroup) || false === $userGroup) {
