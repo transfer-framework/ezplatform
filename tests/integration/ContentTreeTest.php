@@ -1,12 +1,11 @@
 <?php
 
-namespace Transfer\EzPlatform\Tests\Integration;
+namespace Transfer\EzPlatform\tests\integration;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\TreeObject;
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
@@ -26,7 +25,7 @@ class ContentTreeTest extends EzPlatformTestCase
     }
 
     /**
-     * Create a Folder which contains an Article
+     * Create a Folder which contains an Article.
      *
      * @throws \Exception
      */
@@ -119,23 +118,26 @@ class ContentTreeTest extends EzPlatformTestCase
     /**
      * Creates a TreeObject skeleton.
      *
-     * @param int $locationId
+     * @param int   $locationId
      * @param array $data
+     *
      * @return TreeObject
      */
     private function getTreeObject($locationId, $data)
     {
         $tree = new TreeObject($data);
         $tree->setProperty('location_id', $locationId);
+
         return $tree;
     }
 
     /**
      * Creates a ContentObject skeleton.
      *
-     * @param array $data
+     * @param array  $data
      * @param string $contenttype
      * @param string $remoteId
+     *
      * @return ContentObject
      */
     private function getContentObject(array $data, $contenttype, $remoteId)
@@ -144,11 +146,13 @@ class ContentTreeTest extends EzPlatformTestCase
         $content->setContentType($contenttype);
         $content->setRemoteId($remoteId);
         $content->setLanguage('eng-GB');
+
         return $content;
     }
 
     /**
      * @param $content
+     *
      * @return string
      */
     private function getRichtext($content)
