@@ -116,7 +116,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
             try {
                 $objects[] = $service->create($object);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $repository->rollback();
                 throw $e;
             }
