@@ -17,6 +17,8 @@ use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\Content\Query;
+use eZ\Publish\Core\Repository\Values\Content\TrashItem;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
@@ -25,6 +27,7 @@ use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
+use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
 /**
  * Content manager.
@@ -152,6 +155,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $object->setProperty('content_info', $existingContent->getContentInfo());
         }
 
+        $this->ensureNotTrashed($object);
+
         $contentDraft = $this->contentService->createContentDraft($object->getProperty('content_info'));
 
         $contentUpdateStruct = $this->contentService->newContentUpdateStruct();
@@ -277,6 +282,27 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             }
 
             $struct->setField($key, $value);
+        }
+    }
+
+    /**
+     * @param ContentObject $object
+     * @param Location      $location
+     */
+    private function ensureNotTrashed(ContentObject $object)
+    {
+        $query = new Query();
+        $query->filter = new Criterion\ContentId($object->getContentInfo()->id);
+        $trash = $this->repository->getTrashService()->findTrashItems($query);
+        if ($trash->count > 0) {
+            /** @var TrashItem $trashItem */
+            $trashItem = $trash->items[0];
+            $parentLocation = $this->repository->getLocationService()->loadLocation($trashItem->parentLocationId);
+            $this->repository->getTrashService()->recover($trashItem, $parentLocation);
+            if ($this->logger) {
+                $this->logger->warning(sprintf('Content with remote id %s was found in the trash, recovering it and continues the proccess. '.
+                    'Please check if this is correct, and prevent it from happening again.', $object->getRemoteId()));
+            }
         }
     }
 }

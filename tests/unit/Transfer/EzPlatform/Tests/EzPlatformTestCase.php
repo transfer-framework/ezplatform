@@ -14,7 +14,9 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\Core\Repository\Tests\Service\Integration\Legacy\SetupFactory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
+use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
@@ -125,5 +127,54 @@ abstract class EzPlatformTestCase extends KernelTestCase
         ));
 
         static::$contentTypeManager->createOrUpdate($_ct_article);
+    }
+
+    /**
+     * Creates a TreeObject skeleton.
+     *
+     * @param int   $locationId
+     * @param array $data
+     *
+     * @return TreeObject
+     */
+    protected function getTreeObject($locationId, $data)
+    {
+        $tree = new TreeObject($data);
+        $tree->setProperty('location_id', $locationId);
+
+        return $tree;
+    }
+
+    /**
+     * Creates a ContentObject skeleton.
+     *
+     * @param array  $data
+     * @param string $contenttype
+     * @param string $remoteId
+     *
+     * @return ContentObject
+     */
+    protected function getContentObject(array $data, $contenttype, $remoteId)
+    {
+        $content = new ContentObject($data);
+        $content->setContentType($contenttype);
+        $content->setRemoteId($remoteId);
+        $content->setLanguage('eng-GB');
+
+        return $content;
+    }
+
+    /**
+     * @param $content
+     *
+     * @return string
+     */
+    protected function getRichtext($content)
+    {
+        return sprintf(
+            '<?xml version="1.0" encoding="UTF-8"?>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0-variant ezpublish-1.0">%s</section>
+',
+            $content);
     }
 }

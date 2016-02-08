@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use Psr\Log\NullLogger;
 use Transfer\Data\TreeObject;
 use Transfer\Data\ValueObject;
@@ -25,6 +26,7 @@ class ContentTreeServiceTest extends EzPlatformTestCase
     public function setUp()
     {
         $objectService = new ObjectService(static::$repository);
+        $objectService->setLogger(new NullLogger());
         $this->service = new ContentTreeService(static::$repository, $objectService);
         $this->service->setLogger(new NullLogger());
     }
@@ -65,5 +67,25 @@ class ContentTreeServiceTest extends EzPlatformTestCase
         $this->setExpectedException('InvalidArgumentException');
 
         $this->service->create(new ValueObject(null));
+    }
+
+    public function testPublishTrashed()
+    {
+        $tree = $this->getTreeObject(2,
+            $this->getContentObject(
+                array(
+                    'name' => 'Test folder',
+                ),
+                'folder',
+                'content_trashed_folder_0'
+            )
+        );
+
+        $this->service->create($tree);
+        $contentInfo = static::$repository->getContentService()->loadContentInfoByRemoteId('content_trashed_folder_0');
+        $this->assertInstanceOf(ContentInfo::class, $contentInfo);
+        $location = static::$repository->getLocationService()->loadLocation($contentInfo->mainLocationId);
+        static::$repository->getTrashService()->trash($location);
+        $this->service->create($tree);
     }
 }
