@@ -107,7 +107,7 @@ class ContentTreeService extends AbstractRepositoryService
     private function publishLocation(ContentObject $object, Location $parentLocation)
     {
         /** @var LocationList $existingLocations */
-        $existingLocations = $this->getLocationService()->loadLocationChildren($parentLocation);
+        $existingLocations = $this->getLocationService()->loadLocationChildren($parentLocation, 0, PHP_INT_MAX);
         foreach ($existingLocations->locations as $location) {
             if ($location->contentInfo->id == $object->getContentInfo()->id) {
                 if ($this->logger) {
