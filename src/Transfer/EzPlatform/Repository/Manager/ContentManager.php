@@ -18,6 +18,7 @@ use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\Query;
+use eZ\Publish\API\Repository\Values\Content\SearchResult;
 use eZ\Publish\Core\Repository\Values\Content\TrashItem;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -107,6 +108,13 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $type = $this->contentTypeService->loadContentType($content->contentInfo->contentTypeId);
         $object->setContentType($type->identifier);
 
+        if ($object->getContentInfo()->published) {
+            $locations = $this->repository->getLocationService()->loadLocations($content->contentInfo);
+            foreach ($locations as $location) {
+                $object->addParentLocation($location);
+            }
+        }
+
         return $object;
     }
 
@@ -124,9 +132,9 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $object->getProperty('language')
         );
 
-        $this->mapObjectToStruct($object, $createStruct);
+        $this->mapObjectToContentStruct($object, $createStruct);
 
-        $content = $this->contentService->createContent($createStruct);
+        $content = $this->contentService->createContent($createStruct, $object->getParentLocations());
         $this->contentService->publishVersion($content->versionInfo);
 
         if ($this->logger) {
@@ -161,7 +169,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $contentUpdateStruct = $this->contentService->newContentUpdateStruct();
         $this->mapObjectToUpdateStruct($object, $contentUpdateStruct);
-
+        
         $contentDraft = $this->contentService->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
         $content = $this->contentService->publishVersion($contentDraft->versionInfo);
 
@@ -242,7 +250,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      *
      * @throws \InvalidArgumentException
      */
-    private function mapObjectToStruct(ContentObject $object, ContentCreateStruct $createStruct)
+    private function mapObjectToContentStruct(ContentObject $object, ContentCreateStruct $createStruct)
     {
         $this->assignStructFieldValues($object, $createStruct);
 
@@ -287,16 +295,28 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
     /**
      * @param ContentObject $object
-     * @param Location      $location
      */
     private function ensureNotTrashed(ContentObject $object)
     {
+        /* @var TrashItem $trashItem */
+
         $query = new Query();
         $query->filter = new Criterion\ContentId($object->getContentInfo()->id);
-        $trash = $this->repository->getTrashService()->findTrashItems($query);
-        if ($trash->count > 0) {
-            /** @var TrashItem $trashItem */
-            $trashItem = $trash->items[0];
+
+        /** @var SearchResult $result */
+        $result = $this->repository->getTrashService()->findTrashItems($query);
+        if ($result->count == 1) {
+            $trashItem = $result->items[0];
+        } elseif ($result->count > 1) {
+            foreach ($result->items as $trash) {
+                if ($trash->contentInfo->id == $object->getContentInfo()->id) {
+                    $trashItem = $trash;
+                    break;
+                }
+            }
+        }
+
+        if (isset($trashItem)) {
             $parentLocation = $this->repository->getLocationService()->loadLocation($trashItem->parentLocationId);
             $this->repository->getTrashService()->recover($trashItem, $parentLocation);
             if ($this->logger) {

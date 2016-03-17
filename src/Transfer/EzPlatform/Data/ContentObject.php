@@ -10,8 +10,11 @@
 namespace Transfer\EzPlatform\Data;
 
 use eZ\Publish\API\Repository\Values\Content\ContentInfo;
+use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\VersionInfo;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 
 /**
  * Content object.
@@ -30,6 +33,13 @@ class ContentObject extends ValueObject
             $properties,
             array('main_object' => true)
         ));
+
+        if (isset($properties['parent_locations'])) {
+            $this->properties['parent_locations'] = [];
+            array_walk($properties['parent_locations'], function ($location) {
+                $this->addParentLocation($location);
+            });
+        }
     }
 
     /**
@@ -172,5 +182,59 @@ class ContentObject extends ValueObject
     public function isMainObject()
     {
         return (boolean) $this->getProperty('main_object');
+    }
+
+    /**
+     * Convert parameters to LocationCreateStruct and stores it on the ContentObject.
+     *
+     * @param LocationCreateStruct|LocationObject|int $parentLocation
+     */
+    public function addParentLocation($parentLocation)
+    {
+        if ($parentLocation instanceof LocationCreateStruct) {
+            $locationCreateStruct = $parentLocation;
+        } else {
+            $locationCreateStruct = $this->convertToLocationCreateStruct($parentLocation);
+        }
+
+        if ((int) $locationCreateStruct->parentLocationId < 2) {
+            throw new InvalidDataStructureException('Location id must be an integer of 2 or above.');
+        }
+
+        $this->properties['parent_locations'][$locationCreateStruct->parentLocationId] = $locationCreateStruct;
+    }
+
+    /**
+     * Accepts parameter as int, Location or LocationObject.
+     *
+     * @param $parentLocation
+     *
+     * @return LocationCreateStruct
+     */
+    private function convertToLocationCreateStruct($parentLocation)
+    {
+        $locationCreateStruct = new LocationCreateStruct();
+        if ($parentLocation instanceof Location) {
+            $locationCreateStruct->parentLocationId = $parentLocation->parentLocationId;
+            $locationCreateStruct->hidden = $parentLocation->hidden;
+            $locationCreateStruct->priority = $parentLocation->priority;
+            $locationCreateStruct->sortField = $parentLocation->sortField;
+            $locationCreateStruct->sortOrder = $parentLocation->sortOrder;
+            $locationCreateStruct->remoteId = $parentLocation->remoteId;
+        } elseif ($parentLocation instanceof LocationObject) {
+            $locationCreateStruct->parentLocationId = $parentLocation->data['parent_id'];
+        } elseif (is_int($parentLocation)) {
+            $locationCreateStruct->parentLocationId = $parentLocation;
+        }
+
+        return $locationCreateStruct;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParentLocations()
+    {
+        return (array) $this->getProperty('parent_locations');
     }
 }

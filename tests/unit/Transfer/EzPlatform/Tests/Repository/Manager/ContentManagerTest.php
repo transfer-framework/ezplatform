@@ -9,9 +9,12 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;
+use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -51,6 +54,110 @@ class ContentManagerTest extends EzPlatformTestCase
 
         $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
         $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
+    }
+
+    public function testCreateWithLocation()
+    {
+        $contentObject = new ContentObject(
+            array( // fields
+                'name' => 'Test name',
+                'title' => 'Test title',
+                'description' => 'Test description',
+            ), array( // properties
+                'parent_locations' => array(2),
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => '_test_locations_1',
+            )
+        );
+
+        $this->manager->create($contentObject);
+
+        $createdContentObject = $this->manager->findByRemoteId('_test_locations_1');
+
+        $this->assertEquals('Test name', (string) $createdContentObject->data['name']['eng-GB']);
+        $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
+        $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
+
+        $parentLocations = $createdContentObject->getParentLocations();
+
+        $this->assertCount(1, $parentLocations);
+        $this->assertInstanceOf(LocationCreateStruct::class, current($parentLocations));
+        $this->assertEquals(2, current($parentLocations)->parentLocationId);
+    }
+
+    public function testCreateWithMulipleTypesOfLocation()
+    {
+        $contentObject = new ContentObject(array(
+            'name' => 'Test title',
+            'title' => 'Test title',
+            'description' => 'Test description',
+        ));
+        $contentObject->setContentType('_test_article');
+        $contentObject->setLanguage('eng-GB');
+        $contentObject->setRemoteId('_test_locations_2');
+        $contentObject->addParentLocation(2);
+        $contentObject->addParentLocation(new LocationObject(array('parent_id' => 2)));
+        $locationStruct = new LocationCreateStruct();
+        $locationStruct->parentLocationId = 2;
+        $contentObject->addParentLocation($locationStruct);
+
+        $this->manager->create($contentObject);
+
+        $createdContentObject = $this->manager->findByRemoteId('_test_locations_2');
+
+        $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
+        $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
+    }
+
+    public function testCreateWithInvalidLocation()
+    {
+        $this->setExpectedException(InvalidDataStructureException::class);
+
+        $this->manager->create(
+            new ContentObject(
+                array(
+                    'name' => 'Test name',
+                    'title' => 'Test title',
+                    'description' => 'Test description',
+                ), array(
+                    'parent_locations' => array('im not a valid location'),
+                    'content_type_identifier' => '_test_article',
+                    'language' => 'eng-GB',
+                    'remote_id' => '_test_locations_1',
+                )
+            )
+        );
+    }
+
+    public function testUpdateithMulipleTypesOfLocation()
+    {
+        $contentObject = new ContentObject(array(
+            'name' => 'Test title',
+            'title' => 'Test title',
+            'description' => 'Test description',
+        ));
+        $contentObject->setContentType('_test_article');
+        $contentObject->setLanguage('eng-GB');
+        $contentObject->setRemoteId('_test_locations_2');
+        $contentObject->addParentLocation(2);
+        $contentObject->addParentLocation(new LocationObject(array('parent_id' => 5)));
+        $locationStruct = new LocationCreateStruct();
+        $locationStruct->parentLocationId = 5;
+        $contentObject->addParentLocation($locationStruct);
+
+        $this->manager->update($contentObject);
+
+        $createdContentObject = $this->manager->findByRemoteId('_test_locations_2');
+
+        $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
+        $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
+
+        $parentLocations = $createdContentObject->getParentLocations();
+
+        $this->assertCount(1, $parentLocations);
+        $this->assertInstanceOf(LocationCreateStruct::class, current($parentLocations));
+        $this->assertEquals(5, current($parentLocations)->parentLocationId);
     }
 
     public function testCreateWithInvalidArgument()
