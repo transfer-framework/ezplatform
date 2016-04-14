@@ -11,19 +11,21 @@ namespace Transfer\EzPlatform\Repository\Manager;
 
 use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\ContentTypeService;
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
+use eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\Query;
-use eZ\Publish\API\Repository\Values\Content\SearchResult;
-use eZ\Publish\Core\Repository\Values\Content\TrashItem;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\EzPlatform\Data\ContentObject;
+use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
@@ -38,9 +40,9 @@ use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
 {
     /**
-     * @var Repository
+     * @var LocationManager
      */
-    private $repository;
+    private $locationManager;
 
     /**
      * @var ContentService
@@ -63,20 +65,14 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     protected $logger;
 
     /**
-     * @var array List of created content objects.
-     */
-    private $created = array();
-
-    /**
      * @param Repository $repository
      */
-    public function __construct(Repository $repository)
+    public function __construct(Repository $repository, LocationManager $locationManager)
     {
-        $this->repository = $repository;
+        $this->locationManager = $locationManager;
         $this->contentService = $repository->getContentService();
         $this->contentTypeService = $repository->getContentTypeService();
         $this->locationService = $repository->getLocationService();
-        $this->repository = $repository;
     }
 
     /**
@@ -88,34 +84,58 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     }
 
     /**
-     * Finds a content object by remote ID.
+     * Finds a content object by content ID or remote ID.
      *
-     * @param string $remoteId Remote ID
+     * @param ContentObject $object
      *
-     * @return ContentObject
+     * @return ContentObject|false
+     *
+     * @throws NotFoundException
+     * @throws \Transfer\EzPlatform\Exception\InvalidDataStructureException
      */
-    public function findByRemoteId($remoteId)
+    public function find(ContentObject $object)
     {
-        try {
-            $content = $this->contentService->loadContentByRemoteId($remoteId);
-        } catch (\Exception $e) {
-            return;
+        if($object->getProperty('id')) {
+            try {
+                $content = $this->contentService->loadContent($object->getProperty('id'));
+            } catch (NotFoundException $notFoundException) {
+                // We'll store if for now, and throw it later if needed
+                $e = $notFoundException;
+            }
+        }elseif($object->getProperty('remote_id')) {
+            try {
+                $content = $this->contentService->loadContentByRemoteId($object->getProperty('remote_id'));
+            } catch (NotFoundException $notFoundException) {
+                // We'll throw it later if needed
+                $e = $notFoundException;
+            }
+        }else{
+            return false;
         }
 
-        $object = new ContentObject($content->fields);
-        $object->setContentInfo($content->contentInfo);
+        if(!isset($content) && isset($e)) {
+            throw $e;
+        }
+
+        $object = new ContentObject(array());
+        $object->getMapper()->contentToObject($content);
+        
+        if($content->contentInfo->published) {
+            $locations = $this->locationService->loadLocations($content->contentInfo);
+            $object->setParentLocations($locations);
+        }
 
         $type = $this->contentTypeService->loadContentType($content->contentInfo->contentTypeId);
-        $object->setContentType($type->identifier);
+        $object->setProperty('content_type_identifier', $type->identifier);
+        $object->setParentLocations($this->locationService->loadLocations($content->contentInfo));
 
-        if ($object->getContentInfo()->published) {
-            $locations = $this->repository->getLocationService()->loadLocations($content->contentInfo);
-            foreach ($locations as $location) {
-                $object->addParentLocation($location);
-            }
-        }
 
         return $object;
+    }
+
+    public function findByRemoteId($remoteId)
+    {
+        return $this->find(new ContentObject([],['remote_id' => $remoteId]));
     }
 
     /**
@@ -134,17 +154,26 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $this->mapObjectToContentStruct($object, $createStruct);
 
-        $content = $this->contentService->createContent($createStruct, $object->getParentLocations());
+        /** @var LocationObject[] $locationObjects */
+        $locationObjects = $object->getProperty('parent_locations');
+        $locationCreateStructs = [];
+        if(is_array($locationObjects) && count($locationObjects) > 0) {
+            foreach($locationObjects as $locationObject) {
+                $locationCreateStruct = $this->locationService->newLocationCreateStruct($locationObject->data['parent_location_id']);
+                $locationObject->getMapper()->getNewLocationCreateStruct($locationCreateStruct);
+                $locationCreateStructs[] = $locationCreateStruct;
+            }
+        }
+
+        $content = $this->contentService->createContent($createStruct, $locationCreateStructs);
         $this->contentService->publishVersion($content->versionInfo);
 
         if ($this->logger) {
             $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::create'));
         }
 
-        $object->setVersionInfo($content->versionInfo);
-        $object->setContentInfo($content->contentInfo);
-
-        $this->created[] = $object;
+        $object->setProperty('version_info', $content->versionInfo);
+        $object->setProperty('content_info', $content->contentInfo);
 
         return $object;
     }
@@ -158,18 +187,16 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new \InvalidArgumentException('Object is not supported for update.');
         }
 
-        $existingContent = $this->findByRemoteId($object->getRemoteId());
+        $existingContent = $this->find($object);
         if (null === $object->getProperty('content_info')) {
-            $object->setProperty('content_info', $existingContent->getContentInfo());
+            $object->setProperty('content_info', $existingContent->getProperty('content_info'));
         }
-
-        $this->ensureNotTrashed($object);
 
         $contentDraft = $this->contentService->createContentDraft($object->getProperty('content_info'));
 
         $contentUpdateStruct = $this->contentService->newContentUpdateStruct();
         $this->mapObjectToUpdateStruct($object, $contentUpdateStruct);
-        
+
         $contentDraft = $this->contentService->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
         $content = $this->contentService->publishVersion($contentDraft->versionInfo);
 
@@ -177,8 +204,36 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::update'));
         }
 
-        $object->setVersionInfo($content->versionInfo);
-        $object->setContentInfo($content->contentInfo);
+        /** @var LocationObject[] $locationObjects */
+        $locationObjects = $object->getProperty('parent_locations');
+        if(is_array($locationObjects) && count($locationObjects) > 0) {
+
+            $addOrUpdate = [];
+            foreach($locationObjects as $locationObject) {
+                $addOrUpdate[$locationObject->data['parent_location_id']] = $locationObject;
+            }
+
+            $existingLocations = [];
+            foreach($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
+                if (!array_key_exists($existingLocation->parentLocationId, $addOrUpdate)) {
+                    $this->locationService->deleteLocation($existingLocation);
+                } else {
+                    $existingLocations[$existingLocation->parentLocationId] = $existingLocation;
+                }
+            }
+
+            foreach($addOrUpdate as $locationObject) {
+                if(!array_key_exists($locationObject->data['parent_location_id'], $existingLocations)) {
+                    // create or update
+                    $locationObject->data['content_id'] = $content->id;
+                    $locationObject = $this->locationManager->createOrUpdate($locationObject);
+                    $object->addParentLocation($locationObject);
+                }
+            }
+        }
+
+        $object->setProperty('version_info', $content->versionInfo);
+        $object->setProperty('content_info', $content->contentInfo);
 
         return $object;
     }
@@ -196,11 +251,15 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new MissingIdentificationPropertyException($object);
         }
 
-        if ($this->findByRemoteId($object->getRemoteId())) {
-            return $this->update($object);
-        } else {
-            return $this->create($object);
+        try {
+            if($this->find($object)) {
+                return $this->update($object);
+            }
+        } catch(NotFoundException $notFoundException) {
+            // Catch and ignore, we'll create it instead.
         }
+
+        return $this->create($object);
     }
 
     /**
@@ -212,7 +271,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new \InvalidArgumentException('Object is not supported for deletion.');
         }
 
-        $object = $this->findByRemoteId($object->getRemoteId());
+        $object = $this->findByRemoteId($object->getProperty('remote_id'));
 
         if ($object instanceof ContentObject && $object->getProperty('content_info')) {
             $this->contentService->deleteContent($object->getProperty('content_info'));
@@ -237,9 +296,9 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $contentMetadataUpdateStruct->mainLocationId = $location->id;
 
-        $object->setMainLocationId($location->id);
+        $object->setProperty('main_location_id', $location->id);
 
-        return $this->contentService->updateContentMetadata($object->getContentInfo(), $contentMetadataUpdateStruct);
+        return $this->contentService->updateContentMetadata($object->getProperty('content_info'), $contentMetadataUpdateStruct);
     }
 
     /**
@@ -290,39 +349,6 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             }
 
             $struct->setField($key, $value);
-        }
-    }
-
-    /**
-     * @param ContentObject $object
-     */
-    private function ensureNotTrashed(ContentObject $object)
-    {
-        /* @var TrashItem $trashItem */
-
-        $query = new Query();
-        $query->filter = new Criterion\ContentId($object->getContentInfo()->id);
-
-        /** @var SearchResult $result */
-        $result = $this->repository->getTrashService()->findTrashItems($query);
-        if ($result->count == 1) {
-            $trashItem = $result->items[0];
-        } elseif ($result->count > 1) {
-            foreach ($result->items as $trash) {
-                if ($trash->contentInfo->id == $object->getContentInfo()->id) {
-                    $trashItem = $trash;
-                    break;
-                }
-            }
-        }
-
-        if (isset($trashItem)) {
-            $parentLocation = $this->repository->getLocationService()->loadLocation($trashItem->parentLocationId);
-            $this->repository->getTrashService()->recover($trashItem, $parentLocation);
-            if ($this->logger) {
-                $this->logger->warning(sprintf('Content with remote id %s was found in the trash, recovering it and continues the proccess. '.
-                    'Please check if this is correct, and prevent it from happening again.', $object->getRemoteId()));
-            }
         }
     }
 }

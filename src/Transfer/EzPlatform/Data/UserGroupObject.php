@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\Data;
 
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Repository\Content\UserGroupMapper;
+use Transfer\EzPlatform\Repository\Mapper\UserGroupMapper;
 
 /**
  * User Group object.

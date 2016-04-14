@@ -9,8 +9,12 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\API\Repository\Values\Content\Location;
+use Psr\Log\LoggerInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -19,66 +23,153 @@ class LocationManagerTest extends EzPlatformTestCase
     /**
      * @var LocationManager
      */
-    private $manager;
+    private $locM;
+
+    /**
+     * @var LocationManager
+     */
+    private $conM;
 
     public function setUp()
     {
-        $locationMock = $this->getMock('eZ\Publish\API\Repository\Values\Content\Location');
+        $this->locM = static::$locationManager;
+        $this->conM = static::$contentManager;
 
-        $locationServiceMock = $this->getMock('eZ\Publish\API\Repository\LocationService');
-        $locationServiceMock->method('hideLocation')->willReturn($locationMock);
-        $locationServiceMock->method('unhideLocation')->willReturn($locationMock);
+        $this->setLoggers();
 
-        $repositoryMock = $this->getMock('eZ\Publish\API\Repository\Repository');
-        $repositoryMock->method('getLocationService')->willReturn($locationServiceMock);
+        $contentObject = new ContentObject(
+            array( // fields
+                'name' => 'Test title',
+                'title' => 'Test title',
+                'description' => 'Test description',
+            ), array( // properties
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => '_test_content_location',
+                'parent_locations' => array(
+                    new LocationObject(array(
+                        'remote_id' => '_test_location_content',
+                        'parent_location_id' => 58,
+                    ))
+                ),
+            )
+        );
 
-        $this->manager = new LocationManager($repositoryMock);
-        $this->manager->setLogger($this->getMock('Psr\Log\LoggerInterface'));
+        static::$contentManager->createOrUpdate($contentObject);
     }
 
     public function testCreate()
     {
-        $this->setExpectedException('Transfer\EzPlatform\Exception\UnsupportedOperationException');
+        $locationObject = new LocationObject(array(
+            'content_id' => 78,
+            'parent_location_id' => 2,
+            'remote_id' => '_test_location_1',
+        ));
 
-        $this->manager->create(new ValueObject(null));
+        $location = $this->locM->create($locationObject);
+
+        $this->assertInstanceOf(LocationObject::class, $location);
+    }
+
+    public function testCreateWrongObject()
+    {
+        $this->assertNull($this->locM->create(new ValueObject(array())));
+    }
+
+    public function testUpdate()
+    {
+        $locationObject = new LocationObject(array(
+            'content_id' => 78,
+            'parent_location_id' => 58,
+            'remote_id' => '_test_location_1',
+        ));
+
+        $location = $this->locM->createOrUpdate($locationObject);
+        $this->assertInstanceOf(LocationObject::class, $location);
+    }
+
+    public function testUpdateWithRemoteId()
+    {
+        $targetParentLocationId = 62;
+
+        $location1 = static::$repository->getLocationService()->loadLocation(2);
+        $locations1 = static::$repository->getLocationService()->loadLocationChildren($location1);
+
+        $location = false;
+        foreach($locations1->locations as $locationX) {
+            $locations = static::$repository->getLocationService()->loadLocationChildren($locationX);
+            if($locations->totalCount > 0) {
+                foreach ($locations->locations as $locationY) {
+                    if($locationY->parentLocationId != $targetParentLocationId) {
+                        $location = $locationY;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        $locationObject = new LocationObject(array(
+            'parent_location_id' => $targetParentLocationId,
+            'content_id' => $location->contentId,
+        ));
+
+        $locationObject = $this->locM->createOrUpdate($locationObject);
+        $locationObject = $this->locM->createOrUpdate($locationObject);
+        $this->assertInstanceOf(LocationObject::class, $locationObject);
+
+    }
+
+    public function testUpdateNotLocationObject()
+    {
+        $this->assertNull($this->locM->update(new ValueObject(array())));
     }
 
     public function testRemove()
     {
-        $this->setExpectedException('Transfer\EzPlatform\Exception\UnsupportedOperationException');
-
-        $this->manager->remove(new ValueObject($this->getMock('eZ\Publish\API\Repository\Values\Content\Location')));
+        $this->assertNull(
+            $this->locM->remove(new ValueObject(array()))
+        );
     }
 
     public function testHide()
     {
+        $location = static::$repository->getLocationService()->loadLocation(2);
         $this->assertInstanceOf(
-            'eZ\Publish\API\Repository\Values\Content\Location',
-            $this->manager->hide(new LocationObject($this->getMock('eZ\Publish\API\Repository\Values\Content\Location')))
+            Location::class,
+            $this->locM->hide($location)
         );
     }
 
     public function testUnHide()
     {
+        $location = static::$repository->getLocationService()->loadLocation(2);
         $this->assertInstanceOf(
-            'eZ\Publish\API\Repository\Values\Content\Location',
-            $this->manager->unHide(new LocationObject($this->getMock('eZ\Publish\API\Repository\Values\Content\Location')))
+            Location::class,
+            $this->locM->unHide($location)
         );
     }
 
     public function testToggleVisibility()
     {
-        $this->assertInstanceOf(
-            'eZ\Publish\API\Repository\Values\Content\Location',
-            $this->manager->toggleVisibility(new LocationObject($this->getMock('eZ\Publish\API\Repository\Values\Content\Location')))
-        );
-
-        $location = $this->getMock('eZ\Publish\API\Repository\Values\Content\Location');
-        $location->method('__get')->willReturn(true);
+        $location = static::$repository->getLocationService()->loadLocation(2);
 
         $this->assertInstanceOf(
-            'eZ\Publish\API\Repository\Values\Content\Location',
-            $this->manager->toggleVisibility(new LocationObject($location))
+            Location::class,
+            $this->locM->toggleVisibility($location)
         );
+
+        $this->assertInstanceOf(
+            Location::class,
+            $this->locM->toggleVisibility($location)
+        );
+    }
+
+    public function testFindById()
+    {
+        $originalLocation = static::$repository->getLocationService()->loadLocation(2);
+        $object = new LocationObject($originalLocation);
+
+        $location = $this->locM->find($object);
+        $this->assertEquals($originalLocation->id, $location->id);
     }
 }

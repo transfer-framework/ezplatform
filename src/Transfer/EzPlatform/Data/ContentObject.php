@@ -9,18 +9,33 @@
 
 namespace Transfer\EzPlatform\Data;
 
-use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use eZ\Publish\API\Repository\Values\Content\Location;
-use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
-use eZ\Publish\API\Repository\Values\Content\VersionInfo;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
+use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
 
 /**
  * Content object.
  */
 class ContentObject extends ValueObject
 {
+    /**
+     * @var ContentMapper
+     */
+    private $mapper;
+
+    /**
+     * @return ContentMapper
+     */
+    public function getMapper()
+    {
+        if (!$this->mapper) {
+            $this->mapper = new ContentMapper($this);
+        }
+
+        return $this->mapper;
+    }
+
     /**
      * Constructs content object.
      *
@@ -30,211 +45,77 @@ class ContentObject extends ValueObject
     public function __construct(array $data, array $properties = array())
     {
         parent::__construct($data, array_merge(
-            $properties,
-            array('main_object' => true)
+            array(
+                'main_object' => true,
+                'parent_locations' => [],
+            ),
+            $properties
         ));
 
         if (isset($properties['parent_locations'])) {
-            $this->properties['parent_locations'] = [];
-            array_walk($properties['parent_locations'], function ($location) {
-                $this->addParentLocation($location);
-            });
+            $this->setParentLocations($properties['parent_locations']);
         }
     }
 
     /**
-     * Sets content type identifier.
+     * Values in array must be of type Location, LocationObject or int
      *
-     * @param string $type Content type identifier
+     * @param array $parentLocations
      */
-    public function setContentType($type)
+    public function setParentLocations(array $parentLocations)
     {
-        $this->setProperty('content_type_identifier', $type);
-    }
-
-    /**
-     * Sets language.
-     *
-     * @param string $language Language
-     */
-    public function setLanguage($language)
-    {
-        $this->setProperty('language', $language);
-    }
-
-    /**
-     * Sets priority.
-     *
-     * @param int $priority Priority
-     */
-    public function setPriority($priority)
-    {
-        $this->setProperty('priority', (int) $priority);
-    }
-
-    /**
-     * Returns priority.
-     *
-     * @return int
-     */
-    public function getPriority()
-    {
-        return (int) $this->getProperty('priority');
-    }
-
-    /**
-     * Sets remote ID.
-     *
-     * @param string $remoteId Remote ID
-     */
-    public function setRemoteId($remoteId)
-    {
-        $this->setProperty('remote_id', $remoteId);
-    }
-
-    /**
-     * Returns remote ID.
-     *
-     * @return string
-     */
-    public function getRemoteId()
-    {
-        return $this->getProperty('remote_id');
-    }
-
-    /**
-     * Sets version info.
-     *
-     * @param VersionInfo $versionInfo Version info
-     */
-    public function setVersionInfo($versionInfo)
-    {
-        $this->setProperty('version_info', $versionInfo);
-    }
-
-    /**
-     * Sets content info.
-     *
-     * @param ContentInfo $contentInfo Content info.
-     */
-    public function setContentInfo($contentInfo)
-    {
-        $this->setProperty('content_info', $contentInfo);
-    }
-
-    /**
-     * Returns content info.
-     *
-     * @return ContentInfo
-     */
-    public function getContentInfo()
-    {
-        return $this->getProperty('content_info');
-    }
-
-    /**
-     * Sets main location ID.
-     *
-     * @param int $id Main location ID
-     */
-    public function setMainLocationId($id)
-    {
-        $this->setProperty('main_location_id', $id);
-    }
-
-    /**
-     * Sets content object as hidden.
-     *
-     * @param bool $hidden
-     */
-    public function setHidden($hidden)
-    {
-        $this->setProperty('hidden', (boolean) $hidden);
-    }
-
-    /**
-     * Returns visibility state (hidden or visible).
-     *
-     * @return bool
-     */
-    public function isHidden()
-    {
-        return (boolean) $this->getProperty('hidden');
-    }
-
-    /**
-     * Sets as main object.
-     *
-     * If true, this object is going to be the main object among all others having the same remote id.
-     *
-     * @param bool $mainObject Whether this object is the main object
-     */
-    public function setMainObject($mainObject)
-    {
-        $this->setProperty('main_object', (boolean) $mainObject);
-    }
-
-    /**
-     * Returns main object state.
-     *
-     * @return bool True, if object is the main object.
-     */
-    public function isMainObject()
-    {
-        return (boolean) $this->getProperty('main_object');
+        $this->properties['parent_locations'] = [];
+        foreach($parentLocations as $location) {
+            $this->addParentLocation($location);
+        }
     }
 
     /**
      * Convert parameters to LocationCreateStruct and stores it on the ContentObject.
      *
-     * @param LocationCreateStruct|LocationObject|int $parentLocation
+     * @param Location|LocationObject|int $parentLocation
+     *
+     * @throws InvalidDataStructureException
      */
     public function addParentLocation($parentLocation)
     {
-        if ($parentLocation instanceof LocationCreateStruct) {
-            $locationCreateStruct = $parentLocation;
-        } else {
-            $locationCreateStruct = $this->convertToLocationCreateStruct($parentLocation);
+        $locationObject = $this->convertToLocationObject($parentLocation);
+
+        if (!isset($locationObject->data['parent_location_id']) || (int) $locationObject->data['parent_location_id'] < 1) {
+            echo print_r($locationObject);
+            throw new InvalidDataStructureException('Parent location id must be an integer of 2 or above.');
         }
 
-        if ((int) $locationCreateStruct->parentLocationId < 2) {
-            throw new InvalidDataStructureException('Location id must be an integer of 2 or above.');
+        if(!isset($locationObject->data['content_id'])) {
+            if(isset($this->data['id'])) {
+                $locationObject->data['content_id'] = $this->data['id'];
+            }
         }
 
-        $this->properties['parent_locations'][$locationCreateStruct->parentLocationId] = $locationCreateStruct;
+        $this->properties['parent_locations'][$locationObject->data['parent_location_id']] = $locationObject;
     }
 
     /**
-     * Accepts parameter as int, Location or LocationObject.
+     * @param int|Location|LocationObject $parentLocation
      *
-     * @param $parentLocation
-     *
-     * @return LocationCreateStruct
+     * @return LocationObject
      */
-    private function convertToLocationCreateStruct($parentLocation)
+    private function convertToLocationObject($parentLocation)
     {
-        $locationCreateStruct = new LocationCreateStruct();
-        if ($parentLocation instanceof Location) {
-            $locationCreateStruct->parentLocationId = $parentLocation->parentLocationId;
-            $locationCreateStruct->hidden = $parentLocation->hidden;
-            $locationCreateStruct->priority = $parentLocation->priority;
-            $locationCreateStruct->sortField = $parentLocation->sortField;
-            $locationCreateStruct->sortOrder = $parentLocation->sortOrder;
-            $locationCreateStruct->remoteId = $parentLocation->remoteId;
-        } elseif ($parentLocation instanceof LocationObject) {
-            $locationCreateStruct->parentLocationId = $parentLocation->data['parent_id'];
-        } elseif (is_int($parentLocation)) {
-            $locationCreateStruct->parentLocationId = $parentLocation;
+        $locationObject = new LocationObject(array());
+
+        switch(true) {
+            case $parentLocation instanceof Location:
+                $locationObject->getMapper()->locationToObject($parentLocation);
+                break;
+            case $parentLocation instanceof LocationObject:
+                $locationObject = $parentLocation;
+                break;
+            case is_int($parentLocation):
+                $locationObject->data['parent_location_id'] = $parentLocation;
+                break;
         }
 
-        return $locationCreateStruct;
-    }
-
-    /**
-     * @return array
-     */
-    public function getParentLocations()
-    {
-        return (array) $this->getProperty('parent_locations');
+        return $locationObject;
     }
 }

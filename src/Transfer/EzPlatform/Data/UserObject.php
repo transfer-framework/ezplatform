@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\Data;
 
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Repository\Content\UserMapper;
+use Transfer\EzPlatform\Repository\Mapper\UserMapper;
 
 /**
  * User object.

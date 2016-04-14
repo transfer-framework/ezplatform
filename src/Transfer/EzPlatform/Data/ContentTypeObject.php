@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\Data;
 
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Repository\Content\ContentTypeMapper;
+use Transfer\EzPlatform\Repository\Mapper\ContentTypeMapper;
 
 /**
  * Content type object.

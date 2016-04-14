@@ -9,6 +9,12 @@
 
 namespace Transfer\EzPlatform\Repository;
 
+use Transfer\EzPlatform\Data\ContentObject;
+use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Data\LanguageObject;
+use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Data\UserGroupObject;
+use Transfer\EzPlatform\Data\UserObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
@@ -62,7 +68,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->contentManager;
         }
 
-        $this->contentManager = new Manager\ContentManager($this->repository);
+        $this->contentManager = new Manager\ContentManager($this->repository, $this->getLocationManager());
 
         if ($this->logger) {
             $this->contentManager->setLogger($this->logger);
@@ -172,17 +178,18 @@ class ObjectService extends AbstractRepositoryService
     public function create($object)
     {
         $map = array(
-            'Transfer\EzPlatform\Data\ContentObject' => array($this, 'getContentManager'),
-            'Transfer\EzPlatform\Data\ContentTypeObject' => array($this, 'getContentTypeManager'),
-            'Transfer\EzPlatform\Data\LanguageObject' => array($this, 'getLanguageManager'),
-            'Transfer\EzPlatform\Data\UserObject' => array($this, 'getUserManager'),
-            'Transfer\EzPlatform\Data\UserGroupObject' => array($this, 'getUserGroupManager'),
+            ContentObject::class => array($this, 'getContentManager'),
+            LocationObject::class => array($this, 'getLocationManager'),
+            ContentTypeObject::class => array($this, 'getContentTypeManager'),
+            LanguageObject::class => array($this, 'getLanguageManager'),
+            UserObject::class => array($this, 'getUserManager'),
+            UserGroupObject::class => array($this, 'getUserGroupManager'),
         );
 
         foreach ($map as $class => $callable) {
             if ($object instanceof $class) {
+                
                 $manager = call_user_func($callable);
-
                 return $manager->createOrUpdate($object);
             }
         }

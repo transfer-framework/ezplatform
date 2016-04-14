@@ -156,9 +156,9 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
         try {
             $language = $this->findByCode($object->data['code']);
             $this->languageService->deleteLanguage($language);
-        } catch (NotFoundException $notFoundException) {
+        } catch (NotFoundException $e) {
             return true;
-        } catch (InvalidArgumentException $notFoundException) {
+        } catch (InvalidArgumentException $ee) {
             return false;
         }
 

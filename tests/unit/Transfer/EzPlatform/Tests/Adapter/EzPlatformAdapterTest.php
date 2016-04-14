@@ -36,12 +36,16 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
 
     public function testSendContentObject()
     {
-        $contentObject = new ContentObject(array(
-            'title' => 'Test',
-        ));
-        $contentObject->setContentType('_test_article');
-        $contentObject->setLanguage('eng-GB');
-        $contentObject->setRemoteId('test_1');
+        $contentObject = new ContentObject(
+            array(
+                'title' => 'Test',
+            ),
+            array(
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => 'test_1',
+            )
+        );
 
         $this->adapter->send(new Request(array(
             $contentObject,
@@ -50,15 +54,19 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
 
     public function testSendTreeObject()
     {
-        $contentObject = new ContentObject(array(
-            'title' => 'Test',
-        ));
-        $contentObject->setContentType('_test_article');
-        $contentObject->setLanguage('eng-GB');
-        $contentObject->setRemoteId('test_2');
+        $contentObject = new ContentObject(
+            array(
+                'title' => 'Test',
+            ),
+            array(
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => 'test_2',
+            )
+        );
 
         $treeObject = new TreeObject($contentObject);
-        $treeObject->setProperty('location_id', 2);
+        $treeObject->setProperty('parent_location_id', 2);
 
         $this->adapter->send(new Request(array(
             $treeObject,

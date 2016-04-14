@@ -50,7 +50,7 @@ class ContentTreeService extends AbstractRepositoryService
 
         $this->publishContentObjects($object);
         $this->publishLocations($object, $this->getLocationService()->loadLocation(
-            $object->getProperty('location_id')
+            $object->getProperty('parent_location_id')
         ));
     }
 
@@ -109,7 +109,7 @@ class ContentTreeService extends AbstractRepositoryService
         /** @var LocationList $existingLocations */
         $existingLocations = $this->getLocationService()->loadLocationChildren($parentLocation, 0, PHP_INT_MAX);
         foreach ($existingLocations->locations as $location) {
-            if ($location->contentInfo->id == $object->getContentInfo()->id) {
+            if ($location->contentInfo->id == $object->getProperty('content_info')->id) {
                 if ($this->logger) {
                     $this->logger->info(
                         sprintf('Found existing location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)),
@@ -125,11 +125,11 @@ class ContentTreeService extends AbstractRepositoryService
 
         $locationStruct = $this->getLocationService()->newLocationCreateStruct($parentLocation->id);
 
-        if ($priority = $object->getPriority()) {
+        if ($priority = $object->getProperty('priority')) {
             $locationStruct->priority = $priority;
         }
 
-        $location = $this->getLocationService()->createLocation($object->getContentInfo(), $locationStruct);
+        $location = $this->getLocationService()->createLocation($object->getProperty('content_info'), $locationStruct);
 
         if ($this->logger) {
             $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array('SubtreeService::publishLocation'));
@@ -150,7 +150,7 @@ class ContentTreeService extends AbstractRepositoryService
     {
         $this->ensureMainLocationIdIsSet($object, $location);
 
-        if ($object->isHidden() != $location->hidden) {
+        if ($object->getProperty('hidden') != $location->hidden) {
             $this->updateLocationVisibility($location);
         }
     }
@@ -163,7 +163,7 @@ class ContentTreeService extends AbstractRepositoryService
      */
     private function ensureMainLocationIdIsSet(ContentObject $object, Location $location)
     {
-        if (!$object->isMainObject()) {
+        if (!$object->getProperty('main_object')) {
             return;
         }
 
@@ -181,6 +181,6 @@ class ContentTreeService extends AbstractRepositoryService
      */
     private function updateLocationVisibility(Location $location)
     {
-        $this->objectService->getLocationManager()->toggleVisibility(new LocationObject($location));
+        $this->objectService->getLocationManager()->toggleVisibility($location);
     }
 }

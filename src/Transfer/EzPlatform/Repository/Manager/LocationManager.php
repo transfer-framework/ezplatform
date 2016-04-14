@@ -9,6 +9,8 @@
 
 namespace Transfer\EzPlatform\Repository\Manager;
 
+use eZ\Publish\API\Repository\ContentService;
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
@@ -16,26 +18,23 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\EzPlatform\Data\LocationObject;
-use Transfer\EzPlatform\Exception\UnsupportedOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 
 /**
  * Location manager.
  *
  * @internal
  */
-class LocationManager implements LoggerAwareInterface, CreatorInterface, RemoverInterface
+class LocationManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
 {
-    /**
-     * @var Repository
-     */
-    private $repository;
-
     /**
      * @var LoggerInterface Logger
      */
     protected $logger;
+
+    private $repository;
 
     /**
      * @var LocationService Location service
@@ -43,13 +42,18 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Remover
     private $locationService;
 
     /**
+     * @var ContentService Content service
+     */
+    private $contentService;
+
+    /**
      * @param Repository $repository
      */
     public function __construct(Repository $repository)
     {
         $this->repository = $repository;
-
         $this->locationService = $repository->getLocationService();
+        $this->contentService = $repository->getContentService();
     }
 
     /**
@@ -61,11 +65,103 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Remover
     }
 
     /**
+     * Attempts to load Location based on id or remoteId.
+     * Returns false if not found.
+     *
+     * @param LocationObject $object
+     *
+     * @return false|Location
+     */
+    public function find(LocationObject $object)
+    {
+        try {
+            if(isset($object->data['id'])) {
+                $location = $this->locationService->loadLocation($object->data['id']);
+            }elseif(isset($object->data['remote_id'])) {
+                $location = $this->locationService->loadLocationByRemoteId($object->data['remote_id']);
+            }
+        } catch(NotFoundException $notFound) {
+            return false;
+        }
+
+        return isset($location) ? $location : false;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function create(ObjectInterface $object)
     {
-        throw new UnsupportedOperationException('Location creation is not supported at the moment.');
+        if (!$object instanceof LocationObject) {
+            return;
+        }
+
+        if(!isset($object->data['content_id'])) {
+            print_r(debug_print_backtrace(0,2));
+            die;
+        }
+        $contentInfo = $this->repository->getContentService()->loadContentInfo($object->data['content_id']);
+        $locationCreateStruct = $this->locationService->newLocationCreateStruct($object->data['parent_location_id']);
+
+        $object->getMapper()->getNewLocationCreateStruct($locationCreateStruct);
+
+        $location = $this->locationService->createLocation($contentInfo, $locationCreateStruct);
+
+        if($this->logger) {
+            $this->logger->info(sprintf('Created location %s on content id %s, with parent location id %s.', $location->id, $contentInfo->id, $location->parentLocationId));
+        }
+
+        $object->getMapper()->locationToObject($location);
+
+        return $object;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function update(ObjectInterface $object)
+    {
+        if (!$object instanceof LocationObject) {
+            return;
+        }
+
+        if (!isset($object->data['content_id'])) {
+            $contentInfo = $this->contentService->loadContentInfoByRemoteId($object->data['remote_id']);
+        } else {
+            $contentInfo = $this->contentService->loadContentInfo($object->data['content_id']);
+        }
+
+        $locationUpdateStruct = $this->locationService->newLocationUpdateStruct();
+
+        $object->getMapper()->getNewLocationUpdateStruct($locationUpdateStruct);
+
+        $location = $this->locationService->loadLocationByRemoteId($object->data['remote_id']);
+
+        $location = $this->locationService->updateLocation($location, $locationUpdateStruct);
+
+        if($this->logger) {
+            $this->logger->info(sprintf('Updated location %s on content id %s, with parent location id %s.', $location->id, $contentInfo->id, $location->parentLocationId));
+        }
+
+        $object->getMapper()->locationToObject($location);
+
+        return $object;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createOrUpdate(ObjectInterface $object)
+    {
+        if(!$object instanceof LocationObject) {
+            return;
+        }
+
+        if($this->find($object)) {
+            return $this->update($object);
+        }else{
+            return $this->create($object);
+        }
     }
 
     /**
@@ -73,49 +169,54 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Remover
      */
     public function remove(ObjectInterface $object)
     {
-        throw new UnsupportedOperationException('Location removal is not supported at the moment.');
+        if (!$object instanceof LocationObject) {
+            return;
+        }
+
+        if($location = $this->find($object)) {
+            $this->locationService->deleteLocation($location);
+        }
+
+        return true;
     }
 
     /**
      * Hides a location.
      *
-     * @param LocationObject $object Location object
-     *
+     * @param Location $location
      * @return Location
+     *
      */
-    public function hide(LocationObject $object)
+    public function hide(Location $location)
     {
-        return $this->locationService->hideLocation($object->data);
+        return $this->locationService->hideLocation($location);
     }
 
     /**
      * Un-hides a location.
      *
-     * @param LocationObject $object Location object
+     * @param Location $location
      *
      * @return Location
      */
-    public function unHide(LocationObject $object)
+    public function unHide(Location $location)
     {
-        return $this->locationService->unhideLocation($object->data);
+        return $this->locationService->unhideLocation($location);
     }
 
     /**
      * Toggles location visibility.
      *
-     * @param LocationObject $object Location object
+     * @param Location $location
      *
      * @return Location
      */
-    public function toggleVisibility(LocationObject $object)
+    public function toggleVisibility(Location $location)
     {
-        /** @var Location $location */
-        $location = $object->data;
-
         if ($location->hidden) {
-            return $this->unHide($object);
+            return $this->unHide($location);
         }
 
-        return $this->hide($object);
+        return $this->hide($location);
     }
 }

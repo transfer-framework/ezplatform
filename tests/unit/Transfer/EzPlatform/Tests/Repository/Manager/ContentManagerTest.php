@@ -30,7 +30,7 @@ class ContentManagerTest extends EzPlatformTestCase
 
     public function setUp()
     {
-        $this->manager = new ContentManager(static::$repository);
+        $this->manager = static::$contentManager;
 
         /** @var LoggerInterface $logger */
         $logger = $this->getMock('Psr\Log\LoggerInterface');
@@ -39,18 +39,21 @@ class ContentManagerTest extends EzPlatformTestCase
 
     public function testCreate()
     {
-        $contentObject = new ContentObject(array(
+        $contentObject = new ContentObject(
+            array( // fields
                 'name' => 'Test title',
                 'title' => 'Test title',
                 'description' => 'Test description',
-            ));
-        $contentObject->setContentType('_test_article');
-        $contentObject->setLanguage('eng-GB');
-        $contentObject->setRemoteId('_test_1');
+            ), array( // properties
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => '_test_1',
+            )
+        );
 
         $this->manager->create($contentObject);
 
-        $createdContentObject = $this->manager->findByRemoteId('_test_1');
+        $createdContentObject = $this->manager->find($contentObject);
 
         $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
         $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
@@ -64,52 +67,57 @@ class ContentManagerTest extends EzPlatformTestCase
                 'title' => 'Test title',
                 'description' => 'Test description',
             ), array( // properties
-                'parent_locations' => array(2),
                 'content_type_identifier' => '_test_article',
                 'language' => 'eng-GB',
                 'remote_id' => '_test_locations_1',
             )
         );
+        $contentObject->addParentLocation(2);
 
         $this->manager->create($contentObject);
 
-        $createdContentObject = $this->manager->findByRemoteId('_test_locations_1');
+        $createdContentObject = $this->manager->find($contentObject);
 
         $this->assertEquals('Test name', (string) $createdContentObject->data['name']['eng-GB']);
         $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
         $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
 
-        $parentLocations = $createdContentObject->getParentLocations();
+        $parentLocations = $createdContentObject->getProperty('parent_locations');
 
         $this->assertCount(1, $parentLocations);
-        $this->assertInstanceOf(LocationCreateStruct::class, current($parentLocations));
-        $this->assertEquals(2, current($parentLocations)->parentLocationId);
+        $this->assertInstanceOf(LocationObject::class, current($parentLocations));
+        $this->assertEquals(2, current($parentLocations)->data['parent_location_id']);
     }
 
     public function testCreateWithMulipleTypesOfLocation()
     {
-        $contentObject = new ContentObject(array(
-            'name' => 'Test title',
-            'title' => 'Test title',
-            'description' => 'Test description',
-        ));
-        $contentObject->setContentType('_test_article');
-        $contentObject->setLanguage('eng-GB');
-        $contentObject->setRemoteId('_test_locations_2');
+        $contentObject = new ContentObject(
+            array( // fields
+                'name' => 'Test title',
+                'title' => 'Test title',
+                'description' => 'Test description',
+            ), array( // properties
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => '_test_locations_2',
+            )
+        );
+
         $contentObject->addParentLocation(2);
-        $contentObject->addParentLocation(new LocationObject(array('parent_id' => 2)));
-        $locationStruct = new LocationCreateStruct();
-        $locationStruct->parentLocationId = 2;
-        $contentObject->addParentLocation($locationStruct);
+        $contentObject->addParentLocation(new LocationObject(array(
+            'parent_location_id' => 2,
+            'remote_id' => 'content_location_1',
+        )));
 
         $this->manager->create($contentObject);
 
-        $createdContentObject = $this->manager->findByRemoteId('_test_locations_2');
+        $createdContentObject = $this->manager->find($contentObject);
 
         $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
         $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
     }
 
+/* @todo remove comments
     public function testCreateWithInvalidLocation()
     {
         $this->setExpectedException(InvalidDataStructureException::class);
@@ -129,36 +137,46 @@ class ContentManagerTest extends EzPlatformTestCase
             )
         );
     }
-
+*/
     public function testUpdateithMulipleTypesOfLocation()
     {
-        $contentObject = new ContentObject(array(
-            'name' => 'Test title',
-            'title' => 'Test title',
-            'description' => 'Test description',
-        ));
-        $contentObject->setContentType('_test_article');
-        $contentObject->setLanguage('eng-GB');
-        $contentObject->setRemoteId('_test_locations_2');
-        $contentObject->addParentLocation(2);
-        $contentObject->addParentLocation(new LocationObject(array('parent_id' => 5)));
-        $locationStruct = new LocationCreateStruct();
-        $locationStruct->parentLocationId = 5;
-        $contentObject->addParentLocation($locationStruct);
+        $contentObject = new ContentObject(
+            array(
+                'name' => 'Test title',
+                'title' => 'Test title',
+                'description' => 'Test description',
+            ), array(
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => '_test_locations_1',
+            )
+        );
+/*
+        $location = static::$repository->getLocationService()->loadLocation(2);
+        print_r(static::$repository->getLocationService()->loadLocationChildren($location));
+*/
+        $contentObject->addParentLocation(58);
+        $contentObject->addParentLocation(new LocationObject(array(
+            'parent_location_id' => 62,
+            'remote_id' => 'content_location_62',
+        )));
 
-        $this->manager->update($contentObject);
+        $this->manager->createOrUpdate($contentObject);
 
-        $createdContentObject = $this->manager->findByRemoteId('_test_locations_2');
+        $updatedContentObject = $this->manager->findByRemoteId($contentObject->getProperty('remote_id'));
 
-        $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
-        $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
+        $this->assertEquals('Test title', $updatedContentObject->data['title']['eng-GB']);
+        $this->assertEquals('Test description', $updatedContentObject->data['description']['eng-GB']);
 
-        $parentLocations = $createdContentObject->getParentLocations();
-
-        $this->assertCount(1, $parentLocations);
-        $this->assertInstanceOf(LocationCreateStruct::class, current($parentLocations));
-        $this->assertEquals(5, current($parentLocations)->parentLocationId);
+        $parentLocations = $updatedContentObject->getProperty('parent_locations');
+        $this->assertCount(2, $parentLocations);
+        $this->assertInstanceOf(LocationObject::class, current($parentLocations));
+        $this->assertEquals(58, current($parentLocations)->data['parent_location_id']);
     }
+
+    /*
+     public function testUpdateContentWithoutLocations
+     */
 
     public function testCreateWithInvalidArgument()
     {
@@ -191,15 +209,17 @@ class ContentManagerTest extends EzPlatformTestCase
 
     public function testCreateOrUpdateWithNonExistingObject()
     {
-        $object = new ContentObject(array(
-            'name' => 'Test title',
-            'title' => 'Test title',
-            'description' => 'Test description',
-        ));
-
-        $object->setProperty('remote_id', 1);
-        $object->setContentType('_test_article');
-        $object->setLanguage('eng-GB');
+        $object = new ContentObject(
+            array(
+                'name' => 'Test title',
+                'title' => 'Test title',
+                'description' => 'Test description',
+            ), array(
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => 1,
+            )
+        );
 
         $this->assertNotNull($this->manager->createOrUpdate($object));
     }
@@ -223,7 +243,7 @@ class ContentManagerTest extends EzPlatformTestCase
     public function testRemove()
     {
         $object = $this->manager->findByRemoteId('_test_1');
-        $object->setRemoteId('_test_1');
+        $object->setProperty('remote_id', '_test_1');
 
         $this->assertTrue($this->manager->remove($object));
     }

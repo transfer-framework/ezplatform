@@ -33,28 +33,36 @@ class ContentTreeServiceTest extends EzPlatformTestCase
 
     public function testCreate()
     {
-        $rootContentObject = new ContentObject(array(
-            'title' => 'Test',
-            'name' => 'Test',
-        ));
-        $rootContentObject->setContentType('_test_article');
-        $rootContentObject->setLanguage('eng-GB');
-        $rootContentObject->setRemoteId('content_tree_service_test_1');
-        $rootContentObject->setPriority(1);
+        $rootContentObject = new ContentObject(
+            array(
+                'title' => 'Test',
+                'name' => 'Test',
+            ),
+            array(
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => 'content_tree_service_test_1',
+                'priority' => 1,
+            )
+        );
 
-        $secondaryContentObject = new ContentObject(array(
-            'title' => 'Test 2',
-            'name' => 'Test 2',
-        ));
-        $secondaryContentObject->setContentType('_test_article');
-        $secondaryContentObject->setLanguage('eng-GB');
-        $secondaryContentObject->setRemoteId('content_tree_service_test_2');
-        $secondaryContentObject->setPriority(1);
-        $secondaryContentObject->setHidden(true);
-        $secondaryContentObject->setMainObject(false);
+        $secondaryContentObject = new ContentObject(
+            array(
+                'title' => 'Test 2',
+                'name' => 'Test 2',
+            ),
+            array(
+                'content_type_identifier' => '_test_article',
+                'language' => 'eng-GB',
+                'remote_id' => 'content_tree_service_test_2',
+                'priority' => 1,
+                'hidden' => true,
+                'main_object' => false,
+            )
+        );
 
         $treeObject = new TreeObject($rootContentObject);
-        $treeObject->setProperty('location_id', 2);
+        $treeObject->setProperty('parent_location_id', 2);
 
         $treeObject->addNode($secondaryContentObject);
         $treeObject->addNode(new TreeObject($secondaryContentObject));
@@ -67,25 +75,5 @@ class ContentTreeServiceTest extends EzPlatformTestCase
         $this->setExpectedException('InvalidArgumentException');
 
         $this->service->create(new ValueObject(null));
-    }
-
-    public function testPublishTrashed()
-    {
-        $tree = $this->getTreeObject(2,
-            $this->getContentObject(
-                array(
-                    'name' => 'Test folder',
-                ),
-                'folder',
-                'content_trashed_folder_0'
-            )
-        );
-
-        $this->service->create($tree);
-        $contentInfo = static::$repository->getContentService()->loadContentInfoByRemoteId('content_trashed_folder_0');
-        $this->assertInstanceOf(ContentInfo::class, $contentInfo);
-        $location = static::$repository->getLocationService()->loadLocation($contentInfo->mainLocationId);
-        static::$repository->getTrashService()->trash($location);
-        $this->service->create($tree);
     }
 }
