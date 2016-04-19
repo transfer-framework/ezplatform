@@ -10,11 +10,10 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Psr\Log\LoggerInterface;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
-use Transfer\EzPlatform\Repository\Manager\ContentManager;
+use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -50,7 +49,7 @@ class LocationManagerTest extends EzPlatformTestCase
                     new LocationObject(array(
                         'remote_id' => '_test_location_content',
                         'parent_location_id' => 58,
-                    ))
+                    )),
                 ),
             )
         );
@@ -71,9 +70,35 @@ class LocationManagerTest extends EzPlatformTestCase
         $this->assertInstanceOf(LocationObject::class, $location);
     }
 
+    public function testLoadContentAndCreateLocationWithoutContentId()
+    {
+        $content = static::$contentManager->find(new ContentObject(array(), array('id' => 78)));
+        $content->addParentLocation(new LocationObject(array(
+            'parent_location_id' => 2,
+        )));
+
+        $this->assertEquals($content->getProperty('id'), $content->getProperty('parent_locations')[2]->data['content_id']);
+    }
+
     public function testCreateWrongObject()
     {
         $this->assertNull($this->locM->create(new ValueObject(array())));
+    }
+
+    public function testCreateContentWithLocationWithInvalidParentId()
+    {
+        $this->setExpectedException(InvalidDataStructureException::class);
+
+        new ContentObject(
+            array(),
+            array(
+                'parent_locations' => array(
+                    new LocationObject(array(
+                        'parent_location_id' => 0,
+                    )),
+                ),
+            )
+        );
     }
 
     public function testUpdate()
@@ -96,11 +121,11 @@ class LocationManagerTest extends EzPlatformTestCase
         $locations1 = static::$repository->getLocationService()->loadLocationChildren($location1);
 
         $location = false;
-        foreach($locations1->locations as $locationX) {
+        foreach ($locations1->locations as $locationX) {
             $locations = static::$repository->getLocationService()->loadLocationChildren($locationX);
-            if($locations->totalCount > 0) {
+            if ($locations->totalCount > 0) {
                 foreach ($locations->locations as $locationY) {
-                    if($locationY->parentLocationId != $targetParentLocationId) {
+                    if ($locationY->parentLocationId != $targetParentLocationId) {
                         $location = $locationY;
                         break 2;
                     }
@@ -116,7 +141,6 @@ class LocationManagerTest extends EzPlatformTestCase
         $locationObject = $this->locM->createOrUpdate($locationObject);
         $locationObject = $this->locM->createOrUpdate($locationObject);
         $this->assertInstanceOf(LocationObject::class, $locationObject);
-
     }
 
     public function testUpdateNotLocationObject()

@@ -66,7 +66,7 @@ class LocationMapperTest extends EzPlatformTestCase
         $location = static::$repository->getLocationService()->loadLocation(2);
         $locationObject = new LocationObject(array());
         $locationObject->getMapper()->locationToObject($location);
-        
+
         $locationCreateStruct = new LocationCreateStruct();
         $locationObject->getMapper()->getNewLocationCreateStruct($locationCreateStruct);
 
@@ -76,7 +76,7 @@ class LocationMapperTest extends EzPlatformTestCase
         $this->assertEquals($location->sortField, $locationCreateStruct->sortField);
         $this->assertEquals($location->sortOrder, $locationCreateStruct->sortOrder);
     }
-    
+
     public function testLocationUpdateStruct()
     {
         $location = static::$repository->getLocationService()->loadLocation(2);

@@ -2,6 +2,7 @@
 
 namespace Transfer\EzPlatform\tests\integration;
 
+use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\LanguageObject;
@@ -19,6 +20,9 @@ class LanguageTest extends EzPlatformTestCase
         $this->adapter = new EzPlatformAdapter(array(
             'repository' => static::$repository,
         ));
+        $this->adapter->setLogger(
+            $this->getMock(LoggerInterface::class)
+        );
     }
 
     public function testCreateAndUpdateLanguage()

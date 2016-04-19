@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Transfer\Data\TreeObject;
-use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
@@ -35,11 +34,6 @@ abstract class EzPlatformTestCase extends KernelTestCase
      * @var Container
      */
     protected $container;
-
-    /**
-     * @var EzPlatformAdapter
-     */
-    protected $adapter;
 
     /**
      * @var Repository

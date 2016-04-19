@@ -3,6 +3,7 @@
 namespace Transfer\EzPlatform\tests\integration;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentTypeObject;
@@ -20,6 +21,9 @@ class ContentTypeTest extends EzPlatformTestCase
         $this->adapter = new EzPlatformAdapter(array(
             'repository' => static::$repository,
         ));
+        $this->adapter->setLogger(
+            $this->getMock(LoggerInterface::class)
+        );
     }
 
     public function testCreateAndUpdateContentType()

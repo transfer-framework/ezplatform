@@ -1,9 +1,10 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration;
+namespace Transfer\EzPlatform\Tests\integration;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
+use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
@@ -20,6 +21,8 @@ class ContentTreeTest extends EzPlatformTestCase
         $this->adapter = new EzPlatformAdapter(array(
             'repository' => static::$repository,
         ));
+        $logger = $this->getMock(LoggerInterface::class);
+        $this->adapter->setLogger($logger);
     }
 
     /**
@@ -29,7 +32,6 @@ class ContentTreeTest extends EzPlatformTestCase
      */
     public function testCreateAndUpdateLocationsAndContent()
     {
-
         // Create
         $article = $this->getContentObject(array(
             'title' => 'Test article',
@@ -68,14 +70,14 @@ class ContentTreeTest extends EzPlatformTestCase
         $originalLocationFolderId = $locationFolder->id;
         $originalLocationArticleId = $locationArticle->id;
 
-        unset($tree);
-        unset($folder);
-        unset($locationFolder);
-        unset($contentFolder);
-        unset($article);
-        unset($locationArticle);
-        unset($contentArticle);
-        unset($children);
+        unset($tree,
+            $folder,
+            $locationFolder,
+            $contentFolder,
+            $article,
+            $locationArticle,
+            $contentArticle,
+            $children);
 
         // Update
         $article = $this->getContentObject(array(

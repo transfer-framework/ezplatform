@@ -18,9 +18,6 @@ use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
-use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
-use eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct;
-use eZ\Publish\API\Repository\Values\Content\Query;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
@@ -30,7 +27,6 @@ use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
-use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 
 /**
  * Content manager.
@@ -95,32 +91,32 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      */
     public function find(ContentObject $object)
     {
-        if($object->getProperty('id')) {
+        if ($object->getProperty('id')) {
             try {
                 $content = $this->contentService->loadContent($object->getProperty('id'));
             } catch (NotFoundException $notFoundException) {
                 // We'll store if for now, and throw it later if needed
                 $e = $notFoundException;
             }
-        }elseif($object->getProperty('remote_id')) {
+        } elseif ($object->getProperty('remote_id')) {
             try {
                 $content = $this->contentService->loadContentByRemoteId($object->getProperty('remote_id'));
             } catch (NotFoundException $notFoundException) {
                 // We'll throw it later if needed
                 $e = $notFoundException;
             }
-        }else{
+        } else {
             return false;
         }
 
-        if(!isset($content) && isset($e)) {
+        if (!isset($content) && isset($e)) {
             throw $e;
         }
 
         $object = new ContentObject(array());
         $object->getMapper()->contentToObject($content);
-        
-        if($content->contentInfo->published) {
+
+        if ($content->contentInfo->published) {
             $locations = $this->locationService->loadLocations($content->contentInfo);
             $object->setParentLocations($locations);
         }
@@ -129,13 +125,12 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $object->setProperty('content_type_identifier', $type->identifier);
         $object->setParentLocations($this->locationService->loadLocations($content->contentInfo));
 
-
         return $object;
     }
 
     public function findByRemoteId($remoteId)
     {
-        return $this->find(new ContentObject([],['remote_id' => $remoteId]));
+        return $this->find(new ContentObject([], ['remote_id' => $remoteId]));
     }
 
     /**
@@ -157,8 +152,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         /** @var LocationObject[] $locationObjects */
         $locationObjects = $object->getProperty('parent_locations');
         $locationCreateStructs = [];
-        if(is_array($locationObjects) && count($locationObjects) > 0) {
-            foreach($locationObjects as $locationObject) {
+        if (is_array($locationObjects) && count($locationObjects) > 0) {
+            foreach ($locationObjects as $locationObject) {
                 $locationCreateStruct = $this->locationService->newLocationCreateStruct($locationObject->data['parent_location_id']);
                 $locationObject->getMapper()->getNewLocationCreateStruct($locationCreateStruct);
                 $locationCreateStructs[] = $locationCreateStruct;
@@ -206,15 +201,14 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         /** @var LocationObject[] $locationObjects */
         $locationObjects = $object->getProperty('parent_locations');
-        if(is_array($locationObjects) && count($locationObjects) > 0) {
-
+        if (is_array($locationObjects) && count($locationObjects) > 0) {
             $addOrUpdate = [];
-            foreach($locationObjects as $locationObject) {
+            foreach ($locationObjects as $locationObject) {
                 $addOrUpdate[$locationObject->data['parent_location_id']] = $locationObject;
             }
 
             $existingLocations = [];
-            foreach($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
+            foreach ($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
                 if (!array_key_exists($existingLocation->parentLocationId, $addOrUpdate)) {
                     $this->locationService->deleteLocation($existingLocation);
                 } else {
@@ -222,8 +216,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
                 }
             }
 
-            foreach($addOrUpdate as $locationObject) {
-                if(!array_key_exists($locationObject->data['parent_location_id'], $existingLocations)) {
+            foreach ($addOrUpdate as $locationObject) {
+                if (!array_key_exists($locationObject->data['parent_location_id'], $existingLocations)) {
                     // create or update
                     $locationObject->data['content_id'] = $content->id;
                     $locationObject = $this->locationManager->createOrUpdate($locationObject);
@@ -252,10 +246,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         }
 
         try {
-            if($this->find($object)) {
+            if ($this->find($object)) {
                 return $this->update($object);
             }
-        } catch(NotFoundException $notFoundException) {
+        } catch (NotFoundException $notFoundException) {
             // Catch and ignore, we'll create it instead.
         }
 

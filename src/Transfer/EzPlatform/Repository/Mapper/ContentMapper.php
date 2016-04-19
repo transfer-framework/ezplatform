@@ -41,7 +41,7 @@ class ContentMapper
         $this->contentObject->setProperty('remote_id', $content->contentInfo->remoteId);
         $this->contentObject->setProperty('content_info', $content->contentInfo);
         $this->contentObject->setProperty('version_info', $content->versionInfo);
-        foreach($content->getFields() as $field) {
+        foreach ($content->getFields() as $field) {
             $this->contentObject->data[$field->fieldDefIdentifier][$field->languageCode] = $field->value;
         }
     }

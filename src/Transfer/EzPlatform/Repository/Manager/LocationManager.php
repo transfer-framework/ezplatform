@@ -34,6 +34,9 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
      */
     protected $logger;
 
+    /**
+     * @var Repository
+     */
     private $repository;
 
     /**
@@ -75,12 +78,12 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function find(LocationObject $object)
     {
         try {
-            if(isset($object->data['id'])) {
+            if (isset($object->data['id'])) {
                 $location = $this->locationService->loadLocation($object->data['id']);
-            }elseif(isset($object->data['remote_id'])) {
+            } elseif (isset($object->data['remote_id'])) {
                 $location = $this->locationService->loadLocationByRemoteId($object->data['remote_id']);
             }
-        } catch(NotFoundException $notFound) {
+        } catch (NotFoundException $notFound) {
             return false;
         }
 
@@ -96,10 +99,6 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             return;
         }
 
-        if(!isset($object->data['content_id'])) {
-            print_r(debug_print_backtrace(0,2));
-            die;
-        }
         $contentInfo = $this->repository->getContentService()->loadContentInfo($object->data['content_id']);
         $locationCreateStruct = $this->locationService->newLocationCreateStruct($object->data['parent_location_id']);
 
@@ -107,7 +106,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
 
         $location = $this->locationService->createLocation($contentInfo, $locationCreateStruct);
 
-        if($this->logger) {
+        if ($this->logger) {
             $this->logger->info(sprintf('Created location %s on content id %s, with parent location id %s.', $location->id, $contentInfo->id, $location->parentLocationId));
         }
 
@@ -117,18 +116,12 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof LocationObject) {
             return;
-        }
-
-        if (!isset($object->data['content_id'])) {
-            $contentInfo = $this->contentService->loadContentInfoByRemoteId($object->data['remote_id']);
-        } else {
-            $contentInfo = $this->contentService->loadContentInfo($object->data['content_id']);
         }
 
         $locationUpdateStruct = $this->locationService->newLocationUpdateStruct();
@@ -139,8 +132,8 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
 
         $location = $this->locationService->updateLocation($location, $locationUpdateStruct);
 
-        if($this->logger) {
-            $this->logger->info(sprintf('Updated location %s on content id %s, with parent location id %s.', $location->id, $contentInfo->id, $location->parentLocationId));
+        if ($this->logger) {
+            $this->logger->info(sprintf('Updated location %s with parent location id %s.', $location->id, $location->parentLocationId));
         }
 
         $object->getMapper()->locationToObject($location);
@@ -149,17 +142,17 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function createOrUpdate(ObjectInterface $object)
     {
-        if(!$object instanceof LocationObject) {
+        if (!$object instanceof LocationObject) {
             return;
         }
 
-        if($this->find($object)) {
+        if ($this->find($object)) {
             return $this->update($object);
-        }else{
+        } else {
             return $this->create($object);
         }
     }
@@ -173,7 +166,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             return;
         }
 
-        if($location = $this->find($object)) {
+        if ($location = $this->find($object)) {
             $this->locationService->deleteLocation($location);
         }
 
@@ -184,8 +177,8 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
      * Hides a location.
      *
      * @param Location $location
-     * @return Location
      *
+     * @return Location
      */
     public function hide(Location $location)
     {

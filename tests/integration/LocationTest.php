@@ -4,6 +4,7 @@ namespace Transfer\EzPlatform\tests\integration;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
+use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
@@ -22,6 +23,9 @@ class LocationTest extends EzPlatformTestCase
         $this->adapter = new EzPlatformAdapter(array(
             'repository' => static::$repository,
         ));
+        $this->adapter->setLogger(
+            $this->getMock(LoggerInterface::class)
+        );
     }
 
     /**
@@ -80,7 +84,7 @@ class LocationTest extends EzPlatformTestCase
                 'parent_locations' => array(
                     $locationObject,
                     2,
-                )
+                ),
             )
         );
 
@@ -95,8 +99,8 @@ class LocationTest extends EzPlatformTestCase
 
         // Get the location which we did not give a remote Id
         $newLocation2 = null;
-        foreach($newLocations as $location) {
-            if($location->remoteId !== $newLocation1->remoteId) {
+        foreach ($newLocations as $location) {
+            if ($location->remoteId !== $newLocation1->remoteId) {
                 $newLocation2 = $location;
                 break;
             }

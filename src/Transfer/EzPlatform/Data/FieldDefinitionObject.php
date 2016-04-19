@@ -12,6 +12,46 @@ namespace Transfer\EzPlatform\Data;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Mapper\FieldDefinitionMapper;
 
+/*
+
+** Available keys: **
+
+    $parent = Transfer\EzPlatform\Data\ContentTypeObject
+
+    $data = [
+        identifer           => string
+        type                => string
+        names               => string[]
+        descriptions        => string[]
+        field_group         => string
+        position            => int
+        is_translatable     => bool
+        is_required         => bool
+        is_info_collector   => bool
+        is_searchable       => bool
+    ],
+    $properties = [
+        <none>
+    ]
+
+
+** Required on `create`:
+**** Required by transfer:
+    An `identifier` unique to its ContentType(Object)
+
+**** Required by eZ:
+    An `identifier` unique to its ContentType
+    A type, transfer defaults to ezstring
+
+** Required on `update`:
+**** Required by transfer:
+    An `identifier`
+
+**** Required by eZ:
+    An `identifier`
+
+*/
+
 /**
  * Content type object.
  */

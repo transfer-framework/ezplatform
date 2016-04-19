@@ -84,6 +84,8 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+        $this->objectService->setLogger($logger);
+        $this->treeService->setLogger($logger);
     }
 
     /**

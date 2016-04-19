@@ -9,7 +9,6 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
-use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use Psr\Log\NullLogger;
 use Transfer\Data\TreeObject;
 use Transfer\Data\ValueObject;

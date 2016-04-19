@@ -14,7 +14,6 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\LocationList;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\LocationObject;
 
 /**
  * Content tree service.
@@ -45,7 +44,7 @@ class ContentTreeService extends AbstractRepositoryService
     public function create($object)
     {
         if (!($object instanceof TreeObject)) {
-            throw new \InvalidArgumentException('Invalid argument, expected object of type Transfer\Data\TreeObject');
+            throw new \InvalidArgumentException(sprintf('Invalid argument, expected object of type %s.', TreeObject::class));
         }
 
         $this->publishContentObjects($object);
@@ -113,7 +112,7 @@ class ContentTreeService extends AbstractRepositoryService
                 if ($this->logger) {
                     $this->logger->info(
                         sprintf('Found existing location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)),
-                        array('SubtreeService::publishLocation')
+                        array(__METHOD__)
                     );
                 }
 
@@ -132,7 +131,7 @@ class ContentTreeService extends AbstractRepositoryService
         $location = $this->getLocationService()->createLocation($object->getProperty('content_info'), $locationStruct);
 
         if ($this->logger) {
-            $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array('SubtreeService::publishLocation'));
+            $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array(__METHOD__));
         }
 
         $this->ensureLocationState($object, $location);
@@ -168,7 +167,7 @@ class ContentTreeService extends AbstractRepositoryService
         }
 
         if ($this->logger) {
-            $this->logger->info(sprintf('Force main location id for %s', $object->getProperty('name')), array('SubtreeService::ensureMainLocationIdIsSet'));
+            $this->logger->info(sprintf('Force main location id for %s', $object->getProperty('name')), array(__METHOD__));
         }
 
         $this->objectService->getContentManager()->setMainLocation($object, $location);

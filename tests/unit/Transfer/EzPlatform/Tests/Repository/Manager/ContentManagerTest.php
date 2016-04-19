@@ -9,7 +9,6 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
-use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;

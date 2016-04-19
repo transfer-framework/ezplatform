@@ -14,6 +14,50 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
 
+/*
+
+** Available keys: **
+
+    $data = [
+        my_first_field_identifier => my_first_field_value
+        my_second_field_identifier => my_second_field_value
+        ...
+    ],
+    $properties = [
+        id                      => int
+        name                    => string
+        remote_id               => string
+        content_info            => \eZ\Publish\API\Repository\Values\Content\ContentInfo
+        version_info            => \eZ\Publish\API\Repository\Values\Content\VersionInfo
+        main_object             => bool
+        parent_locations        => int|Location|LocationObject
+        content_type_identifier => string
+        language                => string
+        main_location_id        => int
+    ]
+
+
+** Required on `create`:
+**** Required by transfer:
+    Both properties `content_type_identifier` and `language` must be present.
+    $data with keys matching the required fields of the ContentType
+
+**** Required by eZ:
+    `content_type_identifier`
+    `language`
+    Fields matching the required fields of the ContentType
+
+** Required on `update`:
+**** Required by transfer:
+    One of `id`, or `remote_id` must be present
+    Atleast one fieldtype
+
+**** Required by eZ:
+    One of `id`, or `remote_id` must be present
+    Atleast one fieldtype
+
+*/
+
 /**
  * Content object.
  */
@@ -58,14 +102,14 @@ class ContentObject extends ValueObject
     }
 
     /**
-     * Values in array must be of type Location, LocationObject or int
+     * Values in array must be of type Location, LocationObject or int.
      *
      * @param array $parentLocations
      */
     public function setParentLocations(array $parentLocations)
     {
         $this->properties['parent_locations'] = [];
-        foreach($parentLocations as $location) {
+        foreach ($parentLocations as $location) {
             $this->addParentLocation($location);
         }
     }
@@ -82,13 +126,12 @@ class ContentObject extends ValueObject
         $locationObject = $this->convertToLocationObject($parentLocation);
 
         if (!isset($locationObject->data['parent_location_id']) || (int) $locationObject->data['parent_location_id'] < 1) {
-            echo print_r($locationObject);
             throw new InvalidDataStructureException('Parent location id must be an integer of 2 or above.');
         }
 
-        if(!isset($locationObject->data['content_id'])) {
-            if(isset($this->data['id'])) {
-                $locationObject->data['content_id'] = $this->data['id'];
+        if (!isset($locationObject->data['content_id'])) {
+            if ($this->getProperty('id')) {
+                $locationObject->data['content_id'] = $this->getProperty('id');
             }
         }
 
@@ -104,7 +147,7 @@ class ContentObject extends ValueObject
     {
         $locationObject = new LocationObject(array());
 
-        switch(true) {
+        switch (true) {
             case $parentLocation instanceof Location:
                 $locationObject->getMapper()->locationToObject($parentLocation);
                 break;

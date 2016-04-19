@@ -19,6 +19,7 @@ use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
+use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
 use Transfer\EzPlatform\Repository\Manager\UserManager;
 
@@ -89,6 +90,7 @@ class ObjectService extends AbstractRepositoryService
         }
 
         $this->locationManager = new Manager\LocationManager($this->repository);
+
         if ($this->logger) {
             $this->locationManager->setLogger($this->logger);
         }
@@ -127,6 +129,7 @@ class ObjectService extends AbstractRepositoryService
         }
 
         $this->languageManager = new Manager\LanguageManager($this->repository);
+
         if ($this->logger) {
             $this->languageManager->setLogger($this->logger);
         }
@@ -146,6 +149,7 @@ class ObjectService extends AbstractRepositoryService
         }
 
         $this->userGroupManager = new Manager\UserGroupManager($this->repository);
+
         if ($this->logger) {
             $this->userGroupManager->setLogger($this->logger);
         }
@@ -165,6 +169,7 @@ class ObjectService extends AbstractRepositoryService
         }
 
         $this->userManager = new Manager\UserManager($this->repository, $this->getUserGroupManager());
+
         if ($this->logger) {
             $this->userManager->setLogger($this->logger);
         }
@@ -188,8 +193,9 @@ class ObjectService extends AbstractRepositoryService
 
         foreach ($map as $class => $callable) {
             if ($object instanceof $class) {
-                
+                /** @var UpdaterInterface $manager */
                 $manager = call_user_func($callable);
+
                 return $manager->createOrUpdate($object);
             }
         }

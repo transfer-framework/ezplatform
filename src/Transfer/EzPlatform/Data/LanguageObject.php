@@ -12,6 +12,38 @@ namespace Transfer\EzPlatform\Data;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 
+/*
+
+** Available keys: **
+
+    $data = [
+        code => string
+        name => string
+    ],
+    $properties = [
+        <none>
+    ]
+
+
+** Required on `create`:
+**** Required by transfer:
+    code
+
+**** Required by eZ:
+    code
+    name
+
+** Required on `update`:
+**** Required by transfer:
+    code
+    name
+
+**** Required by eZ:
+    code
+    name
+
+*/
+
 /**
  * Content type object.
  */

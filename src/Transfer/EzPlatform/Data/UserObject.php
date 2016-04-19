@@ -12,6 +12,49 @@ namespace Transfer\EzPlatform\Data;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Mapper\UserMapper;
 
+/*
+
+** Available keys: **
+
+    $parents = Transfer\EzPlatform\Data\UserGroupObject[]
+    $data = [
+        username => string
+        email => string
+        password => string
+        main_language_code => string
+        enabled => bool
+        max_login => int
+        fields => [ first_name => string
+                    last_name => string
+                    ...                 ]
+    ],
+    $properties = [
+        <none>
+    ]
+
+
+** Required on `create`:
+**** Required by transfer:
+    `username´
+    `email`
+    `password`
+
+**** Required by eZ:
+    `username´
+    `èmail`
+    `password`
+    `main_language_code`
+    And any required fields in `fields`
+
+** Required on `update`:
+**** Required by transfer:
+    `username`
+
+**** Required by eZ:
+    `username`
+
+*/
+
 /**
  * User object.
  */

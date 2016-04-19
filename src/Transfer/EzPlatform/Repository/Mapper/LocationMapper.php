@@ -57,23 +57,23 @@ class LocationMapper
      */
     public function getNewLocationCreateStruct(LocationCreateStruct $locationCreateStruct)
     {
-        if(isset($this->locationObject->data['remote_id'])) {
+        if (isset($this->locationObject->data['remote_id'])) {
             $locationCreateStruct->remoteId = $this->locationObject->data['remote_id'];
         }
 
-        if(isset($this->locationObject->data['hidden'])) {
+        if (isset($this->locationObject->data['hidden'])) {
             $locationCreateStruct->hidden = $this->locationObject->data['hidden'];
         }
 
-        if(isset($this->locationObject->data['priority'])) {
+        if (isset($this->locationObject->data['priority'])) {
             $locationCreateStruct->priority = $this->locationObject->data['priority'];
         }
 
-        if(isset($this->locationObject->data['sort_field'])) {
+        if (isset($this->locationObject->data['sort_field'])) {
             $locationCreateStruct->sortField = $this->locationObject->data['sort_field'];
         }
 
-        if(isset($this->locationObject->data['sort_order'])) {
+        if (isset($this->locationObject->data['sort_order'])) {
             $locationCreateStruct->sortOrder = $this->locationObject->data['sort_order'];
         }
     }
@@ -83,19 +83,19 @@ class LocationMapper
      */
     public function getNewLocationUpdateStruct(LocationUpdateStruct $locationUpdateStruct)
     {
-        if(isset($this->locationObject->data['remote_id'])) {
+        if (isset($this->locationObject->data['remote_id'])) {
             $locationUpdateStruct->remoteId = $this->locationObject->data['remote_id'];
         }
 
-        if(isset($this->locationObject->data['priority'])) {
+        if (isset($this->locationObject->data['priority'])) {
             $locationUpdateStruct->priority = $this->locationObject->data['priority'];
         }
 
-        if(isset($this->locationObject->data['sort_field'])) {
+        if (isset($this->locationObject->data['sort_field'])) {
             $locationUpdateStruct->sortField = $this->locationObject->data['sort_field'];
         }
 
-        if(isset($this->locationObject->data['sort_order'])) {
+        if (isset($this->locationObject->data['sort_order'])) {
             $locationUpdateStruct->sortOrder = $this->locationObject->data['sort_order'];
         }
     }

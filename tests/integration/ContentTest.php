@@ -2,6 +2,7 @@
 
 namespace Transfer\EzPlatform\tests\integration;
 
+use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
@@ -20,6 +21,9 @@ class ContentTest extends EzPlatformTestCase
         $this->adapter = new EzPlatformAdapter(array(
             'repository' => static::$repository,
         ));
+        $this->adapter->setLogger(
+            $this->getMock(LoggerInterface::class)
+        );
     }
 
     /**
