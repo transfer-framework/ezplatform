@@ -10,6 +10,13 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Repository;
+use Psr\Log\LoggerInterface;
+use Transfer\EzPlatform\Repository\Manager\ContentManager;
+use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
+use Transfer\EzPlatform\Repository\Manager\LanguageManager;
+use Transfer\EzPlatform\Repository\Manager\LocationManager;
+use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
+use Transfer\EzPlatform\Repository\Manager\UserManager;
 use Transfer\EzPlatform\Repository\ObjectService;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -23,10 +30,10 @@ class ObjectServiceTest extends EzPlatformTestCase
     public function setUp()
     {
         /** @var Repository $repository */
-        $repository = $this->getMock('eZ\Publish\API\Repository\Repository');
+        $repository = $this->getMock(Repository::class);
         $this->service = new ObjectService($repository);
 
-        $this->service->setLogger($this->getMock('Psr\Log\LoggerInterface'));
+        $this->service->setLogger($this->getMock(LoggerInterface::class));
     }
 
     public function testGetters()
@@ -49,17 +56,17 @@ class ObjectServiceTest extends EzPlatformTestCase
         $this->service->getUserGroupManager();
         $userGroupManager = $this->service->getUserGroupManager();
 
-        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\ContentManager', $contentManager);
-        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\LocationManager', $locationManager);
-        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\ContentTypeManager', $contentTypeManager);
-        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\LanguageManager', $languageManager);
-        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\UserManager', $userManager);
-        $this->assertInstanceOf('Transfer\EzPlatform\Repository\Manager\UserGroupManager', $userGroupManager);
+        $this->assertInstanceOf(ContentManager::class, $contentManager);
+        $this->assertInstanceOf(LocationManager::class, $locationManager);
+        $this->assertInstanceOf(ContentTypeManager::class, $contentTypeManager);
+        $this->assertInstanceOf(LanguageManager::class, $languageManager);
+        $this->assertInstanceOf(UserManager::class, $userManager);
+        $this->assertInstanceOf(UserGroupManager::class, $userGroupManager);
     }
 
     public function testCreateWithNullArgument()
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException(\InvalidArgumentException::class);
 
         $this->service->create(null);
     }

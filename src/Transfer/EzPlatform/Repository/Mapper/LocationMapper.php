@@ -36,16 +36,16 @@ class LocationMapper
 
     public function locationToObject(Location $location)
     {
-        $this->locationObject->data['id'] = $location->id;
         $this->locationObject->data['content_id'] = $location->contentId;
         $this->locationObject->data['remote_id'] = $location->remoteId;
         $this->locationObject->data['parent_location_id'] = $location->parentLocationId;
-        $this->locationObject->data['depth'] = $location->depth;
         $this->locationObject->data['hidden'] = $location->hidden;
         $this->locationObject->data['priority'] = $location->priority;
         $this->locationObject->data['sort_field'] = $location->sortField;
         $this->locationObject->data['sort_order'] = $location->sortOrder;
 
+        $this->locationObject->setProperty('id', $location->id);
+        $this->locationObject->setProperty('depth', $location->depth);
         $this->locationObject->setProperty('content_info', $location->contentInfo);
         $this->locationObject->setProperty('invisible', $location->invisible);
         $this->locationObject->setProperty('path', $location->path);

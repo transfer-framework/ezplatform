@@ -6,6 +6,7 @@ use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
+use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -114,4 +115,5 @@ class ContentTreeTest extends EzPlatformTestCase
         $this->assertEquals($originalLocationFolderId, $locationFolder->id);
         $this->assertEquals($originalLocationArticleId, $locationArticle->id);
     }
+
 }

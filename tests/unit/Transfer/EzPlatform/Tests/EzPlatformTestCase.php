@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
@@ -183,6 +184,20 @@ abstract class EzPlatformTestCase extends KernelTestCase
         $content->setProperty('language', 'eng-GB');
 
         return $content;
+    }
+
+    /**
+     * @param int $parentLocationId
+     * @param string $remoteId
+     *
+     * @return LocationObject
+     */
+    protected function getLocationObject($parentLocationId, $remoteId)
+    {
+        return new LocationObject([
+            'remote_id' => $remoteId,
+            'parent_location_id' => $parentLocationId,
+        ]);
     }
 
     /**
