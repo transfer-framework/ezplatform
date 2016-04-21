@@ -25,15 +25,15 @@ class LocationMapperTest extends EzPlatformTestCase
         $location = static::$repository->getLocationService()->loadLocation(2);
         $locationObject = new LocationObject($location);
 
-        $this->assertEquals($location->id, $locationObject->data['id']);
         $this->assertEquals($location->remoteId, $locationObject->data['remote_id']);
         $this->assertEquals($location->contentId, $locationObject->data['content_id']);
         $this->assertEquals($location->parentLocationId, $locationObject->data['parent_location_id']);
         $this->assertEquals($location->hidden, $locationObject->data['hidden']);
-        $this->assertEquals($location->depth, $locationObject->data['depth']);
         $this->assertEquals($location->sortOrder, $locationObject->data['sort_order']);
         $this->assertEquals($location->sortField, $locationObject->data['sort_field']);
 
+        $this->assertEquals($location->id, $locationObject->getProperty('id'));
+        $this->assertEquals($location->depth, $locationObject->getProperty('depth'));
         $this->assertEquals($location->contentInfo, $locationObject->getProperty('content_info'));
         $this->assertEquals($location->invisible, $locationObject->getProperty('invisible'));
         $this->assertEquals($location->path, $locationObject->getProperty('path'));
@@ -46,15 +46,15 @@ class LocationMapperTest extends EzPlatformTestCase
         $locationObject = new LocationObject(array());
         $locationObject->getMapper()->locationToObject($location);
 
-        $this->assertEquals($location->id, $locationObject->data['id']);
         $this->assertEquals($location->remoteId, $locationObject->data['remote_id']);
         $this->assertEquals($location->contentId, $locationObject->data['content_id']);
         $this->assertEquals($location->parentLocationId, $locationObject->data['parent_location_id']);
         $this->assertEquals($location->hidden, $locationObject->data['hidden']);
-        $this->assertEquals($location->depth, $locationObject->data['depth']);
         $this->assertEquals($location->sortOrder, $locationObject->data['sort_order']);
         $this->assertEquals($location->sortField, $locationObject->data['sort_field']);
 
+        $this->assertEquals($location->id, $locationObject->getProperty('id'));
+        $this->assertEquals($location->depth, $locationObject->getProperty('depth'));
         $this->assertEquals($location->contentInfo, $locationObject->getProperty('content_info'));
         $this->assertEquals($location->invisible, $locationObject->getProperty('invisible'));
         $this->assertEquals($location->path, $locationObject->getProperty('path'));
