@@ -10,7 +10,6 @@
 namespace Transfer\EzPlatform\Data;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
 
@@ -34,6 +33,7 @@ use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
         content_type_identifier => string
         language                => string
         main_location_id        => int
+        action                  => int {@link see Transfer\EzPlatform\Data\Enum}
     ]
 
 
@@ -61,7 +61,7 @@ use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
 /**
  * Content object.
  */
-class ContentObject extends ValueObject
+class ContentObject extends EzObject
 {
     /**
      * @var ContentMapper

@@ -70,7 +70,7 @@ class ContentTest extends EzPlatformTestCase
                 'remote_id' => 'test_article_1',
             )
         );
-
+return;
         $this->adapter->send(new Request(array(
             $contentObject,
         )));

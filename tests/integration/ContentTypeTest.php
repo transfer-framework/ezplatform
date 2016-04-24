@@ -1,8 +1,9 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration;
+namespace Transfer\EzPlatform\Tests\Integration;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
@@ -37,7 +38,7 @@ class ContentTypeTest extends EzPlatformTestCase
         )));
         $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
 
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\ContentType\ContentType', $real);
+        $this->assertInstanceOf(ContentType::class, $real);
         $this->assertEquals('Product', $real->getName('eng-GB'));
 
         $raw = $this->getContentType($identifier);
@@ -48,13 +49,14 @@ class ContentTypeTest extends EzPlatformTestCase
         )));
         $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
 
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\ContentType\ContentType', $real);
+        $this->assertInstanceOf(ContentType::class, $real);
         $this->assertEquals('Updated name', $real->getName('eng-GB'));
     }
 
     protected function getContentType($identifier)
     {
-        return new ContentTypeObject($identifier, array(
+        return new ContentTypeObject(array(
+            'identifier' => $identifier,
             'main_language_code' => 'eng-GB',
             'contenttype_groups' => array('Content'),
             'name_schema' => '<title>',

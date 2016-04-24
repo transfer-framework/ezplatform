@@ -16,7 +16,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Transfer\Adapter\TargetAdapterInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Adapter\Transaction\Response;
+use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
+use Transfer\EzPlatform\Data\Enum\Action;
+use Transfer\EzPlatform\Data\EzObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
 use Transfer\EzPlatform\Repository\ObjectService;
 
@@ -106,18 +109,11 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
         $objects = array();
         foreach ($request as $object) {
-            if ($object instanceof TreeObject) {
-                $service = $this->treeService;
-            } else {
-                $service = $this->objectService;
-            }
 
-            if ($this->options['repository_current_user']) {
-                $service->setCurrentUser($this->options['repository_current_user']);
-            }
+            $service = $this->getService($object);
 
             try {
-                $objects[] = $service->create($object);
+                $objects[] = $this->executeAction($object, $service);
             } catch (\Exception $e) {
                 $repository->rollback();
                 throw $e;
@@ -131,5 +127,53 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
         $repository->commit();
 
         return $response;
+    }
+
+    /**
+     * @param ObjectInterface $object
+     *
+     * @param ContentTreeService|ObjectService $service
+     *
+     * @return ObjectInterface
+     */
+    protected function executeAction(ObjectInterface $object, $service)
+    {
+        
+        if(is_subclass_of($object, EzObject::class)) {
+            /** @var EzObject $object */
+            switch($object->getAction()) {
+                case Action::DELETE:
+                    return $service->remove($object);
+                    break;
+                case Action::CREATEORUPDATE:
+                default:
+                    return $service->createOrUpdate($object);
+                    break;
+            }
+        } else {
+            return $service->createOrUpdate($object);
+        }
+    }
+
+    /**
+     * Decides which service to use, based on the type of $object given.
+     *
+     * @param ObjectInterface $object
+     *
+     * @return ContentTreeService|ObjectService
+     */
+    protected function getService($object)
+    {
+        if ($object instanceof TreeObject) {
+            $service = $this->treeService;
+        } else {
+            $service = $this->objectService;
+        }
+
+        if ($this->options['repository_current_user']) {
+            $service->setCurrentUser($this->options['repository_current_user']);
+        }
+
+        return $service;
     }
 }

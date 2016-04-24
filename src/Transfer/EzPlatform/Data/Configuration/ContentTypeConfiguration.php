@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\Data\Definition;
+namespace Transfer\EzPlatform\Data\Configuration;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -17,6 +17,7 @@ class ContentTypeConfiguration implements ConfigurationInterface
         $node = $treeBuilder->root('contenttype');
         $node
             ->children()
+                ->scalarNode('identifier')->isRequired()->end()
                 ->arrayNode('names')
                     ->normalizeKeys(false)
                     ->prototype('scalar')->end()

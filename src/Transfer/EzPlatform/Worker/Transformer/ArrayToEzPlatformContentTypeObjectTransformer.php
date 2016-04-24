@@ -11,7 +11,7 @@ namespace Transfer\EzPlatform\Worker\Transformer;
 
 use Symfony\Component\Config\Definition\Processor as ConfigProcessor;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\Definition\ContentTypeConfiguration;
+use Transfer\EzPlatform\Data\Configuration\ContentTypeConfiguration;
 use Transfer\Worker\WorkerInterface;
 
 /**
@@ -33,13 +33,13 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
         $array = array_key_exists('contenttypes', $array) ? $array['contenttypes'] : $array;
 
         $cts = [];
-        foreach ($array as $identifier => $contenttype) {
+        foreach ($array as $contenttype) {
             $processor = new ConfigProcessor();
             $processedConfiguration = $processor->processConfiguration(
                 new ContentTypeConfiguration(),
                 array('contenttypes' => $contenttype)
             );
-            $cts[] = new ContentTypeObject($identifier, $processedConfiguration);
+            $cts[] = new ContentTypeObject($processedConfiguration);
         }
 
         return $cts;

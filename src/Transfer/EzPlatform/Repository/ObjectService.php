@@ -19,6 +19,7 @@ use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
+use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
 use Transfer\EzPlatform\Repository\Manager\UserManager;
@@ -61,7 +62,7 @@ class ObjectService extends AbstractRepositoryService
     /**
      * Returns content manager.
      *
-     * @return Manager\ContentManager
+     * @return ContentManager
      */
     public function getContentManager()
     {
@@ -81,7 +82,7 @@ class ObjectService extends AbstractRepositoryService
     /**
      * Returns location manager.
      *
-     * @return Manager\LocationManager
+     * @return LocationManager
      */
     public function getLocationManager()
     {
@@ -178,11 +179,11 @@ class ObjectService extends AbstractRepositoryService
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function create($object)
+    protected function getManagerMapping()
     {
-        $map = array(
+        return array(
             ContentObject::class => array($this, 'getContentManager'),
             LocationObject::class => array($this, 'getLocationManager'),
             ContentTypeObject::class => array($this, 'getContentTypeManager'),
@@ -190,8 +191,14 @@ class ObjectService extends AbstractRepositoryService
             UserObject::class => array($this, 'getUserManager'),
             UserGroupObject::class => array($this, 'getUserGroupManager'),
         );
+    }
 
-        foreach ($map as $class => $callable) {
+    /**
+     * {@inheritdoc}
+     */
+    public function createOrUpdate($object)
+    {
+        foreach ($this->getManagerMapping() as $class => $callable) {
             if ($object instanceof $class) {
                 /** @var UpdaterInterface $manager */
                 $manager = call_user_func($callable);
@@ -201,5 +208,22 @@ class ObjectService extends AbstractRepositoryService
         }
 
         throw new \InvalidArgumentException('Object is not supported for creation.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($object)
+    {
+        foreach ($this->getManagerMapping() as $class => $callable) {
+            if ($object instanceof $class) {
+                /** @var RemoverInterface $manager */
+                $manager = call_user_func($callable);
+
+                return $manager->remove($object);
+            }
+        }
+
+        throw new \InvalidArgumentException('Object is not supported for deletion.');
     }
 }

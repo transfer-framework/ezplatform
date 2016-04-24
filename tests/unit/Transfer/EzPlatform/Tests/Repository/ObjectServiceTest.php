@@ -68,6 +68,6 @@ class ObjectServiceTest extends EzPlatformTestCase
     {
         $this->setExpectedException(\InvalidArgumentException::class);
 
-        $this->service->create(null);
+        $this->service->createOrUpdate(null);
     }
 }

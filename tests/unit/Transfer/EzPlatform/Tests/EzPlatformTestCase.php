@@ -110,7 +110,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
 
     public static function setUpContentTypes()
     {
-        $_ct_article = new ContentTypeObject('_test_article', array(
+        $_ct_article = new ContentTypeObject(array(
+            'identifier' => '_test_article',
             'main_language_code' => 'eng-GB',
             'contenttype_groups' => array('Content'),
             'name_schema' => '<title>',

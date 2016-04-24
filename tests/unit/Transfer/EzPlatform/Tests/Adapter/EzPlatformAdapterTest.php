@@ -75,7 +75,8 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
 
     public function testSendFullContentTypeObject()
     {
-        $ct = new ContentTypeObject('_test_article', array(
+        $ct = new ContentTypeObject(array(
+            'identifier' => '_test_article',
             'main_language_code' => 'eng-GB',
             'contenttype_groups' => array('Content'),
             'name_schema' => '<title>',
@@ -120,7 +121,8 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
 
     public function testSendMiniContentTypeObject()
     {
-        $array = array('article' => array(
+        $array = array(array(
+            'identifier' => 'article',
             'fields' => array(
                 'title' => array(),
                 'content' => array(),

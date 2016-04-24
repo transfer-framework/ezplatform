@@ -18,34 +18,25 @@ use Transfer\EzPlatform\Tests\EzPlatformTestCase;
  */
 class LanguageManagerTest extends EzPlatformTestCase
 {
-    public function testEmptyLanguage()
-    {
-        $manager = static::$languageManager;
-        $emptyValueObject = new ValueObject(array());
-        $this->assertNull($manager->create($emptyValueObject));
-        $this->assertNull($manager->update($emptyValueObject));
-        $this->assertNull($manager->createOrUpdate($emptyValueObject));
-        $this->assertNull($manager->remove($emptyValueObject));
-    }
-
     public function testEnableLanguage()
     {
         $manager = static::$languageManager;
         $engGB = new LanguageObject(array('code' => 'eng-GB'));
-        $language = $manager->create($engGB)->getData();
-        $this->assertInstanceOf('eZ\Publish\API\Repository\Values\Content\Language', $language);
-        $this->assertEquals('eng-GB', $language->languageCode);
-        $this->assertTrue($language->enabled);
+        $language = $manager->create($engGB);
+        $this->assertInstanceOf(LanguageObject::class, $language);
+        $this->assertEquals('eng-GB', $language->data['code']);
+        $this->assertTrue($language->data['enabled']);
     }
 
     public function testCreateLanguage()
     {
         $manager = static::$languageManager;
         $sweSE = new LanguageObject(array('code' => 'swe-SE'));
-        $language = $manager->create($sweSE)->getData();
-        $this->assertInstanceOf('eZ\Publish\API\Repository\Values\Content\Language', $language);
-        $this->assertEquals('swe-SE', $language->languageCode);
-        $this->assertTrue($language->enabled);
+        $language = $manager->create($sweSE);
+
+        $this->assertInstanceOf(LanguageObject::class, $language);
+        $this->assertEquals('swe-SE', $language->data['code']);
+        $this->assertTrue($language->data['enabled']);
     }
 
     public function testUpdateLanguage()
@@ -53,20 +44,20 @@ class LanguageManagerTest extends EzPlatformTestCase
         $manager = static::$languageManager;
         $engGB = new LanguageObject(array('code' => 'eng-GB'));
         $engGB->data['name'] = 'New name';
-        $manager->update($engGB);
-        $language = $manager->findByCode('eng-GB');
-        $this->assertEquals('New name', $language->name);
+        $language = $manager->update($engGB);
+        $this->assertEquals('New name', $language->data['name']);
     }
 
     public function testCreateOrUpdate()
     {
         $code = 'rus-RU';
         $manager = static::$languageManager;
-        $gerDE = new LanguageObject(array('code' => $code));
-        $manager->createOrUpdate($gerDE);
-        $this->assertTrue($manager->exists($code));
-        $manager->createOrUpdate($gerDE);
-        $this->assertTrue($manager->exists($code));
+        $rusRU = new LanguageObject(array('code' => $code));
+        /** @var LanguageObject $language */
+        $language = $manager->createOrUpdate($rusRU);
+        $this->assertEquals($code, $language->data['code']);
+        $language = $manager->createOrUpdate($rusRU);
+        $this->assertEquals($code, $language->data['code']);
     }
 
     public function testRemove()
@@ -75,7 +66,7 @@ class LanguageManagerTest extends EzPlatformTestCase
         $gerDE = new LanguageObject(array('code' => 'ger-DE'));
         $manager->createOrUpdate($gerDE);
         $manager->remove($gerDE);
-        $this->assertFalse($manager->exists('ger-DE'));
+        $this->assertFalse($manager->find($gerDE));
     }
 
     public function testRemoveNotFound()

@@ -41,7 +41,7 @@ class ContentTreeService extends AbstractRepositoryService
     /**
      * {@inheritdoc}
      */
-    public function create($object)
+    public function createOrUpdate($object)
     {
         if (!($object instanceof TreeObject)) {
             throw new \InvalidArgumentException(sprintf('Invalid argument, expected object of type %s.', TreeObject::class));
@@ -62,13 +62,13 @@ class ContentTreeService extends AbstractRepositoryService
      */
     private function publishContentObjects(TreeObject $object)
     {
-        $this->objectService->create($object->data);
+        $this->objectService->createOrUpdate($object->data);
 
         foreach ($object->getNodes() as $subObject) {
             if ($subObject instanceof TreeObject) {
                 $this->publishContentObjects($subObject);
             } else {
-                $this->objectService->create($subObject);
+                $this->objectService->createOrUpdate($subObject);
             }
         }
     }
@@ -108,6 +108,7 @@ class ContentTreeService extends AbstractRepositoryService
         /** @var LocationList $existingLocations */
         $existingLocations = $this->getLocationService()->loadLocationChildren($parentLocation, 0, PHP_INT_MAX);
         foreach ($existingLocations->locations as $location) {
+            
             if ($location->contentInfo->id == $object->getProperty('content_info')->id) {
                 if ($this->logger) {
                     $this->logger->info(
@@ -129,7 +130,7 @@ class ContentTreeService extends AbstractRepositoryService
         }
 
         $location = $this->getLocationService()->createLocation($object->getProperty('content_info'), $locationStruct);
-
+        
         if ($this->logger) {
             $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array(__METHOD__));
         }

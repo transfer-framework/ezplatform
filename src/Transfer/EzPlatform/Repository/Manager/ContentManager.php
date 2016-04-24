@@ -24,6 +24,7 @@ use Transfer\Data\ObjectInterface;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
@@ -81,13 +82,11 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
     /**
      * Finds a content object by content ID or remote ID.
+     * Returns ContentObject with populated properties, or false.
      *
      * @param ContentObject $object
      *
      * @return ContentObject|false
-     *
-     * @throws NotFoundException
-     * @throws \Transfer\EzPlatform\Exception\InvalidDataStructureException
      */
     public function find(ContentObject $object)
     {
@@ -105,12 +104,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
                 // We'll throw it later if needed
                 $e = $notFoundException;
             }
-        } else {
-            return false;
         }
 
-        if (!isset($content) && isset($e)) {
-            throw $e;
+        if (!isset($content) || isset($e)) {
+            return false;
         }
 
         $object = new ContentObject(array());
@@ -123,14 +120,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $type = $this->contentTypeService->loadContentType($content->contentInfo->contentTypeId);
         $object->setProperty('content_type_identifier', $type->identifier);
-        $object->setParentLocations($this->locationService->loadLocations($content->contentInfo));
 
         return $object;
-    }
-
-    public function findByRemoteId($remoteId)
-    {
-        return $this->find(new ContentObject([], ['remote_id' => $remoteId]));
     }
 
     /**
@@ -139,7 +130,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            throw new \InvalidArgumentException('Object is not supported for creation.');
+            throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
         }
 
         $createStruct = $this->contentService->newContentCreateStruct(
@@ -179,7 +170,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            throw new \InvalidArgumentException('Object is not supported for update.');
+            throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
         }
 
         $existingContent = $this->find($object);
@@ -238,7 +229,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            throw new \InvalidArgumentException('Object is not supported for creation or update.');
+            throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
         }
 
         if (!$object->getProperty('content_id') && !$object->getProperty('remote_id')) {
@@ -262,10 +253,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof ContentObject) {
-            throw new \InvalidArgumentException('Object is not supported for deletion.');
+            throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
         }
 
-        $object = $this->findByRemoteId($object->getProperty('remote_id'));
+        $object = $this->find($object);
 
         if ($object instanceof ContentObject && $object->getProperty('content_info')) {
             $this->contentService->deleteContent($object->getProperty('content_info'));

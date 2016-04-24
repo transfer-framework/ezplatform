@@ -33,6 +33,7 @@ use Transfer\EzPlatform\Repository\Mapper\LocationMapper;
         invisible           => bool
         path                => array
         path_string         => string
+        action              => int {@link see Transfer\EzPlatform\Data\Enum}
     ]
 
 
@@ -50,7 +51,7 @@ use Transfer\EzPlatform\Repository\Mapper\LocationMapper;
 /**
  * Location object.
  */
-class LocationObject extends ValueObject
+class LocationObject extends EzObject
 {
     /**
      * @var LocationMapper

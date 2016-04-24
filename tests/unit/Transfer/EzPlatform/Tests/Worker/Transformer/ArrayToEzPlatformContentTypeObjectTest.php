@@ -7,7 +7,8 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmptyField()
     {
-        $array = array('article' => array(
+        $array = array(array(
+            'identifier' => 'article',
             'fields' => array(
                 'title' => null,
             ),
@@ -26,7 +27,8 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
     public function testMultilingual()
     {
         $array = array('contenttypes' => array(
-            'article' => array(
+            array(
+                'identifier' => 'article',
                 'names' => array(
                     'eng-GB' => 'Article',
                     'nor-NO' => 'Artikkel',
@@ -49,7 +51,8 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
                     ),
                 ),
             ),
-            'frontpage' => array(
+            array(
+                'identifier' => 'frontpage',
                 'names' => array(
                     'eng-GB' => 'Frontpage',
                     'nor-NO' => 'Forside',
@@ -214,7 +217,8 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
     protected function getMiniArrayExample()
     {
-        return array('article' => array(
+        return array(array(
+            'identifier' => 'article',
             'fields' => array(
                 'title' => array(),
                 'content' => array(),
@@ -224,7 +228,8 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
     protected function getDetailedArrayExample()
     {
-        return array('article' => array(
+        return array(array(
+            'identifier' => 'article',
             'main_language_code' => 'eng-GB',
             'contenttype_groups' => 'Content',
             'names' => 'Article',

@@ -11,6 +11,7 @@ namespace Transfer\EzPlatform\Data;
 
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
+use Transfer\EzPlatform\Repository\Mapper\LanguageMapper;
 
 /*
 
@@ -21,7 +22,7 @@ use Transfer\EzPlatform\Exception\LanguageNotFoundException;
         name => string
     ],
     $properties = [
-        <none>
+        action => int {@link see Transfer\EzPlatform\Data\Enum}
     ]
 
 
@@ -47,8 +48,25 @@ use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 /**
  * Content type object.
  */
-class LanguageObject extends ValueObject
+class LanguageObject extends EzObject
 {
+    /**
+     * @var LanguageMapper
+     */
+    private $mapper;
+
+    /**
+     * @return LanguageMapper
+     */
+    public function getMapper()
+    {
+        if (!$this->mapper) {
+            $this->mapper = new LanguageMapper($this);
+        }
+
+        return $this->mapper;
+    }
+
     /**
      * Because a name is required.
      *
@@ -107,9 +125,9 @@ class LanguageObject extends ValueObject
      *
      * @throws LanguageNotFoundException
      */
-    public function __construct($data)
+    public function __construct($data, $properties = [])
     {
-        parent::__construct($data);
+        parent::__construct($data, $properties);
         if (!isset($this->data['name'])) {
             $this->data['name'] = $this->getDefaultName($this->data['code']);
         }

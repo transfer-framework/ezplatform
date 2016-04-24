@@ -32,7 +32,8 @@ use Transfer\EzPlatform\Repository\Mapper\ContentTypeMapper;
         fields                   => FieldDefinition[] {@link see FieldDefinitionObject}
     ],
     $properties = [
-        <none>
+        id                       => int
+        content_type_groups      => \eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup[]
     ]
 
 
@@ -58,7 +59,7 @@ use Transfer\EzPlatform\Repository\Mapper\ContentTypeMapper;
 /**
  * Content type object.
  */
-class ContentTypeObject extends ValueObject
+class ContentTypeObject extends EzObject
 {
     /**
      * @var ContentTypeMapper
@@ -68,24 +69,29 @@ class ContentTypeObject extends ValueObject
     /**
      * @var FieldDefinitionObject[]
      */
-    public $fields;
+    public $fields = array();
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($identifier, $data)
+    public function __construct($data, $properties = array())
     {
-        $data['identifier'] = $identifier;
-        parent::__construct($data);
-        foreach ($data['fields'] as $fieldIdentifier => $field) {
-            $this->fields[] = new FieldDefinitionObject($fieldIdentifier, $this, $field);
+        parent::__construct($data, $properties);
+        if(isset($data['fields'])) {
+            foreach ($data['fields'] as $fieldIdentifier => $field) {
+                $this->fields[] = new FieldDefinitionObject($fieldIdentifier, $this, $field);
+            }
+            unset($data['fields']);
+            $this->setMissingDefaults();
         }
-        unset($data['fields']);
-        $this->setMissingDefaults();
     }
 
     private function setMissingDefaults()
     {
+        if($this->notSetOrEmpty($this->data, 'main_language_code')) {
+            $this->data['main_language_code'] = 'eng-GB';
+        }
+
         if ($this->notSetOrEmpty($this->data, 'names')) {
             $this->data['names'] = array(
                 $this->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),

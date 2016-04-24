@@ -66,13 +66,13 @@ class ContentTreeServiceTest extends EzPlatformTestCase
         $treeObject->addNode($secondaryContentObject);
         $treeObject->addNode(new TreeObject($secondaryContentObject));
 
-        $this->service->create($treeObject);
+        $this->service->createOrUpdate($treeObject);
     }
 
     public function testCreateWithInvalidArgument()
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        $this->service->create(new ValueObject(null));
+        $this->service->createOrUpdate(new ValueObject(null));
     }
 }

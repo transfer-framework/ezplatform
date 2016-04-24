@@ -72,7 +72,10 @@ class LocationTest extends EzPlatformTestCase
         $locationObject = new LocationObject(array(
             'parent_location_id' => 58,
             'remote_id' => '_test_location_content_integration_2',
+            'main_location' => true,
         ));
+        
+        
         $contentObject = new ContentObject(
             array(
                 'title' => 'Test title',
@@ -82,8 +85,8 @@ class LocationTest extends EzPlatformTestCase
                 'content_type_identifier' => '_test_article',
                 'remote_id' => '_test_content_location_integration_2',
                 'parent_locations' => array(
-                    $locationObject,
                     2,
+                    $locationObject,
                 ),
             )
         );

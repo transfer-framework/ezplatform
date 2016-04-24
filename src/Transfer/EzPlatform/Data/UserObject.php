@@ -29,7 +29,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserMapper;
                     ...                 ]
     ],
     $properties = [
-        <none>
+        action => int {@link see Transfer\EzPlatform\Data\Enum}
     ]
 
 
@@ -58,7 +58,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserMapper;
 /**
  * User object.
  */
-class UserObject extends ValueObject
+class UserObject extends EzObject
 {
     /**
      * @var UserGroupObject[]

@@ -24,6 +24,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserGroupMapper;
         fields                  => FieldDefinition[] {@link see ContentObject and FieldDefinitionObject}
     ],
     $properties = [
+        action                  => int {@link see Transfer\EzPlatform\Data\Enum}
     ]
 
 
@@ -52,7 +53,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserGroupMapper;
 /**
  * User Group object.
  */
-class UserGroupObject extends ValueObject
+class UserGroupObject extends EzObject
 {
     /**
      * @var UserGroupMapper

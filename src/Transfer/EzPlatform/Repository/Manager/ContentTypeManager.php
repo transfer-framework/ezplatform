@@ -24,6 +24,7 @@ use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\Exception\ContentTypeNotFoundException;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
@@ -79,23 +80,32 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     /**
      * Finds content type object by identifier.
      *
-     * @param string $identifier Identifier
+     * @param ContentTypeObject $object
      *
      * @return ContentType|false
      */
-    public function findContentTypeByIdentifier($identifier)
+    public function find(ContentTypeObject $object)
     {
-        if (!is_string($identifier)) {
+        if (isset($object->data['identifier'])) {
+            try {
+                $contentType = $this->contentTypeService->loadContentTypeByIdentifier($object->data['identifier']);
+            } catch (NotFoundException $notFoundException) {
+                // Do nothing (yet).
+            }
+        }
+
+        if(!isset($contentType)) {
             return false;
         }
 
-        try {
-            $contentType = $this->contentTypeService->loadContentTypeByIdentifier($identifier);
-        } catch (NotFoundException $e) {
-            return false;
-        }
+        //$object->getMapper()->contentTypeToObject($contentType);
 
         return $contentType;
+    }
+
+    public function findContentTypeByIdentifier($string)
+    {
+        return $this->find(new ContentTypeObject(['identifier' => $string]));
     }
 
     /**
@@ -104,7 +114,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
         if ($this->logger) {
@@ -144,14 +154,14 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
         if ($this->logger) {
             $this->logger->info(sprintf('Updating contenttype %s.', $object->data['identifier']));
         }
 
-        $contentType = $this->findContentTypeByIdentifier($object->data['identifier']);
+        $contentType = $this->find($object);
 
         if (!$contentType) {
             throw new ContentTypeNotFoundException(sprintf('Contenttype "%s" not found.', $object->data['identifier']));
@@ -219,10 +229,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
-        $contentObject = $this->findContentTypeByIdentifier($object->data['identifier']);
+        $contentObject = $this->find($object);
         if (!$contentObject) {
             return $this->create($object);
         } else {
@@ -236,7 +246,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
         return $this->removeContentTypeByIdentifier($object->data['identifier']);

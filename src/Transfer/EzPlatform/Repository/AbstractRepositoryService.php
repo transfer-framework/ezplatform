@@ -114,9 +114,10 @@ abstract class AbstractRepositoryService implements LoggerAwareInterface
     }
 
     /**
-     * Handles object creation.
+     * Handles object creation and update.
      *
      * @param ObjectInterface $object
      */
-    abstract public function create($object);
+    abstract public function createOrUpdate($object);
+
 }

@@ -12,6 +12,7 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Tests\EzPlatformTestCase;
 
@@ -25,24 +26,14 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $this->setExpectedException('Transfer\EzPlatform\Exception\ContentTypeNotFoundException', 'Contenttype "_update_not_found" not found.');
         $manager = static::$contentTypeManager;
 
-        $ct = new ContentTypeObject('_update_not_found', $this->getFrontpageContentTypeDataArray());
+        $ct = new ContentTypeObject($this->getFrontpageContentTypeDataArray('_update_not_found'));
         $manager->update($ct);
-    }
-
-    public function testValueObject()
-    {
-        $v = new ValueObject(array());
-        $manager = static::$contentTypeManager;
-        $this->assertNull($manager->create($v));
-        $this->assertNull($manager->update($v));
-        $this->assertNull($manager->createOrUpdate($v));
-        $this->assertNull($manager->remove($v));
     }
 
     public function testUnknownLanguage()
     {
         $manager = static::$contentTypeManager;
-        $this->setExpectedException('Transfer\EzPlatform\Exception\LanguageNotFoundException', 'Default language name for code "test-TEST" not found.');
+        $this->setExpectedException(LanguageNotFoundException::class, 'Default language name for code "test-TEST" not found.');
         $frontpage = $this->getFrontpageContentTypeObject();
         $frontpage->data['names'] = ['test-TEST' => 'My test language'];
         $manager->createOrUpdate($frontpage);
@@ -243,12 +234,13 @@ class ContentTypeManagerTest extends EzPlatformTestCase
      */
     protected function getFrontpageContentTypeObject()
     {
-        return new ContentTypeObject('frontpage', $this->getFrontpageContentTypeDataArray());
+        return new ContentTypeObject($this->getFrontpageContentTypeDataArray('frontpage'));
     }
 
-    protected function getFrontpageContentTypeDataArray()
+    protected function getFrontpageContentTypeDataArray($identifier)
     {
         return array(
+            'identifier' => $identifier,
             'main_language_code' => 'eng-GB',
             'contenttype_groups' => array('Content'),
             'names' => array('eng-GB' => 'Frontpage'),
@@ -299,7 +291,8 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $frontPage->fields[0]->data['names'] = array('eng-GB' => 'Updated name');
         $frontPage->fields[0]->data['descriptions'] = array('eng-GB' => 'Updated name description');
 
-        return new ContentTypeObject('frontpage', array(
+        return new ContentTypeObject(array(
+            'identifier' => 'frontpage',
             'main_language_code' => 'eng-GB',
             'contenttype_groups' => array('Content'),
             'names' => array('eng-GB' => 'Updated frontpage'),

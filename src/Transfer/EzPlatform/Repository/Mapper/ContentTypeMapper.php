@@ -10,6 +10,7 @@
 namespace Transfer\EzPlatform\Repository\Mapper;
 
 use eZ\Publish\API\Repository\ContentTypeService;
+use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
 use Transfer\EzPlatform\Data\ContentTypeObject;
@@ -72,5 +73,21 @@ class ContentTypeMapper
         $contentTypeUpdateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
         $contentTypeUpdateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
         $contentTypeUpdateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
+    }
+
+    public function contentTypeToObject(ContentType $contentType)
+    {
+        $this->contentTypeObject->data['identifier'] = $contentType->identifier;
+        $this->contentTypeObject->data['names'] = $contentType->getNames();
+        $this->contentTypeObject->data['descriptions'] = $contentType->getDescriptions();
+        $this->contentTypeObject->data['name_schema'] = $contentType->nameSchema;
+        $this->contentTypeObject->data['url_alias_schema'] = $contentType->urlAliasSchema;
+        $this->contentTypeObject->data['is_container'] = $contentType->isContainer;
+        $this->contentTypeObject->data['default_always_available'] = $contentType->defaultAlwaysAvailable;
+        $this->contentTypeObject->data['default_sort_field'] = $contentType->defaultSortField;
+        $this->contentTypeObject->data['default_sort_order'] = $contentType->defaultSortOrder;
+
+        $this->contentTypeObject->setProperty('id', $contentType->id);
+        $this->contentTypeObject->setProperty('content_type_groups', $contentType->contentTypeGroups);
     }
 }
