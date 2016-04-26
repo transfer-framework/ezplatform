@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ValueObject;
@@ -16,7 +16,7 @@ use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 /**
  * Content manager tests.

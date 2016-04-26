@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\Tests\integration;
+namespace Transfer\EzPlatform\tests\integration;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 class ContentTreeTest extends EzPlatformTestCase
 {

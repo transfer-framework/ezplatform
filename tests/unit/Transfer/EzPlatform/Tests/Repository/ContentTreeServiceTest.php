@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use Psr\Log\NullLogger;
 use Transfer\Data\TreeObject;
@@ -15,7 +15,7 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
 use Transfer\EzPlatform\Repository\ObjectService;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 class ContentTreeServiceTest extends EzPlatformTestCase
 {

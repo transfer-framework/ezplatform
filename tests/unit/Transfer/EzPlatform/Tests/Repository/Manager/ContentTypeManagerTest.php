@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
@@ -17,7 +17,7 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 /**
  * Content type manager tests.

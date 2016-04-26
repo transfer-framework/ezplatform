@@ -7,10 +7,10 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use Transfer\EzPlatform\Repository\AbstractRepositoryService;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 class AbstractRepositoryServiceTest extends EzPlatformTestCase
 {

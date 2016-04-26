@@ -7,11 +7,11 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\LanguageObject;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 /**
  * Language manager tests.

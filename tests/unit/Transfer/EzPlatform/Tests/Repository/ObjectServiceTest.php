@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Repository;
 use Psr\Log\LoggerInterface;
@@ -18,7 +18,7 @@ use Transfer\EzPlatform\Repository\Manager\LocationManager;
 use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
 use Transfer\EzPlatform\Repository\Manager\UserManager;
 use Transfer\EzPlatform\Repository\ObjectService;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 class ObjectServiceTest extends EzPlatformTestCase
 {

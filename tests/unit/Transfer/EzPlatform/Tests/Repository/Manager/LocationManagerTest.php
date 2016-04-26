@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Data\ValueObject;
@@ -15,7 +15,7 @@ use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 class LocationManagerTest extends EzPlatformTestCase
 {

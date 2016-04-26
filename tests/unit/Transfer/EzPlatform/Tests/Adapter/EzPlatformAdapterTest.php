@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Tests\Repository\Manager;
+namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Adapter\Transaction\Request;
@@ -17,7 +17,7 @@ use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Data\UserObject;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
 class EzPlatformAdapterTest extends EzPlatformTestCase

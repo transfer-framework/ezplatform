@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\Tests\Integration;
+namespace Transfer\EzPlatform\tests\Integration;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 class ContentTypeTest extends EzPlatformTestCase
 {

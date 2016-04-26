@@ -18,7 +18,7 @@
     "require": {
         "php": "~5.5|~7.0",
         "transfer/transfer": "~1.0.0",
-        "ezsystems/ezpublish-kernel": "~6.0.0",
+        "ezsystems/ezpublish-kernel": "~6.3.0-rc3",
         "symfony/config": "~2.7.7"
     },
     "require-dev": {

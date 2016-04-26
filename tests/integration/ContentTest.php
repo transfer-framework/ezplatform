@@ -7,7 +7,7 @@ use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\EzPlatformTestCase;
 
 class ContentTest extends EzPlatformTestCase
 {
