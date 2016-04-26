@@ -9,7 +9,8 @@
 
 namespace Transfer\EzPlatform\Repository\Manager\Type;
 
-use Transfer\Data\ValueObject;
+use eZ\Publish\API\Repository\Values\ValueObject as EzValueObject;
+use \Transfer\Data\ValueObject as TransferValueObject;
 
 /**
  * Finder interface.
@@ -19,12 +20,12 @@ use Transfer\Data\ValueObject;
 interface FinderInterface
 {
     /**
-     * Find an object.
+     * Find an eZ Object, based on a Transfer object.
      *
-     * @param ValueObject $object         Object to find
-     * @param bool        $throwException
+     * @param TransferValueObject $object
+     * @param bool                $throwException
      *
-     * @return ValueObject|false
+     * @return EzValueObject|false
      */
-    public function find(ValueObject $object, $throwException);
+    public function find(TransferValueObject $object, $throwException);
 }

@@ -91,9 +91,6 @@ abstract class EzPlatformTestCase extends KernelTestCase
         static::$userManager = new UserManager(static::$repository, static::$userGroupManager);
         static::$locationManager = new LocationManager(static::$repository);
         static::$contentManager = new ContentManager(static::$repository, static::$locationManager);
-
-        static::setUpContentTypes();
-
         static::$hasDatabase = true;
     }
 
@@ -106,112 +103,5 @@ abstract class EzPlatformTestCase extends KernelTestCase
         static::$userManager->setLogger($logger);
         static::$locationManager->setLogger($logger);
         static::$contentManager->setLogger($logger);
-    }
-
-    public static function setUpContentTypes()
-    {
-        $_ct_article = new ContentTypeObject(array(
-            'identifier' => '_test_article',
-            'main_language_code' => 'eng-GB',
-            'contenttype_groups' => array('Content'),
-            'name_schema' => '<title>',
-            'url_alias_schema' => '<title>',
-            'names' => array('eng-GB' => 'Article'),
-            'descriptions' => array('eng-GB' => 'An article'),
-            'is_container' => true,
-            'default_always_available' => false,
-            'default_sort_field' => Location::SORT_FIELD_PUBLISHED,
-            'default_sort_order' => Location::SORT_ORDER_ASC,
-            'fields' => array(
-                'title' => array(
-                    'type' => 'ezstring',
-                    'names' => array('eng-GB' => 'Title'),
-                    'descriptions' => array('eng-GB' => 'Title of the article'),
-                    'field_group' => 'content',
-                    'position' => 10,
-                    'is_required' => true,
-                    'is_translatable' => true,
-                    'is_searchable' => true,
-                    'is_info_collector' => false,
-                ),
-                'description' => array(
-                    'type' => 'ezstring',
-                    'names' => array('eng-GB' => 'Description'),
-                    'descriptions' => array('eng-GB' => 'Description of the article'),
-                    'field_group' => 'content',
-                    'position' => 20,
-                    'is_required' => false,
-                    'is_translatable' => true,
-                    'is_searchable' => true,
-                    'is_info_collector' => false,
-
-                ),
-            ),
-        ));
-
-        static::$contentTypeManager->createOrUpdate($_ct_article);
-    }
-
-    /**
-     * Creates a TreeObject skeleton.
-     *
-     * @param int   $locationId
-     * @param array $data
-     *
-     * @return TreeObject
-     */
-    protected function getTreeObject($locationId, $data)
-    {
-        $tree = new TreeObject($data);
-        $tree->setProperty('parent_location_id', $locationId);
-
-        return $tree;
-    }
-
-    /**
-     * Creates a ContentObject skeleton.
-     *
-     * @param array  $data
-     * @param string $contenttype
-     * @param string $remoteId
-     *
-     * @return ContentObject
-     */
-    protected function getContentObject(array $data, $contenttype, $remoteId)
-    {
-        $content = new ContentObject($data);
-        $content->setProperty('content_type_identifier', $contenttype);
-        $content->setProperty('remote_id', $remoteId);
-        $content->setProperty('language', 'eng-GB');
-
-        return $content;
-    }
-
-    /**
-     * @param int    $parentLocationId
-     * @param string $remoteId
-     *
-     * @return LocationObject
-     */
-    protected function getLocationObject($parentLocationId, $remoteId)
-    {
-        return new LocationObject([
-            'remote_id' => $remoteId,
-            'parent_location_id' => $parentLocationId,
-        ]);
-    }
-
-    /**
-     * @param $content
-     *
-     * @return string
-     */
-    protected function getRichtext($content)
-    {
-        return sprintf(
-            '<?xml version="1.0" encoding="UTF-8"?>
-<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0-variant ezpublish-1.0">%s</section>
-',
-            $content);
     }
 }

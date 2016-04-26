@@ -1,29 +1,18 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration;
+namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
-use Psr\Log\LoggerInterface;
+use eZ\Publish\API\Repository\Values\Content\Content;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\ContentTestCase;
 
-class ContentTest extends EzPlatformTestCase
+class ContentTest extends ContentTestCase
 {
-    /**
-     * @var EzPlatformAdapter
-     */
-    protected $adapter;
 
-    public function setUp()
-    {
-        $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository,
-        ));
-        $this->adapter->setLogger(
-            $this->getMock(LoggerInterface::class)
-        );
+    public function setUp() {
+        parent::setUp();
     }
 
     /**
@@ -31,24 +20,19 @@ class ContentTest extends EzPlatformTestCase
      */
     public function testCreateContent()
     {
-        $contentObject = new ContentObject(
-            array(
-                'title' => 'Test title',
-            ),
-            array(
-                'language' => 'eng-GB',
-                'content_type_identifier' => '_test_article',
-                'remote_id' => 'test_article_1',
-            )
-        );
+        $remoteId = 'test_article_1';
+
+        $contentObject = $this->getContentObject(array(
+            'title' => 'Test title',
+        ), $remoteId, static::_content_type_article);
 
         $this->adapter->send(new Request(array(
             $contentObject,
         )));
 
-        $content = static::$repository->getContentService()->loadContentByRemoteId('test_article_1');
+        $content = static::$repository->getContentService()->loadContentByRemoteId($remoteId);
 
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\Content\Content', $content);
+        $this->assertInstanceOf(Content::class, $content);
         $this->assertEquals('Test title', $content->contentInfo->name);
         $this->assertEquals('Test title', $content->fields['title']['eng-GB']->text);
         $this->assertEquals('eng-GB', $content->contentInfo->mainLanguageCode);
@@ -71,7 +55,6 @@ class ContentTest extends EzPlatformTestCase
             )
         );
 
-        return;
         $this->adapter->send(new Request(array(
             $contentObject,
         )));

@@ -1,30 +1,16 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration;
+namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\ContentTreeTestCase;
 
-class ContentTreeTest extends EzPlatformTestCase
+class ContentTreeTest extends ContentTreeTestCase
 {
-    /**
-     * @var EzPlatformAdapter
-     */
-    protected $adapter;
-
-    public function setUp()
-    {
-        $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository,
-        ));
-        $logger = $this->getMock(LoggerInterface::class);
-        $this->adapter->setLogger($logger);
-    }
-
     /**
      * Create a Folder which contains an Article.
      *
@@ -36,10 +22,10 @@ class ContentTreeTest extends EzPlatformTestCase
         $article = $this->getContentObject(array(
             'title' => 'Test article',
             'intro' => $this->getRichtext('<para>Article intro</para>'),
-        ), 'article', 'tree_article_0');
+        ), 'tree_article_0', 'article');
         $folder = $this->getContentObject(array(
             'name' => 'Test folder',
-        ), 'folder', 'tree_folder_0');
+        ), 'tree_folder_0', 'folder');
 
         $tree = $this->getTreeObject(2, $folder);
         $tree->addNode($article);
@@ -82,10 +68,10 @@ class ContentTreeTest extends EzPlatformTestCase
         // Update
         $article = $this->getContentObject(array(
             'title' => 'Updated article',
-        ), 'article', 'tree_article_0');
+        ), 'tree_article_0', 'article');
         $folder = $this->getContentObject(array(
             'name' => 'Updated folder',
-        ), 'folder', 'tree_folder_0');
+        ), 'tree_folder_0', 'folder');
 
         $tree = $this->getTreeObject(2, $folder);
         $tree->addNode($article);

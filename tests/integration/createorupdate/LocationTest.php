@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration;
+namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
@@ -9,62 +9,48 @@ use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\LocationTestCase;
 
-class LocationTest extends EzPlatformTestCase
+class LocationTest extends LocationTestCase
 {
-    /**
-     * @var EzPlatformAdapter
-     */
-    protected $adapter;
-
-    public function setUp()
-    {
-        $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository,
-        ));
-        $this->adapter->setLogger(
-            $this->getMock(LoggerInterface::class)
-        );
-    }
 
     /**
      * Tests location creation.
      */
     public function testCreateLocation()
     {
-        $locationObject = new LocationObject(array(
-            'content_id' => 59,
-            'parent_location_id' => 2,
-            'remote_id' => '_test_location_integration_1',
-        ));
+        $remoteId = '_test_location_integration_1';
+        $parentLocationId = 60;
+
+        $locationObject = $this->getLocationObject($remoteId, $this->_test_contentId_1, $parentLocationId);
 
         $this->adapter->send(new Request(array(
             $locationObject,
         )));
 
-        $location = static::$repository->getLocationService()->loadLocationByRemoteId('_test_location_integration_1');
+        $location = static::$repository->getLocationService()->loadLocationByRemoteId($remoteId);
 
         $this->assertInstanceOf(Location::class, $location);
-        $this->assertEquals(59, $location->contentInfo->id);
+        $this->assertEquals($this->_test_contentId_1, $location->contentInfo->id);
+        $this->assertEquals($parentLocationId, $location->parentLocationId);
     }
 
     public function testUpdateLocation()
     {
-        $locationObject = new LocationObject(array(
-            'content_id' => 59,
-            'parent_location_id' => 58,
-            'remote_id' => '_test_location_integration_1',
-        ));
+        $remoteId = '_test_location_integration_1';
+        $parentLocationId = 64;
+
+        $locationObject = $this->getLocationObject($remoteId, $this->_test_contentId_1, $parentLocationId);
 
         $this->adapter->send(new Request(array(
             $locationObject,
         )));
 
-        $location = static::$repository->getLocationService()->loadLocationByRemoteId('_test_location_integration_1');
+        $location = static::$repository->getLocationService()->loadLocationByRemoteId($remoteId);
 
         $this->assertInstanceOf(Location::class, $location);
-        $this->assertEquals(59, $location->contentInfo->id);
+        $this->assertEquals($this->_test_contentId_1, $location->contentInfo->id);
+        $this->assertEquals($parentLocationId, $location->parentLocationId);
     }
 
     public function testCreateContentAndLocation()

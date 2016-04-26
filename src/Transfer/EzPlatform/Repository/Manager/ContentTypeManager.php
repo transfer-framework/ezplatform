@@ -228,11 +228,8 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function createOrUpdate(ObjectInterface $object)
     {
-        if (!$object instanceof ContentTypeObject) {
-            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
-        }
-
         $contentObject = $this->find($object);
+
         if (!$contentObject) {
             return $this->create($object);
         } else {
@@ -245,11 +242,15 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function remove(ObjectInterface $object)
     {
-        if (!$object instanceof ContentTypeObject) {
-            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
+        $contentType = $this->find($object);
+
+        if (!$contentType) {
+            return false;
         }
 
-        return $this->removeContentTypeByIdentifier($object->data['identifier']);
+        $this->contentTypeService->deleteContentType($contentType);
+
+        return true;
     }
 
     /**
@@ -259,15 +260,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function removeContentTypeByIdentifier($identifier)
     {
-        $contentType = $this->find(new ContentTypeObject(['identifier' => $identifier]));
-
-        if (!$contentType) {
-            return true;
-        }
-
-        $this->contentTypeService->deleteContentType($contentType);
-
-        return true;
+        return $this->remove(new ValueObject(['identifier' => $identifier]));
     }
 
     /**

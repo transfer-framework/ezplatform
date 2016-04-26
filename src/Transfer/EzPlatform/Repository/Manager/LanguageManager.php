@@ -21,6 +21,7 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 
@@ -31,7 +32,7 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class LanguageManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class LanguageManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
      * @var Repository

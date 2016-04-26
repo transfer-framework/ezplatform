@@ -10,6 +10,7 @@
 namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
@@ -22,16 +23,20 @@ use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTra
 
 class EzPlatformAdapterTest extends EzPlatformTestCase
 {
+
     /**
      * @var EzPlatformAdapter
      */
-    protected $adapter;
+    public $adapter;
 
     public function setUp()
     {
         $this->adapter = new EzPlatformAdapter(array(
             'repository' => static::$repository,
         ));
+        $this->adapter->setLogger(
+            $this->getMock(LoggerInterface::class)
+        );
     }
 
     public function testSendContentObject()

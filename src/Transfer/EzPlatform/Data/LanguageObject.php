@@ -21,7 +21,7 @@ use Transfer\EzPlatform\Repository\Mapper\LanguageMapper;
         name => string
     ],
     $properties = [
-        action => int {@link see Transfer\EzPlatform\Data\Enum}
+        action => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
     ]
 
 

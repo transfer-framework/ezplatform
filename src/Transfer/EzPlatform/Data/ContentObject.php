@@ -33,18 +33,18 @@ use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
         content_type_identifier => string
         language                => string
         main_location_id        => int
-        action                  => int {@link see Transfer\EzPlatform\Data\Enum\Action}
+        action                  => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
     ]
 
 
 ** Required on `create`:
 **** Required by transfer:
-    Both properties `content_type_identifier` and `language` must be present.
-    $data with keys matching the required fields of the ContentType
+    * content_type_identifier
+    * $data with keys matching the required fields of the ContentType
 
 **** Required by eZ:
-    `content_type_identifier`
-    `language`
+    * `content_type_identifier`
+    * `language`
     Fields matching the required fields of the ContentType
 
 ** Required on `update`:

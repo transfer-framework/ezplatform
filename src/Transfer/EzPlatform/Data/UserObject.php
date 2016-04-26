@@ -28,7 +28,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserMapper;
                     ...                 ]
     ],
     $properties = [
-        action => int {@link see Transfer\EzPlatform\Data\Enum}
+        action => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
     ]
 
 

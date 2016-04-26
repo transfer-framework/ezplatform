@@ -33,6 +33,7 @@ use Transfer\EzPlatform\Repository\Mapper\ContentTypeMapper;
     $properties = [
         id                       => int
         content_type_groups      => \eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup[]
+        action                   => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
     ]
 
 

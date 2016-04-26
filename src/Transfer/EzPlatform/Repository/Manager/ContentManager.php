@@ -27,6 +27,7 @@ use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 
@@ -35,7 +36,7 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
  *
  * @internal
  */
-class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
      * @var LocationManager

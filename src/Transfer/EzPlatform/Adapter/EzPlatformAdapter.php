@@ -12,15 +12,19 @@ namespace Transfer\EzPlatform\Adapter;
 use eZ\Publish\API\Repository\Repository;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Transfer\Adapter\TargetAdapterInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Adapter\Transaction\Response;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
-use Transfer\EzPlatform\Data\Enum\Action;
+use Transfer\EzPlatform\Data\Action\ActionInterface;
+use Transfer\EzPlatform\Data\Action\Enum\Action;
 use Transfer\EzPlatform\Data\EzPlatformObject;
+use Transfer\EzPlatform\Repository\AbstractRepositoryService;
 use Transfer\EzPlatform\Repository\ContentTreeService;
+use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\ObjectService;
 
 /**
@@ -129,22 +133,26 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
     }
 
     /**
-     * @param ObjectInterface                  $object
-     * @param ContentTreeService|ObjectService $service
+     * @param ObjectInterface           $object
+     * @param AbstractRepositoryService $service
      *
      * @return ObjectInterface
      */
-    protected function executeAction(ObjectInterface $object, $service)
+    protected function executeAction(ObjectInterface $object, AbstractRepositoryService $service)
     {
-        if (is_subclass_of($object, EzPlatformObject::class)) {
-            /** @var EzPlatformObject $object */
+        $reflection = new ReflectionClass($object);
+
+        if ($reflection->implementsInterface(ActionInterface::class)) {
+            /** @var ActionInterface $object */
             switch ($object->getAction()) {
+                case Action::CREATEORUPDATE:
+                    return $service->createOrUpdate($object);
+                    break;
                 case Action::DELETE:
                     return $service->remove($object);
                     break;
-                case Action::CREATEORUPDATE:
+                case Action::SKIP:
                 default:
-                    return $service->createOrUpdate($object);
                     break;
             }
         } else {

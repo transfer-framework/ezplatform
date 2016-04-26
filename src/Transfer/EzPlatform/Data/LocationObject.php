@@ -32,18 +32,28 @@ use Transfer\EzPlatform\Repository\Mapper\LocationMapper;
         invisible           => bool
         path                => array
         path_string         => string
-        action              => int {@link see Transfer\EzPlatform\Data\Enum}
+        action              => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
     ]
 
 
 ** Required on `create`:
 
-    Both `content_id` and `parent_location_id`
+**** Required by Transfer:
+    * content_id
+    * parent_location_id
+
+**** Required by eZ:
+    * @todo finish requirements
 
 
 ** Required on `update`:
 
-    One of `content_id` or `remote_id` must be present
+**** Required by Transfer:
+    * content_id or remote_id
+    * parent_location_id
+
+**** Required by eZ:
+    * @todo finish requirements
 
 */
 

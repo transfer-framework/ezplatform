@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration;
+namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;

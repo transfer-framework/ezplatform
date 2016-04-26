@@ -72,20 +72,20 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
      * Attempts to load Location based on id or remoteId.
      * Returns false if not found.
      *
-     * @param ValueObject|LocationObject $object
-     * @param bool                       $throwException
+     * @param ValueObject    $object
+     * @param bool           $throwException
      *
      * @return Location|false
      *
      * @throws NotFoundException
      */
-    public function find(LocationObject $object, $throwException = false)
+    public function find(ValueObject $object, $throwException = false)
     {
         try {
-            if (isset($object->data['id'])) {
-                $location = $this->locationService->loadLocation($object->data['id']);
-            } elseif (isset($object->data['remote_id'])) {
+            if (isset($object->data['remote_id'])) {
                 $location = $this->locationService->loadLocationByRemoteId($object->data['remote_id']);
+            } elseif ($object->getProperty('id')) {
+                $location = $this->locationService->loadLocation($object->getProperty('id'));
             }
         } catch (NotFoundException $notFound) {
             $exception = $notFound;
@@ -100,6 +100,19 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
         }
 
         return isset($location) ? $location : false;
+    }
+
+    /**
+     * Shortcut to find, mainly for locating parents.
+     *
+     * @param int $id
+     * @param bool $throwException
+     *
+     * @return Location|false
+     */
+    public function findById($id, $throwException = false)
+    {
+        return $this->find(new ValueObject([], ['id' => $id]), $throwException);
     }
 
     /**
@@ -136,11 +149,19 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             return;
         }
 
+        $location = $this->find($object, true);
+
+        // Move if parent_location_id differs.
+        if(isset($object->data['parent_location_id'])) {
+            if($object->data['parent_location_id'] !== $location->parentLocationId) {
+                $parentLocation = $this->findById($object->data['parent_location_id'], true);
+                $this->locationService->moveSubtree($location, $parentLocation);
+            }
+        }
+
         $locationUpdateStruct = $this->locationService->newLocationUpdateStruct();
 
         $object->getMapper()->getNewLocationUpdateStruct($locationUpdateStruct);
-
-        $location = $this->locationService->loadLocationByRemoteId($object->data['remote_id']);
 
         $location = $this->locationService->updateLocation($location, $locationUpdateStruct);
 

@@ -26,7 +26,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserGroupMapper;
         id                      => int (same as contentInfo->id)
         content_info            => \eZ\Publish\API\Repository\Values\Content\ContentInfo
         version_info            => \eZ\Publish\API\Repository\Values\Content\VersionInfo
-        action                  => int {@link see Transfer\EzPlatform\Data\Enum}
+        action                  => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
     ]
 
 
