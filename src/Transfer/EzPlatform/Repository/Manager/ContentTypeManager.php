@@ -165,11 +165,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             $this->logger->info(sprintf('Updating contenttype %s.', $object->data['identifier']));
         }
 
-        $contentType = $this->find($object);
-
-        if (!$contentType) {
-            throw new ContentTypeNotFoundException(sprintf('Contenttype "%s" not found.', $object->data['identifier']));
-        }
+        $contentType = $this->find($object, true);
 
         $this->updateContentTypeLanguages($object);
 

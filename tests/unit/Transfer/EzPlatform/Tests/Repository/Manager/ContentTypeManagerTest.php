@@ -24,15 +24,6 @@ use Transfer\EzPlatform\Tests\EzPlatformTestCase;
  */
 class ContentTypeManagerTest extends EzPlatformTestCase
 {
-    public function testUpdateNotFound()
-    {
-        $this->setExpectedException('Transfer\EzPlatform\Exception\ContentTypeNotFoundException', 'Contenttype "_update_not_found" not found.');
-        $manager = static::$contentTypeManager;
-
-        $ct = new ContentTypeObject($this->getFrontpageContentTypeDataArray('_update_not_found'));
-        $manager->update($ct);
-    }
-
     public function testUnknownLanguage()
     {
         $manager = static::$contentTypeManager;

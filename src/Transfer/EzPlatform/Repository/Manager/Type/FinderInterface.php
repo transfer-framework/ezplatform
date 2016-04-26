@@ -21,11 +21,11 @@ interface FinderInterface
     /**
      * Find an object.
      *
-     * @param EzPlatformObject $object Object to find
+     * @param ValueObject $object Object to find
      *
      * @param bool $throwException
      *
-     * @return EzPlatformObject
+     * @return ValueObject|false
      */
     public function find(ValueObject $object, $throwException);
 }
