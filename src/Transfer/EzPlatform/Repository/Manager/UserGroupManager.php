@@ -16,9 +16,11 @@ use eZ\Publish\API\Repository\UserService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Exception\UserGroupNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 use eZ\Publish\API\Repository\Values\User\UserGroup;
@@ -29,7 +31,7 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
  *
  * @internal
  */
-class UserGroupManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class UserGroupManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
      * @var Repository
@@ -76,19 +78,52 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     }
 
     /**
-     * Shortcut to load a usergroup by id, without throwing an exception if it's not found.
+     * Load a UserGroup by remote_id or id.
      *
-     * @param int $id
+     * @param ValueObject $object
+     * @param bool $throwException
      *
      * @return UserGroup|false
+     *
+     * @throws NotFoundException
+     *
      */
-    public function find($id)
+    public function find(ValueObject $object, $throwException = false)
     {
         try {
-            return $this->userService->loadUserGroup($id);
-        } catch (NotFoundException $e) {
+            if (isset($object->data['remote_id'])) {
+                $contentObject = $this->contentService->loadContentByRemoteId($object->data['remote_id']);
+                $userGroup = $this->userService->loadUserGroup($contentObject->contentInfo->id);
+            } elseif ($object->getProperty('id')) {
+                $userGroup = $this->userService->loadUserGroup($object->getProperty('id'));
+            }
+        } catch (NotFoundException $notFoundException) {
+            $exception = $notFoundException;
+        }
+
+        if (!isset($userGroup)) {
+            if (isset($exception) && $throwException) {
+                throw $exception;
+            }
             return false;
         }
+
+        return $userGroup;
+    }
+
+    /**
+     * Shortcut to get UserGroup by id, mainly to get parent by Id.
+     *
+     * @param int $id
+     * @param bool $throwException
+     *
+     * @return UserGroup|false
+     *
+     * @throws NotFoundException
+     */
+    public function findById($id, $throwException = false)
+    {
+        return $this->find(new ValueObject([], ['id' => $id]), $throwException);
     }
 
     /**
@@ -100,11 +135,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             return;
         }
 
-        $parentUserGroup = $this->find($object->data['parent_id']);
-
-        if (!$parentUserGroup) {
-            throw new UserGroupNotFoundException(sprintf('Usergroup with parent_id "%s" not found.', $object->data['parent_id']));
-        }
+        $parentUserGroup = $this->findById($object->data['parent_id'], true);
 
         // Instantiate usergroup
         $contentType = $this->contentTypeService->loadContentTypeByIdentifier($object->data['content_type_identifier']);
@@ -118,7 +149,9 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
 
         // Create usergroup
         $userGroup = $this->userService->createUserGroup($userGroupCreateStruct, $parentUserGroup);
-        $object->data['id'] = $userGroup->id;
+
+        /* @todo update with mapper */
+        $object->setProperty('id', $userGroup->id);
 
         return $object;
     }
@@ -132,15 +165,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             return;
         }
 
-        if (!array_key_exists('id', $object->data)) {
-            throw new UserGroupNotFoundException('Unable to update usergroup without an id.');
-        }
-
-        $userGroup = $this->find($object->data['id']);
-
-        if (!$userGroup) {
-            throw new UserGroupNotFoundException(sprintf('Usergroup with id "%s" not found.', $object->data['id']));
-        }
+        $userGroup = $this->find($object, true);
 
         $userGroupUpdateStruct = $this->userService->newUserGroupUpdateStruct();
         $userGroupUpdateStruct->contentUpdateStruct = $this->contentService->newContentUpdateStruct();
@@ -150,7 +175,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
         $this->userService->updateUserGroup($userGroup, $userGroupUpdateStruct);
 
         if ($userGroup->parentId !== $object->data['parent_id']) {
-            $newParentGroup = $this->find($object->data['parent_id']);
+            $newParentGroup = $this->findById($object->data['parent_id'], true);
             $this->userService->moveUserGroup($userGroup, $newParentGroup);
         }
 
@@ -166,10 +191,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             return;
         }
 
-        if (array_key_exists('id', $object->data)) {
-            $userGroup = $this->find($object->data['id']);
-        }
-        if (!isset($userGroup) || false === $userGroup) {
+        if (!$this->find($object)) {
             return $this->create($object);
         } else {
             return $this->update($object);
@@ -185,15 +207,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             return;
         }
 
-        if (array_key_exists('id', $object->data)) {
-            $userGroup = $this->find($object->data['id']);
-        } else {
-            throw new UserGroupNotFoundException(sprintf('Usergroup with id "%s" not found.', ''));
-        }
-
-        if (!$userGroup) {
-            throw new UserGroupNotFoundException(sprintf('Usergroup with id "%s" not found.', $object->data['id']));
-        }
+        $userGroup = $this->find($object, true);
 
         $this->userService->deleteUserGroup($userGroup);
 

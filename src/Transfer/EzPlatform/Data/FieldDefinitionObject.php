@@ -55,7 +55,7 @@ use Transfer\EzPlatform\Repository\Mapper\FieldDefinitionMapper;
 /**
  * Content type object.
  */
-class FieldDefinitionObject extends ValueObject
+class FieldDefinitionObject extends EzPlatformObject
 {
     /**
      * @var ContentTypeObject

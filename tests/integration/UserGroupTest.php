@@ -28,6 +28,7 @@ class UserGroupTest extends EzPlatformTestCase
     public function testCreateAndUpdateUsergroup()
     {
         $parentUsergroup = static::$repository->getUserService()->loadUserGroup(12);
+
         $countOriginal = count(static::$repository->getUserService()->loadSubUserGroups($parentUsergroup));
 
         $name = 'TestUsergroup';

@@ -9,7 +9,6 @@
 
 namespace Transfer\EzPlatform\Data;
 
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Repository\Mapper\LanguageMapper;
 
@@ -48,7 +47,7 @@ use Transfer\EzPlatform\Repository\Mapper\LanguageMapper;
 /**
  * Content type object.
  */
-class LanguageObject extends EzObject
+class LanguageObject extends EzPlatformObject
 {
     /**
      * @var LanguageMapper

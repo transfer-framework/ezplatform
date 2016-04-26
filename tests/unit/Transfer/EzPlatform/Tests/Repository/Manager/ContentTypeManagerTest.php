@@ -10,6 +10,9 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
+use Psr\Log\AbstractLogger;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
@@ -56,7 +59,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         );
         $manager->createOrUpdate($frontpage);
 
-        $ct = $manager->findContentTypeByIdentifier('frontpage');
+        $ct = $manager->find(new ValueObject(['identifier' => 'frontpage']));
         $this->assertEquals('Titelseite', $ct->getName('ger-DE'));
         $this->assertEquals('Beschreibung', $ct->getDescription('ger-DE'));
         $this->assertEquals('Forside', $ct->getName('nor-NO'));
@@ -70,7 +73,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $ct->data['contenttype_groups'][] = 'MyGroup1';
         $ct->data['contenttype_groups'][] = 'MyGroup2';
         $manager->createOrUpdate($ct);
-        $contentType = $manager->findContentTypeByIdentifier('frontpage');
+        $contentType = $manager->find(new ValueObject(['identifier' => 'frontpage']));
         $this->assertEquals('Content', $contentType->contentTypeGroups[0]->identifier);
         $this->assertEquals('MyGroup1', $contentType->contentTypeGroups[1]->identifier);
         $this->assertEquals('MyGroup2', $contentType->contentTypeGroups[2]->identifier);
@@ -83,7 +86,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $ct = $this->getFrontpageContentTypeObject();
         $ct->data['contenttype_groups'] = array('FrontpageGroup');
         $manager->createOrUpdate($ct);
-        $contentType = $manager->findContentTypeByIdentifier('frontpage');
+        $contentType = $manager->find(new ValueObject(['identifier' => 'frontpage']));
         $this->assertEquals('FrontpageGroup', $contentType->contentTypeGroups[0]->identifier);
     }
 
@@ -104,7 +107,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
     public function testfindNotFound()
     {
         $manager = static::$contentTypeManager;
-        $result = $manager->findContentTypeByIdentifier(null);
+        $result = $manager->find(new ValueObject([]));
         $this->assertFalse($result);
     }
 
@@ -117,8 +120,8 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
         $this->create($manager);
 
-        $contentType = $manager->findContentTypeByIdentifier('frontpage');
-        $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\ContentType', $contentType);
+        $contentType = $manager->find(new ValueObject(['identifier' => 'frontpage']));
+        $this->assertInstanceOf(ContentType::class, $contentType);
         $this->assertEquals('Frontpage', $contentType->getName('eng-GB'));
         $this->assertEquals('Frontpage description', $contentType->getDescription('eng-GB'));
         $contentTypeGroups = $contentType->getContentTypeGroups();
@@ -129,7 +132,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $this->assertFalse($contentType->isContainer);
 
         $contentFieldDefinition = $contentType->fieldDefinitions[0];
-        $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\FieldDefinition', $contentFieldDefinition);
+        $this->assertInstanceOf(FieldDefinition::class, $contentFieldDefinition);
         $this->assertEquals('name', $contentFieldDefinition->identifier);
         $this->assertEquals('Name', $contentFieldDefinition->getName('eng-GB'));
         $this->assertEquals('Name description', $contentFieldDefinition->getDescription('eng-GB'));
@@ -141,14 +144,14 @@ class ContentTypeManagerTest extends EzPlatformTestCase
 
         $this->update($manager);
 
-        $contentType = $manager->findContentTypeByIdentifier('frontpage');
+        $contentType = $manager->find(new ValueObject(['identifier' => 'frontpage']));
         $this->assertEquals('Updated frontpage', $contentType->getName('eng-GB'));
         $this->assertEquals('Updated frontpage description', $contentType->getDescription('eng-GB'));
         $this->assertFalse($contentType->isContainer);
 
         $this->assertCount(2, $contentType->fieldDefinitions);
         $contentFieldDefinition = $contentType->fieldDefinitions[0];
-        $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\FieldDefinition', $contentFieldDefinition);
+        $this->assertInstanceOf(FieldDefinition::class, $contentFieldDefinition);
         $this->assertEquals('name', $contentFieldDefinition->identifier);
         $this->assertEquals('Name', $contentFieldDefinition->getName('eng-GB'));
         $this->assertEquals('Updated name description', $contentFieldDefinition->getDescription('eng-GB'));
@@ -159,7 +162,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
         $this->assertFalse($contentFieldDefinition->isInfoCollector);
 
         $contentFieldDefinition = $contentType->fieldDefinitions[1];
-        $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\ContentType\FieldDefinition', $contentFieldDefinition);
+        $this->assertInstanceOf(FieldDefinition::class, $contentFieldDefinition);
         $this->assertEquals('short_description', $contentFieldDefinition->identifier);
         $this->assertEquals('Short description', $contentFieldDefinition->getName('eng-GB'));
         $this->assertEquals('', $contentFieldDefinition->getDescription('eng-GB'));
@@ -173,7 +176,7 @@ class ContentTypeManagerTest extends EzPlatformTestCase
     public function testUpdateWithLogger()
     {
         $manager = static::$contentTypeManager;
-        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
+        $mockLogger = $this->getMock(AbstractLogger::class, array('log'), array(), '', false);
         $manager->setLogger($mockLogger);
 
         $this->createOrUpdate($manager);

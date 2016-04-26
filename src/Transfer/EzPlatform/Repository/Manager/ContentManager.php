@@ -21,6 +21,7 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
@@ -82,31 +83,31 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
     /**
      * Finds a content object by content ID or remote ID.
-     * Returns ContentObject with populated properties, or false.
+     * Returns ContentObject with populated properties, or false|NotFoundException.
      *
-     * @param ContentObject $object
+     * @param ValueObject|ContentObject $object
+     * @param bool $throwException
      *
-     * @return ContentObject|false
+     * @return false|ContentObject
+     *
+     * @throws NotFoundException
      */
-    public function find(ContentObject $object)
+    public function find(ValueObject $object, $throwException = false)
     {
-        if ($object->getProperty('id')) {
-            try {
+        try {
+            if ($object->getProperty('id')) {
                 $content = $this->contentService->loadContent($object->getProperty('id'));
-            } catch (NotFoundException $notFoundException) {
-                // We'll store if for now, and throw it later if needed
-                $e = $notFoundException;
-            }
-        } elseif ($object->getProperty('remote_id')) {
-            try {
+            } elseif ($object->getProperty('remote_id')) {
                 $content = $this->contentService->loadContentByRemoteId($object->getProperty('remote_id'));
-            } catch (NotFoundException $notFoundException) {
-                // We'll throw it later if needed
-                $e = $notFoundException;
             }
+        } catch (NotFoundException $notFoundException) {
+            $exception = $notFoundException;
         }
 
-        if (!isset($content) || isset($e)) {
+        if (!isset($content)) {
+            if(isset($exception) && $throwException) {
+                throw $exception;
+            }
             return false;
         }
 

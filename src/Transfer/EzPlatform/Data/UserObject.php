@@ -58,7 +58,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserMapper;
 /**
  * User object.
  */
-class UserObject extends EzObject
+class UserObject extends EzPlatformObject
 {
     /**
      * @var UserGroupObject[]

@@ -51,7 +51,7 @@ use Transfer\EzPlatform\Repository\Mapper\LocationMapper;
 /**
  * Location object.
  */
-class LocationObject extends EzObject
+class LocationObject extends EzPlatformObject
 {
     /**
      * @var LocationMapper

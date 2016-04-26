@@ -9,7 +9,6 @@
 
 namespace Transfer\EzPlatform\Data;
 
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Mapper\ContentTypeMapper;
 
 /*
@@ -59,7 +58,7 @@ use Transfer\EzPlatform\Repository\Mapper\ContentTypeMapper;
 /**
  * Content type object.
  */
-class ContentTypeObject extends EzObject
+class ContentTypeObject extends EzPlatformObject
 {
     /**
      * @var ContentTypeMapper

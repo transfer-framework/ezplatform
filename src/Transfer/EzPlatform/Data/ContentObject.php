@@ -33,7 +33,7 @@ use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
         content_type_identifier => string
         language                => string
         main_location_id        => int
-        action                  => int {@link see Transfer\EzPlatform\Data\Enum}
+        action                  => int {@link see Transfer\EzPlatform\Data\Enum\Action}
     ]
 
 
@@ -61,7 +61,7 @@ use Transfer\EzPlatform\Repository\Mapper\ContentMapper;
 /**
  * Content object.
  */
-class ContentObject extends EzObject
+class ContentObject extends EzPlatformObject
 {
     /**
      * @var ContentMapper

@@ -20,12 +20,15 @@ use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Data\EzPlatformObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\Exception\ContentTypeNotFoundException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 
@@ -36,7 +39,7 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
      * @var Repository
@@ -80,32 +83,33 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     /**
      * Finds content type object by identifier.
      *
-     * @param ContentTypeObject $object
+     * @param ObjectInterface|EzPlatformObject $object
+     * @param bool $throwException
      *
      * @return ContentType|false
+     *
+     * @throws NotFoundException
      */
-    public function find(ContentTypeObject $object)
+    public function find(ValueObject $object, $throwException = false)
     {
         if (isset($object->data['identifier'])) {
             try {
                 $contentType = $this->contentTypeService->loadContentTypeByIdentifier($object->data['identifier']);
             } catch (NotFoundException $notFoundException) {
-                // Do nothing (yet).
+                $exception = $notFoundException;
             }
         }
 
         if(!isset($contentType)) {
+            if(isset($exception) && $throwException) {
+                throw $exception;
+            }
             return false;
         }
 
         //$object->getMapper()->contentTypeToObject($contentType);
 
         return $contentType;
-    }
-
-    public function findContentTypeByIdentifier($string)
-    {
-        return $this->find(new ContentTypeObject(['identifier' => $string]));
     }
 
     /**
@@ -259,7 +263,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function removeContentTypeByIdentifier($identifier)
     {
-        $contentType = $this->findContentTypeByIdentifier($identifier);
+        $contentType = $this->find(new ContentTypeObject(['identifier' => $identifier]));
 
         if (!$contentType) {
             return true;

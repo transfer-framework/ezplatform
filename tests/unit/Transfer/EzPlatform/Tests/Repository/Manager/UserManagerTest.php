@@ -34,22 +34,10 @@ class UserManagerTest extends EzPlatformTestCase
         /** @var UserObject $user */
         $user = $manager->createOrUpdate($this->getUser());
         /** @var User $result */
-        $result = $manager->findByUsername($user->data['username']);
+        $result = $manager->find($user);
 
         $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\User\User', $result);
         $this->assertEquals($user->data['username'], $result->login);
-    }
-
-    public function testFindNotString()
-    {
-        $manager = static::$userManager;
-        $this->assertFalse($manager->findByUsername(123));
-    }
-
-    public function findNotFound()
-    {
-        $manager = static::$userManager;
-        $this->assertFalse($manager->findByUsername('a_very_unusual_username'));
     }
 
     public function testCreate()
@@ -76,7 +64,7 @@ class UserManagerTest extends EzPlatformTestCase
         $manager->update($this->getUpdateUser());
 
         /** @var User $updatedUser */
-        $updatedUser = $manager->findByUsername($this->getUpdateUser()->data['username']);
+        $updatedUser = $manager->find($this->getUpdateUser());
         $this->assertEquals('updated@example.com', $updatedUser->email);
         $this->assertEquals('da9287bf067f474372b58fd3d8470da9', $updatedUser->passwordHash);
         $this->assertEquals('Updated', $updatedUser->getField('first_name')->value);
@@ -88,15 +76,6 @@ class UserManagerTest extends EzPlatformTestCase
         $manager = static::$userManager;
         $null = $manager->update(new ValueObject(array()));
         $this->assertNull($null);
-    }
-
-    public function testUpdateNotFound()
-    {
-        $this->setExpectedException('Transfer\EzPlatform\Exception\UserNotFoundException');
-        $manager = static::$userManager;
-        $user = $this->getUser();
-        $user->data['username'] = 'some_random_username';
-        $manager->update($user);
     }
 
     public function testCreate_CreateOrUpdate()

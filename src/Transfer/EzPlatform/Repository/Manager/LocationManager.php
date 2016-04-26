@@ -17,6 +17,8 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
+use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Data\EzPlatformObject;
 use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
@@ -71,11 +73,14 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
      * Attempts to load Location based on id or remoteId.
      * Returns false if not found.
      *
-     * @param LocationObject $object
+     * @param ValueObject|LocationObject $object
+     * @param bool $throwException
      *
-     * @return false|Location
+     * @return Location|false
+     *
+     * @throws NotFoundException
      */
-    public function find(LocationObject $object)
+    public function find(LocationObject $object, $throwException = false)
     {
         try {
             if (isset($object->data['id'])) {
@@ -84,9 +89,16 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
                 $location = $this->locationService->loadLocationByRemoteId($object->data['remote_id']);
             }
         } catch (NotFoundException $notFound) {
-            return false;
+            $exception = $notFound;
         }
 
+        if(!isset($location)) {
+            if(isset($exception) && $throwException) {
+                throw $exception;
+            }
+            return false;
+        }
+        
         return isset($location) ? $location : false;
     }
 

@@ -17,13 +17,16 @@ use Transfer\EzPlatform\Repository\Mapper\UserGroupMapper;
 ** Available keys: **
 
     $data = [
-        id                      => int
+        remote_id               => string
         parent_id               => int      // Defaults to 12
         main_language_code      => string   // Defaults to eng-GB
         content_type_identifier => string   // Defaults to user_group
         fields                  => FieldDefinition[] {@link see ContentObject and FieldDefinitionObject}
     ],
     $properties = [
+        id                      => int (same as contentInfo->id)
+        content_info            => \eZ\Publish\API\Repository\Values\Content\ContentInfo
+        version_info            => \eZ\Publish\API\Repository\Values\Content\VersionInfo
         action                  => int {@link see Transfer\EzPlatform\Data\Enum}
     ]
 
@@ -53,7 +56,7 @@ use Transfer\EzPlatform\Repository\Mapper\UserGroupMapper;
 /**
  * User Group object.
  */
-class UserGroupObject extends EzObject
+class UserGroupObject extends EzPlatformObject
 {
     /**
      * @var UserGroupMapper

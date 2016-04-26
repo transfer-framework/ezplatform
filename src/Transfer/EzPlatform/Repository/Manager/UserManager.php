@@ -16,10 +16,12 @@ use eZ\Publish\API\Repository\Values\User\UserGroup;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Data\UserObject;
 use Transfer\EzPlatform\Exception\UserNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
@@ -29,7 +31,7 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
  *
  * @internal
  */
-class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
      * @var Repository
@@ -73,19 +75,27 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     /**
      * Finds user object by username.
      *
-     * @param string $username
+     * @param ValueObject $object
+     * @param bool $throwException
      *
      * @return User|false
+     *
+     * @throws NotFoundException
      */
-    public function findByUsername($username)
+    public function find(ValueObject $object, $throwException = false)
     {
-        if (!is_string($username)) {
-            return false;
+        try {
+            if (isset($object->data['username'])) {
+                $user = $this->userService->loadUserByLogin($object->data['username']);
+            }
+        } catch (NotFoundException $notFoundException) {
+            $exception = $notFoundException;
         }
 
-        try {
-            $user = $this->userService->loadUserByLogin($username);
-        } catch (NotFoundException $e) {
+        if(!isset($user)) {
+            if(isset($exception) && $throwException) {
+                throw $exception;
+            }
             return false;
         }
 
@@ -114,7 +124,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
         foreach ($object->parents as $userGroup) {
             $userGroup = $this->userGroupManager->createOrUpdate($userGroup);
             if ($userGroup instanceof UserGroupObject) {
-                $groups[] = $this->userGroupManager->find($userGroup->data['id']);
+                $groups[] = $this->userGroupManager->find($userGroup);
             }
         }
 
@@ -133,11 +143,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             return;
         }
 
-        $user = $this->findByUsername($object->data['username']);
-
-        if (!$user) {
-            throw new UserNotFoundException(sprintf('User with username "%s" not found.', $object->data['username']));
-        }
+        $user = $this->find($object, true);
 
         // Populate struct
         $userUpdateStruct = $this->userService->newUserUpdateStruct();
@@ -164,7 +170,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             return;
         }
 
-        if (!$this->findByUsername($object->data['username'])) {
+        if (!$this->find($object)) {
             return $this->create($object);
         } else {
             return $this->update($object);
@@ -180,7 +186,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             return;
         }
 
-        $user = $this->findByUsername($object->data['username']);
+        $user = $this->find($object);
 
         if ($user) {
             $this->userService->deleteUser($user);
@@ -203,7 +209,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
         foreach ($userGroupObjects as $userGroup) {
             $userGroup = $this->userGroupManager->createOrUpdate($userGroup);
             if ($userGroup instanceof UserGroupObject) {
-                $ezUserGroup = $this->userGroupManager->find($userGroup->data['id']);
+                $ezUserGroup = $this->userGroupManager->find($userGroup);
                 if ($ezUserGroup) {
                     $ezUserGroups[$ezUserGroup->id] = $ezUserGroup;
                     $this->userService->assignUserToUserGroup($user, $ezUserGroup);

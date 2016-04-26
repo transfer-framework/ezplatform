@@ -17,7 +17,8 @@ use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
-use Transfer\EzPlatform\Data\EzObject;
+use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Data\EzPlatformObject;
 use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
@@ -76,7 +77,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
      *
      * @throws NotFoundException
      */
-    public function find(EzPlatformObject $object, $throwExceptions = false)
+    public function find(ValueObject $object, $throwExceptions = false)
     {
         if (isset($object->data['code'])) {
             try {
