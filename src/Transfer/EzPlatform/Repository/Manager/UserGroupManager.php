@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\Exception\UserGroupNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
@@ -81,12 +80,11 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
      * Load a UserGroup by remote_id or id.
      *
      * @param ValueObject $object
-     * @param bool $throwException
+     * @param bool        $throwException
      *
      * @return UserGroup|false
      *
      * @throws NotFoundException
-     *
      */
     public function find(ValueObject $object, $throwException = false)
     {
@@ -105,6 +103,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             if (isset($exception) && $throwException) {
                 throw $exception;
             }
+
             return false;
         }
 
@@ -114,7 +113,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     /**
      * Shortcut to get UserGroup by id, mainly to get parent by Id.
      *
-     * @param int $id
+     * @param int  $id
      * @param bool $throwException
      *
      * @return UserGroup|false

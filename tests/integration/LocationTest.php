@@ -74,8 +74,7 @@ class LocationTest extends EzPlatformTestCase
             'remote_id' => '_test_location_content_integration_2',
             'main_location' => true,
         ));
-        
-        
+
         $contentObject = new ContentObject(
             array(
                 'title' => 'Test title',

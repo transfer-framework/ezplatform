@@ -10,7 +10,6 @@
 namespace Transfer\EzPlatform\Data;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Mapper\LocationMapper;
 
 /*

@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\tests\Repository\Manager;
+namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\User\User;
 use Transfer\Data\ValueObject;

@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\tests\Repository\Manager;
+namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;

@@ -18,7 +18,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\EzPlatformObject;
 use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
@@ -71,7 +70,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
      * Returns Language.
      *
      * @param LanguageObject $object
-     * @param bool $throwExceptions
+     * @param bool           $throwExceptions
      *
      * @return Language
      *
@@ -87,10 +86,11 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             }
         }
 
-        if(!isset($language)) {
-            if(isset($exception) && $throwExceptions) {
+        if (!isset($language)) {
+            if (isset($exception) && $throwExceptions) {
                 throw $exception;
             }
+
             return false;
         }
 
@@ -115,7 +115,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             $languageCreateStruct->name = $object->data['name'];
             $language = $this->languageService->createLanguage($languageCreateStruct);
         }
-        
+
         $object->getMapper()->languageToObject($language);
 
         return $object;
@@ -169,7 +169,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
         } catch (NotFoundException $e) {
             return true;
         } catch (InvalidArgumentException $ee) {
-            /**
+            /*
              * Tried to delete the main language, or a language
              * that still has existing translations (is in use).
              */

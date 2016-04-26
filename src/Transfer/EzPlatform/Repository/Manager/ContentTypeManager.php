@@ -25,7 +25,6 @@ use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\EzPlatformObject;
 use Transfer\EzPlatform\Data\FieldDefinitionObject;
 use Transfer\EzPlatform\Data\LanguageObject;
-use Transfer\EzPlatform\Exception\ContentTypeNotFoundException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
@@ -84,7 +83,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      * Finds content type object by identifier.
      *
      * @param ObjectInterface|EzPlatformObject $object
-     * @param bool $throwException
+     * @param bool                             $throwException
      *
      * @return ContentType|false
      *
@@ -100,10 +99,11 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             }
         }
 
-        if(!isset($contentType)) {
-            if(isset($exception) && $throwException) {
+        if (!isset($contentType)) {
+            if (isset($exception) && $throwException) {
                 throw $exception;
             }
+
             return false;
         }
 

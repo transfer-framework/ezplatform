@@ -86,7 +86,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      * Returns ContentObject with populated properties, or false|NotFoundException.
      *
      * @param ValueObject|ContentObject $object
-     * @param bool $throwException
+     * @param bool                      $throwException
      *
      * @return false|ContentObject
      *
@@ -105,9 +105,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         }
 
         if (!isset($content)) {
-            if(isset($exception) && $throwException) {
+            if (isset($exception) && $throwException) {
                 throw $exception;
             }
+
             return false;
         }
 

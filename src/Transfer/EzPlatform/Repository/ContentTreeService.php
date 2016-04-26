@@ -108,7 +108,6 @@ class ContentTreeService extends AbstractRepositoryService
         /** @var LocationList $existingLocations */
         $existingLocations = $this->getLocationService()->loadLocationChildren($parentLocation, 0, PHP_INT_MAX);
         foreach ($existingLocations->locations as $location) {
-            
             if ($location->contentInfo->id == $object->getProperty('content_info')->id) {
                 if ($this->logger) {
                     $this->logger->info(
@@ -130,7 +129,7 @@ class ContentTreeService extends AbstractRepositoryService
         }
 
         $location = $this->getLocationService()->createLocation($object->getProperty('content_info'), $locationStruct);
-        
+
         if ($this->logger) {
             $this->logger->info(sprintf('Created location for %s (%s)', $object->getProperty('name'), implode('/', $location->path)), array(__METHOD__));
         }

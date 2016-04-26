@@ -19,7 +19,6 @@ use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Data\UserObject;
-use Transfer\EzPlatform\Exception\UserNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
@@ -76,7 +75,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
      * Finds user object by username.
      *
      * @param ValueObject $object
-     * @param bool $throwException
+     * @param bool        $throwException
      *
      * @return User|false
      *
@@ -92,10 +91,11 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             $exception = $notFoundException;
         }
 
-        if(!isset($user)) {
-            if(isset($exception) && $throwException) {
+        if (!isset($user)) {
+            if (isset($exception) && $throwException) {
                 throw $exception;
             }
+
             return false;
         }
 

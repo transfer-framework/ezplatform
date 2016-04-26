@@ -76,7 +76,7 @@ class ContentTypeObject extends EzPlatformObject
     public function __construct($data, $properties = array())
     {
         parent::__construct($data, $properties);
-        if(isset($data['fields'])) {
+        if (isset($data['fields'])) {
             foreach ($data['fields'] as $fieldIdentifier => $field) {
                 $this->fields[] = new FieldDefinitionObject($fieldIdentifier, $this, $field);
             }
@@ -87,7 +87,7 @@ class ContentTypeObject extends EzPlatformObject
 
     private function setMissingDefaults()
     {
-        if($this->notSetOrEmpty($this->data, 'main_language_code')) {
+        if ($this->notSetOrEmpty($this->data, 'main_language_code')) {
             $this->data['main_language_code'] = 'eng-GB';
         }
 

@@ -7,9 +7,8 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\tests\Repository\Manager;
+namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
-use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\LanguageObject;
 use Transfer\EzPlatform\tests\EzPlatformTestCase;
 

@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\tests\Repository\Manager;
+namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ValueObject;

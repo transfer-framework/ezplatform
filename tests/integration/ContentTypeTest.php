@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\Integration;
+namespace Transfer\EzPlatform\tests\integration;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;

@@ -21,9 +21,8 @@ interface FinderInterface
     /**
      * Find an object.
      *
-     * @param ValueObject $object Object to find
-     *
-     * @param bool $throwException
+     * @param ValueObject $object         Object to find
+     * @param bool        $throwException
      *
      * @return ValueObject|false
      */

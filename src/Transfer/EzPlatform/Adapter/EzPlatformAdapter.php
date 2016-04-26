@@ -19,7 +19,6 @@ use Transfer\Adapter\Transaction\Response;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Data\Enum\Action;
-use Transfer\EzPlatform\Data\EzObject;
 use Transfer\EzPlatform\Data\EzPlatformObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
 use Transfer\EzPlatform\Repository\ObjectService;
@@ -110,7 +109,6 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 
         $objects = array();
         foreach ($request as $object) {
-
             $service = $this->getService($object);
 
             try {
@@ -131,17 +129,16 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
     }
 
     /**
-     * @param ObjectInterface $object
-     *
+     * @param ObjectInterface                  $object
      * @param ContentTreeService|ObjectService $service
      *
      * @return ObjectInterface
      */
     protected function executeAction(ObjectInterface $object, $service)
     {
-        if(is_subclass_of($object, EzPlatformObject::class)) {
+        if (is_subclass_of($object, EzPlatformObject::class)) {
             /** @var EzPlatformObject $object */
-            switch($object->getAction()) {
+            switch ($object->getAction()) {
                 case Action::DELETE:
                     return $service->remove($object);
                     break;

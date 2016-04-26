@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\tests;
+namespace Transfer\EzPlatform\Tests;
 
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
@@ -188,7 +188,7 @@ abstract class EzPlatformTestCase extends KernelTestCase
     }
 
     /**
-     * @param int $parentLocationId
+     * @param int    $parentLocationId
      * @param string $remoteId
      *
      * @return LocationObject
