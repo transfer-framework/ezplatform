@@ -258,7 +258,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      *
      * @return bool
      */
-    public function removeContentTypeByIdentifier($identifier)
+    public function removeByIdentifier($identifier)
     {
         return $this->remove(new ValueObject(['identifier' => $identifier]));
     }

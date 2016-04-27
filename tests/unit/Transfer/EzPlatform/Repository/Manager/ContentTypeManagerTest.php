@@ -84,8 +84,8 @@ class ContentTypeManagerTest extends EzPlatformTestCase
     public function testDeleteNotFound()
     {
         $manager = static::$contentTypeManager;
-        $this->assertTrue($manager->removeContentTypeByIdentifier(null));
-        $this->assertTrue($manager->removeContentTypeByIdentifier('_i_dont_exist'));
+        $this->assertFalse($manager->removeByIdentifier(null));
+        $this->assertFalse($manager->removeByIdentifier('_i_dont_exist'));
     }
 
     public function testLogger()

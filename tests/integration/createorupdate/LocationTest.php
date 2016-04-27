@@ -9,6 +9,7 @@ use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\LocationTestCase;
 
 class LocationTest extends LocationTestCase
@@ -55,33 +56,32 @@ class LocationTest extends LocationTestCase
 
     public function testCreateContentAndLocation()
     {
-        $locationObject = new LocationObject(array(
-            'parent_location_id' => 58,
-            'remote_id' => '_test_location_content_integration_2',
-            'main_location' => true,
-        ));
+        $locationRemoteId = '_test_location_content_integration_2';
+        $locationParentId = 58;
 
-        $contentObject = new ContentObject(
-            array(
-                'title' => 'Test title',
-            ),
-            array(
-                'language' => 'eng-GB',
-                'content_type_identifier' => '_test_article',
-                'remote_id' => '_test_content_location_integration_2',
-                'parent_locations' => array(
-                    2,
-                    $locationObject,
-                ),
-            )
+        $contentRemoteId = '_test_content_location_integration_2';
+        $contentFields = array('title' => 'Test title');
+        $contentTypeIdentifier = ContentTestCase::_content_type_article;
+
+        $locationObject = $this->getLocationObject(
+            $locationRemoteId,
+            false,
+            $locationParentId
+        );
+        $contentObject = $this->getContentObject(
+            $contentFields,
+            $contentRemoteId,
+            $contentTypeIdentifier,
+            'eng-GB',
+            array(2, $locationObject)
         );
 
         $this->adapter->send(new Request(array(
             $contentObject,
         )));
 
-        $newLocation1 = static::$repository->getLocationService()->loadLocationByRemoteId('_test_location_content_integration_2');
-        $newContent = static::$repository->getContentService()->loadContentByRemoteId('_test_content_location_integration_2');
+        $newLocation1 = static::$repository->getLocationService()->loadLocationByRemoteId($locationRemoteId);
+        $newContent = static::$repository->getContentService()->loadContentByRemoteId($contentRemoteId);
 
         $newLocations = static::$repository->getLocationService()->loadLocations($newContent->contentInfo);
 
@@ -93,7 +93,7 @@ class LocationTest extends LocationTestCase
                 break;
             }
         }
-
+        
         $this->assertInstanceOf(Location::class, $newLocation1);
         $this->assertInstanceOf(Location::class, $newLocation2);
         $this->assertInstanceOf(Content::class, $newContent);

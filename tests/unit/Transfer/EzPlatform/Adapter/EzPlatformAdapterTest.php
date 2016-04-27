@@ -18,6 +18,7 @@ use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Data\UserObject;
+use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
@@ -46,7 +47,7 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
                 'title' => 'Test',
             ),
             array(
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => 'test_1',
             )
@@ -64,7 +65,7 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
                 'title' => 'Test',
             ),
             array(
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => 'test_2',
             )

@@ -16,6 +16,7 @@ use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
+use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
@@ -41,11 +42,10 @@ class ContentManagerTest extends EzPlatformTestCase
     {
         $contentObject = new ContentObject(
             array( // fields
-                'name' => 'Test title',
                 'title' => 'Test title',
                 'description' => 'Test description',
             ), array( // properties
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => '_test_1',
             )
@@ -63,11 +63,10 @@ class ContentManagerTest extends EzPlatformTestCase
     {
         $contentObject = new ContentObject(
             array( // fields
-                'name' => 'Test name',
                 'title' => 'Test title',
                 'description' => 'Test description',
             ), array( // properties
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => '_test_locations_1',
             )
@@ -78,7 +77,6 @@ class ContentManagerTest extends EzPlatformTestCase
 
         $createdContentObject = $this->manager->find($contentObject);
 
-        $this->assertEquals('Test name', (string) $createdContentObject->data['name']['eng-GB']);
         $this->assertEquals('Test title', (string) $createdContentObject->data['title']['eng-GB']);
         $this->assertEquals('Test description', (string) $createdContentObject->data['description']['eng-GB']);
 
@@ -93,11 +91,10 @@ class ContentManagerTest extends EzPlatformTestCase
     {
         $contentObject = new ContentObject(
             array( // fields
-                'name' => 'Test title',
                 'title' => 'Test title',
                 'description' => 'Test description',
             ), array( // properties
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => '_test_locations_2',
             )
@@ -142,11 +139,10 @@ class ContentManagerTest extends EzPlatformTestCase
     {
         $contentObject = new ContentObject(
             array(
-                'name' => 'Test title',
                 'title' => 'Test title',
                 'description' => 'Test description',
             ), array(
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => '_test_locations_1',
             )
@@ -210,11 +206,10 @@ class ContentManagerTest extends EzPlatformTestCase
     {
         $object = new ContentObject(
             array(
-                'name' => 'Test title',
                 'title' => 'Test title',
                 'description' => 'Test description',
             ), array(
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => 1,
             )

@@ -15,6 +15,7 @@ use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
+use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class LocationManagerTest extends EzPlatformTestCase
@@ -38,11 +39,10 @@ class LocationManagerTest extends EzPlatformTestCase
 
         $contentObject = new ContentObject(
             array( // fields
-                'name' => 'Test title',
                 'title' => 'Test title',
                 'description' => 'Test description',
             ), array( // properties
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => '_test_content_location',
                 'parent_locations' => array(
@@ -60,10 +60,11 @@ class LocationManagerTest extends EzPlatformTestCase
     public function testCreate()
     {
         $locationObject = new LocationObject(array(
-            'content_id' => 78,
+            'content_id' => 80,
             'parent_location_id' => 2,
             'remote_id' => '_test_location_1',
         ));
+
 
         $location = $this->locM->create($locationObject);
 
@@ -72,7 +73,7 @@ class LocationManagerTest extends EzPlatformTestCase
 
     public function testLoadContentAndCreateLocationWithoutContentId()
     {
-        $content = static::$contentManager->find(new ContentObject(array(), array('id' => 78)));
+        $content = static::$contentManager->find(new ContentObject(array(), array('id' => 79)));
         $content->addParentLocation(new LocationObject(array(
             'parent_location_id' => 2,
         )));

@@ -15,6 +15,7 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
 use Transfer\EzPlatform\Repository\ObjectService;
+use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class ContentTreeServiceTest extends EzPlatformTestCase
@@ -35,10 +36,9 @@ class ContentTreeServiceTest extends EzPlatformTestCase
         $rootContentObject = new ContentObject(
             array(
                 'title' => 'Test',
-                'name' => 'Test',
             ),
             array(
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => 'content_tree_service_test_1',
                 'priority' => 1,
@@ -48,10 +48,9 @@ class ContentTreeServiceTest extends EzPlatformTestCase
         $secondaryContentObject = new ContentObject(
             array(
                 'title' => 'Test 2',
-                'name' => 'Test 2',
             ),
             array(
-                'content_type_identifier' => '_test_article',
+                'content_type_identifier' => ContentTestCase::_content_type_article,
                 'language' => 'eng-GB',
                 'remote_id' => 'content_tree_service_test_2',
                 'priority' => 1,

@@ -66,8 +66,8 @@ class UserGroupManagerTest extends EzPlatformTestCase
         $usergroup = $manager->create($this->getUserGroup());
         $this->assertEquals(12, $usergroup->data['parent_id']);
         $usergroup->data['parent_id'] = $newParentUsergroup->getProperty('id');
-        $manager->update($usergroup);
-        $this->assertEquals(83, $usergroup->data['parent_id']);
+        $usergroup = $manager->update($usergroup);
+        $this->assertEquals($newParentUsergroup->getProperty('id'), $usergroup->data['parent_id']);
     }
 
     public function testUpdateEmpty()
