@@ -15,7 +15,7 @@ use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class LocationManagerTest extends EzPlatformTestCase
 {

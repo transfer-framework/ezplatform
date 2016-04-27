@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\tests;
+namespace Transfer\EzPlatform\tests\testcase;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerInterface;

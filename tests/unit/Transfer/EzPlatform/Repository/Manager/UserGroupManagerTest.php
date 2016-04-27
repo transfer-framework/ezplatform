@@ -11,7 +11,7 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
  * User manager tests.

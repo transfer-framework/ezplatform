@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class UserGroupTest extends EzPlatformTestCase
 {

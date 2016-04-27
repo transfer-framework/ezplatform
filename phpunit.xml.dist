@@ -11,8 +11,11 @@
          bootstrap                   = "tests/bootstrap.php">
 
     <testsuites>
-        <testsuite name="Transfer eZ Platform Tests">
-            <directory suffix="Test.php">./tests</directory>
+        <testsuite name="Transfer eZ Platform Integration Tests">
+            <directory suffix="Test.php">./tests/integration</directory>
+        </testsuite>
+        <testsuite name="Transfer eZ Platform Unit Tests">
+            <directory suffix="Test.php">./tests/unit</directory>
         </testsuite>
     </testsuites>
 

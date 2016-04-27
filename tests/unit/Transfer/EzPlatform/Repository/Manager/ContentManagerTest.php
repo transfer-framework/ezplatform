@@ -16,7 +16,7 @@ use Transfer\EzPlatform\Data\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
  * Content manager tests.

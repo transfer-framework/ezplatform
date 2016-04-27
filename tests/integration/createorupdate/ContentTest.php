@@ -3,10 +3,10 @@
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
+use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\tests\ContentTestCase;
 
 class ContentTest extends ContentTestCase
 {

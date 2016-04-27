@@ -7,7 +7,7 @@ use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Data\UserObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class UserTest extends EzPlatformTestCase
 {

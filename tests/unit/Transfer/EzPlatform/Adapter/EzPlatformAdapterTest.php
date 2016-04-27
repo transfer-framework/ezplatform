@@ -18,7 +18,7 @@ use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Data\UserObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
 class EzPlatformAdapterTest extends EzPlatformTestCase

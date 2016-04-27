@@ -15,7 +15,7 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Repository\ContentTreeService;
 use Transfer\EzPlatform\Repository\ObjectService;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class ContentTreeServiceTest extends EzPlatformTestCase
 {

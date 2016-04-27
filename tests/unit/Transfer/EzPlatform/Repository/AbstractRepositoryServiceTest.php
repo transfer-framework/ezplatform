@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use Transfer\EzPlatform\Repository\AbstractRepositoryService;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class AbstractRepositoryServiceTest extends EzPlatformTestCase
 {

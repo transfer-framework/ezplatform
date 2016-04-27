@@ -13,7 +13,7 @@ use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct;
 use Transfer\EzPlatform\Data\LocationObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
  * User manager tests.

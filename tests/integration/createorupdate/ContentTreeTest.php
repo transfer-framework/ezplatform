@@ -7,7 +7,7 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\tests\ContentTreeTestCase;
+use Transfer\EzPlatform\tests\testcase\ContentTreeTestCase;
 
 class ContentTreeTest extends ContentTreeTestCase
 {

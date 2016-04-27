@@ -17,7 +17,7 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\ContentTypeObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
  * Content type manager tests.

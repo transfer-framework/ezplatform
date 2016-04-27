@@ -9,7 +9,7 @@ use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Data\ContentObject;
 use Transfer\EzPlatform\Data\LocationObject;
-use Transfer\EzPlatform\tests\LocationTestCase;
+use Transfer\EzPlatform\tests\testcase\LocationTestCase;
 
 class LocationTest extends LocationTestCase
 {

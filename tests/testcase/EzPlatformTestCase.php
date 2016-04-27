@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\tests;
+namespace Transfer\EzPlatform\tests\testcase;
 
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;

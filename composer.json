@@ -26,5 +26,12 @@
     },
     "autoload": {
         "psr-4": { "Transfer\\EzPlatform\\": "src/Transfer/EzPlatform/" }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Transfer\\EzPlatform\\tests\\testcase\\": "tests/testcase/",
+            "Transfer\\EzPlatform\\tests\\integration\\": "tests/integration/",
+            "Transfer\\EzPlatform\\tests\\unit\\": "tests/unit/Transfer/EzPlatform/"
+        }
     }
 }

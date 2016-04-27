@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\EzPlatform\Data\LanguageObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
  * Language manager tests.

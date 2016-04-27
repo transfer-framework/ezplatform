@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\tests;
+namespace Transfer\EzPlatform\tests\testcase;
 
 use Psr\Log\LoggerInterface;
 use Transfer\Data\TreeObject;

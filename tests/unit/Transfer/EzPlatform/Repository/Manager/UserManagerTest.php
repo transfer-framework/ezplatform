@@ -13,7 +13,7 @@ use eZ\Publish\API\Repository\Values\User\User;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Data\UserGroupObject;
 use Transfer\EzPlatform\Data\UserObject;
-use Transfer\EzPlatform\tests\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
  * User manager tests.
