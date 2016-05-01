@@ -178,7 +178,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             $this->userService->moveUserGroup($userGroup, $newParentGroup);
         }
 
-        /** @todo update object */
+        /* @todo update object */
 
         return $object;
     }

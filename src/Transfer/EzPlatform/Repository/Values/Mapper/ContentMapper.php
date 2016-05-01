@@ -48,7 +48,7 @@ class ContentMapper
 
     public function setAfterUpdateProperties(array $properties)
     {
-        foreach($properties as $property => $value) {
+        foreach ($properties as $property => $value) {
             $this->contentObject->setProperty($property, $value);
         }
     }

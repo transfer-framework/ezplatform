@@ -10,15 +10,10 @@
 namespace Transfer\EzPlatform\tests\testcase;
 
 use eZ\Publish\API\Repository\Repository;
-use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\Core\Repository\Tests\Service\Integration\Legacy\SetupFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Transfer\Data\TreeObject;
-use Transfer\EzPlatform\Repository\Values\ContentObject;
-use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
-use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;

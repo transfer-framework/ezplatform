@@ -2,10 +2,7 @@
 
 namespace Transfer\EzPlatform\tests\testcase;
 
-use Psr\Log\LoggerInterface;
 use Transfer\Data\TreeObject;
-use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Repository\Values\ContentObject;
 
 class ContentTreeTestCase extends ContentTestCase
 {

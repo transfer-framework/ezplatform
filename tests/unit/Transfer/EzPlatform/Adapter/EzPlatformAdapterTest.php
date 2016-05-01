@@ -26,7 +26,6 @@ use Transfer\Adapter\Transaction\Response;
 
 class EzPlatformAdapterTest extends EzPlatformTestCase
 {
-
     /**
      * @var EzPlatformAdapter
      */

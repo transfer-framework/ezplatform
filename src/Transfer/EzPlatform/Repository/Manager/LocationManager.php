@@ -72,8 +72,8 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
      * Attempts to load Location based on id or remoteId.
      * Returns false if not found.
      *
-     * @param ValueObject    $object
-     * @param bool           $throwException
+     * @param ValueObject $object
+     * @param bool        $throwException
      *
      * @return Location|false
      *
@@ -105,7 +105,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     /**
      * Shortcut to find, mainly for locating parents.
      *
-     * @param int $id
+     * @param int  $id
      * @param bool $throwException
      *
      * @return Location|false
@@ -152,8 +152,8 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
         $location = $this->find($object, true);
 
         // Move if parent_location_id differs.
-        if(isset($object->data['parent_location_id'])) {
-            if($object->data['parent_location_id'] !== $location->parentLocationId) {
+        if (isset($object->data['parent_location_id'])) {
+            if ($object->data['parent_location_id'] !== $location->parentLocationId) {
                 $parentLocation = $this->findById($object->data['parent_location_id'], true);
                 $this->locationService->moveSubtree($location, $parentLocation);
             }

@@ -32,11 +32,12 @@ class ContentTestCase extends EzPlatformTestCase
     }
 
     /**
-     * @param array $fields
+     * @param array  $fields
      * @param string $remoteId
      * @param string $contentTypeIdentifier
-     * @param bool $languageCode
-     * @param bool $parentLocations
+     * @param bool   $languageCode
+     * @param bool   $parentLocations
+     *
      * @return ContentObject
      */
     public function getContentObject(array $fields, $remoteId, $contentTypeIdentifier, $languageCode = false, $parentLocations = false)
@@ -50,7 +51,7 @@ class ContentTestCase extends EzPlatformTestCase
             )
         );
 
-        if($parentLocations) {
+        if ($parentLocations) {
             $co->setParentLocations($parentLocations);
         }
 
@@ -76,7 +77,6 @@ class ContentTestCase extends EzPlatformTestCase
         $_ct_article = static::getContentTypeObject(static::_content_type_article);
         static::$contentTypeManager->createOrUpdate($_ct_article);
     }
-
 
     /** @todo move to ContentTypeTestCase ? */
     public static function getContentTypeObject($identifier)

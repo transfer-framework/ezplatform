@@ -10,8 +10,8 @@ use Transfer\EzPlatform\Repository\Values\ContentObject;
 
 class ContentTest extends ContentTestCase
 {
-
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
     }
 

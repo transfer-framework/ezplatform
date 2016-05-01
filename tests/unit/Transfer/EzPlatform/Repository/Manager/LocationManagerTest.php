@@ -65,7 +65,6 @@ class LocationManagerTest extends EzPlatformTestCase
             'remote_id' => '_test_location_1',
         ));
 
-
         $location = $this->locM->create($locationObject);
 
         $this->assertInstanceOf(LocationObject::class, $location);

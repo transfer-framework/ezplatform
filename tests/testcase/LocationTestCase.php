@@ -2,8 +2,6 @@
 
 namespace Transfer\EzPlatform\tests\testcase;
 
-use Psr\Log\LoggerInterface;
-use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
 
 class LocationTestCase extends ContentTestCase
@@ -11,14 +9,12 @@ class LocationTestCase extends ContentTestCase
     /**
      * initial structure:
      *  - location 2, content 57:
-     *      - location 60, content 58
+     *      - location 60, content 58.
      *
      *      // After setup:
      *      - location 62, content 61
      *      - location 64, content 63
      */
-
-
     protected $_test_contentId_0;
     protected $_test_contentId_1;
 
@@ -32,8 +28,7 @@ class LocationTestCase extends ContentTestCase
         // requesites
         $this->setUpContents();
         $this->setUpLocations();
-
-        }
+    }
 
     protected function setUpContents()
     {
@@ -52,7 +47,6 @@ class LocationTestCase extends ContentTestCase
 
         $co = static::$contentManager->createOrUpdate($contentObject);
         $this->_test_contentId_1 = $co->getProperty('content_info')->id;
-
     }
 
     protected function setUpLocations()
@@ -75,14 +69,13 @@ class LocationTestCase extends ContentTestCase
             'remote_id' => $remote_id,
         ));
 
-        if($contentId) {
+        if ($contentId) {
             $locationObject->data['content_id'] = $contentId;
         }
-        if($parentLocationId) {
+        if ($parentLocationId) {
             $locationObject->data['parent_location_id'] = $parentLocationId;
         }
 
         return $locationObject;
     }
-
 }

@@ -26,5 +26,4 @@ interface CreatorInterface
      * @return ObjectInterface|null
      */
     public function create(ObjectInterface $object);
-
 }
