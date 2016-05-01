@@ -12,9 +12,9 @@ namespace Transfer\EzPlatform\tests\Repository\Manager;
 use Psr\Log\NullLogger;
 use Transfer\Data\TreeObject;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Repository\ContentTreeService;
-use Transfer\EzPlatform\Repository\ObjectService;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Manager\Core\ContentTreeService;
+use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 

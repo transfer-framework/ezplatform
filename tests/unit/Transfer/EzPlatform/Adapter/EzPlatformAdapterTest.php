@@ -10,17 +10,19 @@
 namespace Transfer\EzPlatform\tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\Data\UserObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
+use Transfer\EzPlatform\Repository\Values\UserObject;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
+use Transfer\Adapter\Transaction\Response;
 
 class EzPlatformAdapterTest extends EzPlatformTestCase
 {
@@ -139,7 +141,7 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
         $ct = $transformer->handle($array);
         $ct = $ct[0];
 
-        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
+        $mockLogger = $this->getMock(AbstractLogger::class, array('log'), array(), '', false);
         $this->adapter->setLogger($mockLogger);
 
         $this->adapter->send(new Request(array(
@@ -168,7 +170,7 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
             )),
         );
 
-        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
+        $mockLogger = $this->getMock(AbstractLogger::class, array('log'), array(), '', false);
         $this->adapter->setLogger($mockLogger);
 
         $this->adapter->send(new Request(array(
@@ -184,16 +186,16 @@ class EzPlatformAdapterTest extends EzPlatformTestCase
             ),
         ));
 
-        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
+        $mockLogger = $this->getMock(AbstractLogger::class, array('log'), array(), '', false);
         $this->adapter->setLogger($mockLogger);
 
         $response = $this->adapter->send(new Request(array(
             $userGroup,
         )));
 
-        $this->assertInstanceOf('Transfer\Adapter\Transaction\Response', $response);
+        $this->assertInstanceOf(Response::class, $response);
         $this->assertCount(1, $response);
         $object = iterator_to_array($response);
-        $this->assertInstanceOf('Transfer\Ezplatform\Data\UserGroupObject', $object[0]);
+        $this->assertInstanceOf(UserGroupObject::class, $object[0]);
     }
 }

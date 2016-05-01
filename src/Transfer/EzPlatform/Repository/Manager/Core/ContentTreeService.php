@@ -7,13 +7,13 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Repository;
+namespace Transfer\EzPlatform\Repository\Manager\Core;
 
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\LocationList;
 use Transfer\Data\TreeObject;
-use Transfer\EzPlatform\Data\ContentObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
 
 /**
  * Content tree service.

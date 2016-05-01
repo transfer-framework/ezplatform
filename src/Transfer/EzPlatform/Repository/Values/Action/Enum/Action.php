@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\Data\Action\Enum;
+namespace Transfer\EzPlatform\Repository\Values\Action\Enum;
 
 class Action
 {

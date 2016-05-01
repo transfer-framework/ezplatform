@@ -9,7 +9,7 @@
 
 namespace Transfer\EzPlatform\tests\Repository\Manager;
 
-use Transfer\EzPlatform\Repository\AbstractRepositoryService;
+use Transfer\EzPlatform\Repository\Manager\Core\AbstractRepositoryService;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class AbstractRepositoryServiceTest extends EzPlatformTestCase
@@ -40,7 +40,7 @@ class AbstractRepositoryServiceTest extends EzPlatformTestCase
             ->willReturn($this->getMock('eZ\Publish\API\Repository\UserService'));
 
         $this->mock = $this
-            ->getMockForAbstractClass('Transfer\EzPlatform\Repository\AbstractRepositoryService', array($repositoryMock));
+            ->getMockForAbstractClass(AbstractRepositoryService::class, array($repositoryMock));
     }
 
     public function testGetRepository()

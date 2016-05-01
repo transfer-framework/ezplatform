@@ -7,12 +7,12 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Repository\Mapper;
+namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
 use eZ\Publish\API\Repository\Values\ValueObject;
-use Transfer\EzPlatform\Data\FieldDefinitionObject;
+use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
 
 /**
  * Field definition mapper.

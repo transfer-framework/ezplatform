@@ -7,7 +7,7 @@ use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class ContentTypeTest extends EzPlatformTestCase

@@ -7,10 +7,10 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Data;
+namespace Transfer\EzPlatform\Repository\Values;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Transfer\EzPlatform\Repository\Mapper\LocationMapper;
+use Transfer\EzPlatform\Repository\Values\Mapper\LocationMapper;
 
 /*
   

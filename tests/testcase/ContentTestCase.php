@@ -5,8 +5,8 @@ namespace Transfer\EzPlatform\tests\testcase;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerInterface;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 
 class ContentTestCase extends EzPlatformTestCase
 {

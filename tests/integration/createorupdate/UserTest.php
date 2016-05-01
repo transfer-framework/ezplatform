@@ -5,8 +5,8 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\Data\UserObject;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
+use Transfer\EzPlatform\Repository\Values\UserObject;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class UserTest extends EzPlatformTestCase

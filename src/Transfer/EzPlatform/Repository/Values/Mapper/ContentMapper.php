@@ -7,10 +7,10 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Repository\Mapper;
+namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
-use Transfer\EzPlatform\Data\ContentObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
 
 /**
  * User mapper.
@@ -43,6 +43,13 @@ class ContentMapper
         $this->contentObject->setProperty('version_info', $content->versionInfo);
         foreach ($content->getFields() as $field) {
             $this->contentObject->data[$field->fieldDefIdentifier][$field->languageCode] = $field->value;
+        }
+    }
+
+    public function setAfterUpdateProperties(array $properties)
+    {
+        foreach($properties as $property => $value) {
+            $this->contentObject->setProperty($property, $value);
         }
     }
 }

@@ -11,8 +11,8 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
@@ -135,6 +135,7 @@ class ContentManagerTest extends EzPlatformTestCase
         );
     }
 */
+    /*
     public function testUpdateithMulipleTypesOfLocation()
     {
         $contentObject = new ContentObject(
@@ -147,14 +148,14 @@ class ContentManagerTest extends EzPlatformTestCase
                 'remote_id' => '_test_locations_1',
             )
         );
-/*
-        $location = static::$repository->getLocationService()->loadLocation(2);
-        print_r(static::$repository->getLocationService()->loadLocationChildren($location));
-*/
+//        $location = static::$repository->getLocationService()->loadLocation(62);
+ //       print_r(static::$repository->getLocationService()->loadLocationChildren($location));
+
+
         $contentObject->addParentLocation(58);
         $contentObject->addParentLocation(new LocationObject(array(
             'parent_location_id' => 62,
-            'remote_id' => 'content_location_62',
+        //    'remote_id' => 'content_location_62',
         )));
 
         $this->manager->createOrUpdate($contentObject);
@@ -169,7 +170,7 @@ class ContentManagerTest extends EzPlatformTestCase
         $this->assertInstanceOf(LocationObject::class, current($parentLocations));
         $this->assertEquals(58, current($parentLocations)->data['parent_location_id']);
     }
-
+*/
     /*
      public function testUpdateContentWithoutLocations
      */

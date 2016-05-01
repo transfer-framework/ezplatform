@@ -7,14 +7,14 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Repository;
+namespace Transfer\EzPlatform\Repository\Manager\Core;
 
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\LanguageObject;
-use Transfer\EzPlatform\Data\LocationObject;
-use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\Data\UserObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\LanguageObject;
+use Transfer\EzPlatform\Repository\Values\LocationObject;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
+use Transfer\EzPlatform\Repository\Values\UserObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
@@ -70,7 +70,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->contentManager;
         }
 
-        $this->contentManager = new Manager\ContentManager($this->repository, $this->getLocationManager());
+        $this->contentManager = new ContentManager($this->repository, $this->getLocationManager());
 
         if ($this->logger) {
             $this->contentManager->setLogger($this->logger);
@@ -90,7 +90,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->locationManager;
         }
 
-        $this->locationManager = new Manager\LocationManager($this->repository);
+        $this->locationManager = new LocationManager($this->repository);
 
         if ($this->logger) {
             $this->locationManager->setLogger($this->logger);
@@ -110,7 +110,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->contentTypeManager;
         }
 
-        $this->contentTypeManager = new Manager\ContentTypeManager($this->repository, $this->getLanguageManager());
+        $this->contentTypeManager = new ContentTypeManager($this->repository, $this->getLanguageManager());
         if ($this->logger) {
             $this->contentTypeManager->setLogger($this->logger);
         }
@@ -129,7 +129,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->languageManager;
         }
 
-        $this->languageManager = new Manager\LanguageManager($this->repository);
+        $this->languageManager = new LanguageManager($this->repository);
 
         if ($this->logger) {
             $this->languageManager->setLogger($this->logger);
@@ -149,7 +149,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->userGroupManager;
         }
 
-        $this->userGroupManager = new Manager\UserGroupManager($this->repository);
+        $this->userGroupManager = new UserGroupManager($this->repository);
 
         if ($this->logger) {
             $this->userGroupManager->setLogger($this->logger);
@@ -169,7 +169,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->userManager;
         }
 
-        $this->userManager = new Manager\UserManager($this->repository, $this->getUserGroupManager());
+        $this->userManager = new UserManager($this->repository, $this->getUserGroupManager());
 
         if ($this->logger) {
             $this->userManager->setLogger($this->logger);

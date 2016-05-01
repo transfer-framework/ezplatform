@@ -14,7 +14,7 @@ use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use Psr\Log\AbstractLogger;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;

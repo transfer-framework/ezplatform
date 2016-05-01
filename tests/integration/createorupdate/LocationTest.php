@@ -7,8 +7,8 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\LocationTestCase;
 

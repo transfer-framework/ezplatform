@@ -11,8 +11,8 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\User\User;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\UserGroupObject;
-use Transfer\EzPlatform\Data\UserObject;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
+use Transfer\EzPlatform\Repository\Values\UserObject;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
@@ -84,7 +84,7 @@ class UserManagerTest extends EzPlatformTestCase
         $user = $this->getUser();
         $user->data['username'] = 'create_createOrUpdate';
         $user = $manager->createOrUpdate($user);
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\UserObject', $user);
+        $this->assertInstanceOf(UserObject::class, $user);
     }
 
     public function testUpdate_CreateOrUpdate()
@@ -92,7 +92,7 @@ class UserManagerTest extends EzPlatformTestCase
         $manager = static::$userManager;
         $user = $this->getUser();
         $user = $manager->createOrUpdate($user);
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\UserObject', $user);
+        $this->assertInstanceOf(UserObject::class, $user);
     }
 
     public function testCreateOrUpdateInvalid()

@@ -6,7 +6,7 @@ use eZ\Publish\API\Repository\Values\Content\Content;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\ContentObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
 
 class ContentTest extends ContentTestCase
 {

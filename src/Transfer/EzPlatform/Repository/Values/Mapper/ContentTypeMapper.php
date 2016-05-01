@@ -7,13 +7,13 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Repository\Mapper;
+namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
-use Transfer\EzPlatform\Data\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 
 /**
  * Contenttype mapper.

@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\Repository\Manager\Type;
 
 use eZ\Publish\API\Repository\Values\ValueObject as EzValueObject;
-use \Transfer\Data\ValueObject as TransferValueObject;
+use Transfer\Data\ValueObject as TransferValueObject;
 
 /**
  * Finder interface.

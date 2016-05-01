@@ -17,7 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\UserGroupObject;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;

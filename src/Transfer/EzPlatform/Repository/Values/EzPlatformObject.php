@@ -1,10 +1,10 @@
 <?php
 
-namespace Transfer\EzPlatform\Data;
+namespace Transfer\EzPlatform\Repository\Values;
 
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\Action\ActionInterface;
-use Transfer\EzPlatform\Data\Action\Enum\Action;
+use Transfer\EzPlatform\Repository\Values\Action\ActionInterface;
+use Transfer\EzPlatform\Repository\Values\Action\Enum\Action;
 
 abstract class EzPlatformObject extends ValueObject implements ActionInterface
 {

@@ -5,7 +5,7 @@ namespace Transfer\EzPlatform\tests\integration;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Data\LanguageObject;
+use Transfer\EzPlatform\Repository\Values\LanguageObject;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class LanguageTest extends EzPlatformTestCase

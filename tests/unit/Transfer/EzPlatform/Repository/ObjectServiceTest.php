@@ -17,7 +17,7 @@ use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
 use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
 use Transfer\EzPlatform\Repository\Manager\UserManager;
-use Transfer\EzPlatform\Repository\ObjectService;
+use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class ObjectServiceTest extends EzPlatformTestCase

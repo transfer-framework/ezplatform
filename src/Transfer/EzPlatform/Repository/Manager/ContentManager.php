@@ -22,8 +22,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
@@ -161,6 +161,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::create'));
         }
 
+        $object->setProperty('id', $content->contentInfo->id);
         $object->setProperty('version_info', $content->versionInfo);
         $object->setProperty('content_info', $content->contentInfo);
 
@@ -193,6 +194,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::update'));
         }
 
+        // Add/Update/Delete parent locations
         /** @var LocationObject[] $locationObjects */
         $locationObjects = $object->getProperty('parent_locations');
         if (is_array($locationObjects) && count($locationObjects) > 0) {
@@ -213,13 +215,14 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             foreach ($addOrUpdate as $locationObject) {
                 if (!array_key_exists($locationObject->data['parent_location_id'], $existingLocations)) {
                     // create or update
-                    $locationObject->data['content_id'] = $content->id;
+                    $locationObject->data['content_id'] = $content->contentInfo->id;
                     $locationObject = $this->locationManager->createOrUpdate($locationObject);
                     $object->addParentLocation($locationObject);
                 }
             }
         }
 
+        $object->setProperty('id', $content->contentInfo->id);
         $object->setProperty('version_info', $content->versionInfo);
         $object->setProperty('content_info', $content->contentInfo);
 
@@ -239,15 +242,11 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new MissingIdentificationPropertyException($object);
         }
 
-        try {
-            if ($this->find($object)) {
-                return $this->update($object);
-            }
-        } catch (NotFoundException $notFoundException) {
-            // Catch and ignore, we'll create it instead.
+        if ($this->find($object)) {
+            return $this->update($object);
+        } else {
+            return $this->create($object);
         }
-
-        return $this->create($object);
     }
 
     /**

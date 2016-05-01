@@ -7,10 +7,10 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Repository\Mapper;
+namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\Values\Content\Language;
-use Transfer\EzPlatform\Data\LanguageObject;
+use Transfer\EzPlatform\Repository\Values\LanguageObject;
 
 /**
  * Language mapper.

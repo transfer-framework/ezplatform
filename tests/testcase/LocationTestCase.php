@@ -4,7 +4,7 @@ namespace Transfer\EzPlatform\tests\testcase;
 
 use Psr\Log\LoggerInterface;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Repository\Values\LocationObject;
 
 class LocationTestCase extends ContentTestCase
 {

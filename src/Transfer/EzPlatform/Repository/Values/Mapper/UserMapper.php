@@ -7,12 +7,12 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Repository\Mapper;
+namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\Values\User\UserCreateStruct;
 use eZ\Publish\API\Repository\Values\User\UserUpdateStruct;
 use eZ\Publish\Core\Repository\Values\Content\ContentUpdateStruct;
-use Transfer\EzPlatform\Data\UserObject;
+use Transfer\EzPlatform\Repository\Values\UserObject;
 
 /**
  * User mapper.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Transfer\EzPlatform\Data\Configuration;
+namespace Transfer\EzPlatform\Repository\Values\Configuration;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;

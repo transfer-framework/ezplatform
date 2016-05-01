@@ -10,7 +10,7 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\UserGroupObject;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**
@@ -52,7 +52,7 @@ class UserGroupManagerTest extends EzPlatformTestCase
         $this->assertEquals('My User Group', $usergroup->data['fields']['name']);
         $usergroup->data['fields']['name'] = 'My updated group';
         $usergroup = $manager->update($usergroup);
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\UserGroupObject', $usergroup);
+        $this->assertInstanceOf(UserGroupObject::class, $usergroup);
         $this->assertEquals('My updated group', $usergroup->data['fields']['name']);
         $this->assertEquals($id, $usergroup->getProperty('id'));
     }
@@ -83,7 +83,7 @@ class UserGroupManagerTest extends EzPlatformTestCase
         /** @var UserGroupObject $usergroup */
         $usergroup = $manager->createOrUpdate($this->getUserGroup());
         $usergroup = $manager->createOrUpdate($usergroup);
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\UserGroupObject', $usergroup);
+        $this->assertInstanceOf(UserGroupObject::class, $usergroup);
     }
 
     public function testCreateOrUpdateEmpty()

@@ -7,10 +7,10 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Data;
+namespace Transfer\EzPlatform\Repository\Values;
 
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
-use Transfer\EzPlatform\Repository\Mapper\LanguageMapper;
+use Transfer\EzPlatform\Repository\Values\Mapper\LanguageMapper;
 
 /*
 

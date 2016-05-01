@@ -1,6 +1,8 @@
 <?php
 
 use eZ\Publish\API\Repository\Values\Content\Location;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
 class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
@@ -110,7 +112,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
         $ct0 = $ct[0];
 
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\ContentTypeObject', $ct0);
+        $this->assertInstanceOf(ContentTypeObject::class, $ct0);
         $this->assertEquals('article', $ct0->data['identifier']);
         $this->assertEquals('Content', $ct0->data['contenttype_groups'][0]);
         $this->assertArrayHasKey('eng-GB', $ct0->data['names']);
@@ -126,7 +128,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(2, $ct0->fields);
         $f0 = $ct0->fields[0];
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f0);
+        $this->assertInstanceOf(FieldDefinitionObject::class, $f0);
         $this->assertEquals('title', $f0->data['identifier']);
         $this->assertEquals('ezstring', $f0->data['type']);
         $this->assertEquals('content', $f0->data['field_group']);
@@ -142,7 +144,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($f0->data['is_info_collector']);
 
         $f1 = $ct0->fields[1];
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f1);
+        $this->assertInstanceOf(FieldDefinitionObject::class, $f1);
         $this->assertEquals('content', $f1->data['identifier']);
         $this->assertEquals('ezrichtext', $f1->data['type']);
         $this->assertEquals('content', $f1->data['field_group']);
@@ -168,7 +170,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
         $ct0 = $ct[0];
 
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\ContentTypeObject', $ct0);
+        $this->assertInstanceOf(ContentTypeObject::class, $ct0);
         $this->assertEquals('article', $ct0->data['identifier']);
         $this->assertCount(1, $ct0->data['contenttype_groups']);
         $this->assertEquals('Content', $ct0->data['contenttype_groups'][0]);
@@ -185,7 +187,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $ct0->fields);
         $f0 = $ct0->fields[0];
 
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f0);
+        $this->assertInstanceOf(FieldDefinitionObject::class, $f0);
         $this->assertEquals('title', $f0->data['identifier']);
         $this->assertEquals('ezstring', $f0->data['type']);
         $this->assertEquals('content', $f0->data['field_group']);
@@ -200,7 +202,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($f0->data['is_info_collector']);
 
         $f1 = $ct0->fields[1];
-        $this->assertInstanceOf('Transfer\EzPlatform\Data\FieldDefinitionObject', $f1);
+        $this->assertInstanceOf(FieldDefinitionObject::class, $f1);
         $this->assertEquals('content', $f1->data['identifier']);
         $this->assertEquals('ezstring', $f1->data['type']);
         $this->assertEquals('content', $f1->data['field_group']);

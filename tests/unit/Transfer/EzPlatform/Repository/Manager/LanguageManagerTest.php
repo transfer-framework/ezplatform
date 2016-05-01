@@ -9,7 +9,7 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
-use Transfer\EzPlatform\Data\LanguageObject;
+use Transfer\EzPlatform\Repository\Values\LanguageObject;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 /**

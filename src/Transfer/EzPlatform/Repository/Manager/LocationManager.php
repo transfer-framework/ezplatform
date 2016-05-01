@@ -18,7 +18,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;

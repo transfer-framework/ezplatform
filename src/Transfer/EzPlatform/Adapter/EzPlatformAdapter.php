@@ -19,13 +19,13 @@ use Transfer\Adapter\Transaction\Request;
 use Transfer\Adapter\Transaction\Response;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
-use Transfer\EzPlatform\Data\Action\ActionInterface;
-use Transfer\EzPlatform\Data\Action\Enum\Action;
-use Transfer\EzPlatform\Data\EzPlatformObject;
-use Transfer\EzPlatform\Repository\AbstractRepositoryService;
-use Transfer\EzPlatform\Repository\ContentTreeService;
+use Transfer\EzPlatform\Repository\Values\Action\ActionInterface;
+use Transfer\EzPlatform\Repository\Values\Action\Enum\Action;
+use Transfer\EzPlatform\Repository\Values\EzPlatformObject;
+use Transfer\EzPlatform\Repository\Manager\Core\AbstractRepositoryService;
+use Transfer\EzPlatform\Repository\Manager\Core\ContentTreeService;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
-use Transfer\EzPlatform\Repository\ObjectService;
+use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
 
 /**
  * eZ Platform adapter.

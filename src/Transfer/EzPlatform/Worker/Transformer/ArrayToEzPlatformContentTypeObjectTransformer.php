@@ -10,8 +10,8 @@
 namespace Transfer\EzPlatform\Worker\Transformer;
 
 use Symfony\Component\Config\Definition\Processor as ConfigProcessor;
-use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\Configuration\ContentTypeConfiguration;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\Configuration\ContentTypeConfiguration;
 use Transfer\Worker\WorkerInterface;
 
 /**

@@ -7,7 +7,7 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Data\Action;
+namespace Transfer\EzPlatform\Repository\Values\Action;
 
 /**
  * Action interface.

@@ -7,9 +7,9 @@
  * in the root directory.
  */
 
-namespace Transfer\EzPlatform\Data;
+namespace Transfer\EzPlatform\Repository\Values;
 
-use Transfer\EzPlatform\Repository\Mapper\FieldDefinitionMapper;
+use Transfer\EzPlatform\Repository\Values\Mapper\FieldDefinitionMapper;
 
 /*
 

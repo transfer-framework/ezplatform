@@ -11,8 +11,8 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\ContentObject;
-use Transfer\EzPlatform\Data\LocationObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
