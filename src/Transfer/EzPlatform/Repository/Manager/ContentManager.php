@@ -96,10 +96,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     public function find(ValueObject $object, $throwException = false)
     {
         try {
-            if ($object->getProperty('id')) {
-                $content = $this->contentService->loadContent($object->getProperty('id'));
-            } elseif ($object->getProperty('remote_id')) {
+            if ($object->getProperty('remote_id')) {
                 $content = $this->contentService->loadContentByRemoteId($object->getProperty('remote_id'));
+            }elseif ($object->getProperty('id')) {
+                $content = $this->contentService->loadContent($object->getProperty('id'));
             }
         } catch (NotFoundException $notFoundException) {
             $exception = $notFoundException;
@@ -195,32 +195,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         }
 
         // Add/Update/Delete parent locations
-        /** @var LocationObject[] $locationObjects */
-        $locationObjects = $object->getProperty('parent_locations');
-        if (is_array($locationObjects) && count($locationObjects) > 0) {
-            $addOrUpdate = [];
-            foreach ($locationObjects as $locationObject) {
-                $addOrUpdate[$locationObject->data['parent_location_id']] = $locationObject;
-            }
-
-            $existingLocations = [];
-            foreach ($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
-                if (!array_key_exists($existingLocation->parentLocationId, $addOrUpdate)) {
-                    $this->locationService->deleteLocation($existingLocation);
-                } else {
-                    $existingLocations[$existingLocation->parentLocationId] = $existingLocation;
-                }
-            }
-
-            foreach ($addOrUpdate as $locationObject) {
-                if (!array_key_exists($locationObject->data['parent_location_id'], $existingLocations)) {
-                    // create or update
-                    $locationObject->data['content_id'] = $content->contentInfo->id;
-                    $locationObject = $this->locationManager->createOrUpdate($locationObject);
-                    $object->addParentLocation($locationObject);
-                }
-            }
-        }
+        $this->locationManager->syncronizeLocationsFromContentObject($object);
 
         $object->setProperty('id', $content->contentInfo->id);
         $object->setProperty('version_info', $content->versionInfo);

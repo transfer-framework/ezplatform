@@ -3,6 +3,8 @@
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
+use eZ\Publish\API\Repository\Values\Content\Location;
+use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
@@ -20,7 +22,7 @@ class ContentTest extends ContentTestCase
      */
     public function testCreateContent()
     {
-        $remoteId = 'test_article_1';
+        $remoteId = 'test_integration_content_1';
 
         $contentObject = $this->getContentObject(array(
             'title' => 'Test title',
@@ -39,19 +41,16 @@ class ContentTest extends ContentTestCase
         $this->assertEquals(36, $content->contentInfo->contentTypeId);
     }
 
-    /**
-     * Tests content update.
-     */
-    public function testUpdateContent()
+    public function testCreateContentWithLocations()
     {
-        $contentObject = new ContentObject(
+        $remoteId = 'test_integration_content_with_locations_1';
+        $parentNodeId = 2;
+
+        $contentObject = $this->getContentObject(array(
+            'title' => 'Test title',
+        ), $remoteId, static::_content_type_article, false,
             array(
-                'title' => 'Test updated title',
-            ),
-            array(
-                'language' => 'eng-GB',
-                'content_type_identifier' => '_test_article',
-                'remote_id' => 'test_article_1',
+                $parentNodeId,
             )
         );
 
@@ -59,9 +58,68 @@ class ContentTest extends ContentTestCase
             $contentObject,
         )));
 
-        $content = static::$repository->getContentService()->loadContentByRemoteId('test_article_1');
+        $content = static::$repository->getContentService()->loadContentByRemoteId($remoteId);
+        $locations = static::$repository->getLocationService()->loadLocations($content->contentInfo);
 
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\Content\Content', $content);
+        $this->assertCount(1, $locations);
+
+        /** @var Location $location */
+        $location = current($locations);
+        $this->assertEquals($parentNodeId, $location->parentLocationId);
+    }
+
+    public function testUpdateContentWithLocations()
+    {
+        $remoteId = 'test_integration_content_with_locations_1';
+        $parentNodeId = 60;
+
+        $contentObject = $this->getContentObject(array(
+            'title' => 'Test title',
+        ), $remoteId, static::_content_type_article, false,
+            array(
+                $parentNodeId,
+            )
+        );
+
+        $this->adapter->send(new Request(array(
+            $contentObject,
+        )));
+
+        $content = static::$repository->getContentService()->loadContentByRemoteId($remoteId);
+        $locations = static::$repository->getLocationService()->loadLocations($content->contentInfo);
+
+        $this->assertCount(1, $locations);
+
+        /** @var Location $location */
+        $location = current($locations);
+        $this->assertEquals($parentNodeId, $location->parentLocationId);
+    }
+
+    /**
+     * Tests content update.
+     */
+    public function testUpdateContent()
+    {
+        $remoteId = 'test_integration_content_1';
+
+        $contentObject = new ContentObject(
+            array(
+                'title' => 'Test updated title',
+            ),
+            array(
+                'language' => 'eng-GB',
+                'content_type_identifier' => '_test_article',
+                'remote_id' => $remoteId,
+            )
+        );
+
+        $this->adapter->send(new Request(array(
+            $contentObject,
+        )));
+
+        $content = static::$repository->getContentService()->loadContentByRemoteId($remoteId);
+
+        $this->assertInstanceOf(Content::class, $content);
         $this->assertEquals('Test updated title', $content->getField('title')->value->text);
         $this->assertEquals('eng-GB', $content->contentInfo->mainLanguageCode);
         $this->assertEquals(36, $content->contentInfo->contentTypeId);
@@ -72,7 +130,7 @@ class ContentTest extends ContentTestCase
      */
     public function testCreateOrUpdateWithAmbiguousObject()
     {
-        $this->setExpectedException('Transfer\EzPlatform\Exception\MissingIdentificationPropertyException');
+        $this->setExpectedException(MissingIdentificationPropertyException::class);
 
         $object = new ContentObject(array());
 
@@ -86,7 +144,7 @@ class ContentTest extends ContentTestCase
      */
     public function testCreateOrUpdateWithInvalidArgument()
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException(\InvalidArgumentException::class);
 
         $this->adapter->send(new Request(array(
             new ValueObject(null),

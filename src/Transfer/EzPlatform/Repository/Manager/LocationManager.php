@@ -18,6 +18,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
@@ -187,6 +188,41 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             return $this->update($object);
         } else {
             return $this->create($object);
+        }
+    }
+
+    /**
+     * Creates/updates/deletes locations in ContentObject->parent_locations
+     *
+     * @param ContentObject $object
+     */
+    public function syncronizeLocationsFromContentObject(ContentObject $object)
+    {
+        /** @var LocationObject[] $locationObjects */
+        $locationObjects = $object->getProperty('parent_locations');
+        if (is_array($locationObjects) && count($locationObjects) > 0) {
+            $addOrUpdate = [];
+            foreach ($locationObjects as $locationObject) {
+                $addOrUpdate[$locationObject->data['parent_location_id']] = $locationObject;
+            }
+
+            $existingLocations = [];
+            foreach ($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
+                if (!array_key_exists($existingLocation->parentLocationId, $addOrUpdate)) {
+                    $this->locationService->deleteLocation($existingLocation);
+                } else {
+                    $existingLocations[$existingLocation->parentLocationId] = $existingLocation;
+                }
+            }
+
+            foreach ($addOrUpdate as $locationObject) {
+                if (!array_key_exists($locationObject->data['parent_location_id'], $existingLocations)) {
+                    // create or update
+                    $locationObject->data['content_id'] = $object->getProperty('content_info')->id;
+                    $locationObject = $this->createOrUpdate($locationObject);
+                    $object->addParentLocation($locationObject);
+                }
+            }
         }
     }
 

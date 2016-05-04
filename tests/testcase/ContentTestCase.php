@@ -32,11 +32,11 @@ class ContentTestCase extends EzPlatformTestCase
     }
 
     /**
-     * @param array  $fields
-     * @param string $remoteId
-     * @param string $contentTypeIdentifier
-     * @param bool   $languageCode
-     * @param bool   $parentLocations
+     * @param array         $fields
+     * @param string        $remoteId
+     * @param string        $contentTypeIdentifier
+     * @param bool          $languageCode
+     * @param bool|array    $parentLocations
      *
      * @return ContentObject
      */
