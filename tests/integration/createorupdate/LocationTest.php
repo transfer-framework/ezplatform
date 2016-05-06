@@ -15,10 +15,10 @@ class LocationTest extends LocationTestCase
      */
     public function testCreateLocation()
     {
-        $remoteId = '_test_location_integration_1';
+        $remoteId = $this->_test_location_remote_id_1;
         $parentLocationId = 60;
 
-        $locationObject = $this->getLocationObject($remoteId, $this->_test_contentId_1, $parentLocationId);
+        $locationObject = $this->getLocationObject($remoteId, $this->_test_content_id_1, $parentLocationId);
 
         $this->adapter->send(new Request(array(
             $locationObject,
@@ -27,16 +27,16 @@ class LocationTest extends LocationTestCase
         $location = static::$repository->getLocationService()->loadLocationByRemoteId($remoteId);
 
         $this->assertInstanceOf(Location::class, $location);
-        $this->assertEquals($this->_test_contentId_1, $location->contentInfo->id);
+        $this->assertEquals($this->_test_content_id_1, $location->contentInfo->id);
         $this->assertEquals($parentLocationId, $location->parentLocationId);
     }
 
     public function testUpdateLocation()
     {
-        $remoteId = '_test_location_integration_1';
+        $remoteId = $this->_test_location_remote_id_1;
         $parentLocationId = 64;
 
-        $locationObject = $this->getLocationObject($remoteId, $this->_test_contentId_1, $parentLocationId);
+        $locationObject = $this->getLocationObject($remoteId, $this->_test_content_id_1, $parentLocationId);
 
         $this->adapter->send(new Request(array(
             $locationObject,
@@ -45,16 +45,16 @@ class LocationTest extends LocationTestCase
         $location = static::$repository->getLocationService()->loadLocationByRemoteId($remoteId);
 
         $this->assertInstanceOf(Location::class, $location);
-        $this->assertEquals($this->_test_contentId_1, $location->contentInfo->id);
+        $this->assertEquals($this->_test_content_id_1, $location->contentInfo->id);
         $this->assertEquals($parentLocationId, $location->parentLocationId);
     }
 
     public function testCreateContentAndLocation()
     {
-        $locationRemoteId = '_test_location_content_integration_2';
+        $locationRemoteId = $this->_test_location_remote_id_3;
         $locationParentId = 58;
 
-        $contentRemoteId = '_test_content_location_integration_2';
+        $contentRemoteId = $this->_test_content_remote_id_3;
         $contentFields = array('title' => 'Test title');
         $contentTypeIdentifier = ContentTestCase::_content_type_article;
 

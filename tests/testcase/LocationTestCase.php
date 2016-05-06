@@ -15,11 +15,19 @@ class LocationTestCase extends ContentTestCase
      *      - location 62, content 61
      *      - location 64, content 63
      */
-    protected $_test_contentId_0;
-    protected $_test_contentId_1;
+    protected $_test_content_id_1;
+    protected $_test_content_id_2;
 
-    protected $_test_locationId_0;
-    protected $_test_locationId_1;
+    protected $_test_location_id_1;
+    protected $_test_location_id_2;
+
+    protected $_test_location_remote_id_1 = 'test_integration_location_1';
+    protected $_test_location_remote_id_2 = 'test_integration_location_2';
+    protected $_test_location_remote_id_3 = 'test_integration_location_3';
+
+    protected $_test_content_remote_id_1 = 'test_integration_content_1';
+    protected $_test_content_remote_id_2 = 'test_integration_content_2';
+    protected $_test_content_remote_id_3 = 'test_integration_content_3';
 
     public function setUp()
     {
@@ -35,29 +43,29 @@ class LocationTestCase extends ContentTestCase
         // First one
         $contentObject = $this->getContentObject(array(
             'title' => 'Test title',
-        ), '_integration_location_content_0_0', static::_content_type_article);
+        ), $this->_test_location_remote_id_1, static::_content_type_article);
 
         $co = static::$contentManager->createOrUpdate($contentObject);
-        $this->_test_contentId_0 = $co->getProperty('content_info')->id;
+        $this->_test_content_id_1 = $co->getProperty('content_info')->id;
 
         // Another one
         $contentObject = $this->getContentObject(array(
             'title' => 'Test title',
-        ), '_integration_location_content_0_1', static::_content_type_article);
+        ), $this->_test_location_remote_id_2, static::_content_type_article);
 
         $co = static::$contentManager->createOrUpdate($contentObject);
-        $this->_test_contentId_1 = $co->getProperty('content_info')->id;
+        $this->_test_content_id_2 = $co->getProperty('content_info')->id;
     }
 
     protected function setUpLocations()
     {
         // First one
-        $locationObject = $this->getLocationObject('test_integration_location_1', $this->_test_contentId_0, 60);
+        $locationObject = $this->getLocationObject($this->_test_location_remote_id_1, $this->_test_content_id_1, 60);
         $co = static::$locationManager->createOrUpdate($locationObject);
         $this->_test_locationId_0 = $co->getProperty('id');
 
         // Another one
-        $locationObject = $this->getLocationObject('test_integration_location_2', $this->_test_contentId_1, 63);
+        $locationObject = $this->getLocationObject($this->_test_location_remote_id_2, $this->_test_content_id_2, 63);
         $co = static::$locationManager->createOrUpdate($locationObject);
         $this->_test_locationId_1 = $co->getProperty('id');
     }
