@@ -64,7 +64,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     protected $logger;
 
     /**
-     * @param Repository $repository
+     * @param Repository      $repository
+     * @param LocationManager $locationManager
      */
     public function __construct(Repository $repository, LocationManager $locationManager)
     {
@@ -98,7 +99,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         try {
             if ($object->getProperty('remote_id')) {
                 $content = $this->contentService->loadContentByRemoteId($object->getProperty('remote_id'));
-            }elseif ($object->getProperty('id')) {
+            } elseif ($object->getProperty('id')) {
                 $content = $this->contentService->loadContent($object->getProperty('id'));
             }
         } catch (NotFoundException $notFoundException) {
@@ -194,12 +195,12 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::update'));
         }
 
-        // Add/Update/Delete parent locations
-        $this->locationManager->syncronizeLocationsFromContentObject($object);
-
         $object->setProperty('id', $content->contentInfo->id);
         $object->setProperty('version_info', $content->versionInfo);
         $object->setProperty('content_info', $content->contentInfo);
+
+        // Add/Update/Delete parent locations
+        $this->locationManager->syncronizeLocationsFromContentObject($object);
 
         return $object;
     }

@@ -71,7 +71,9 @@ class ContentTest extends ContentTestCase
     public function testUpdateContentWithLocations()
     {
         $remoteId = 'test_integration_content_with_locations_1';
-        $parentNodeId = 60;
+
+        // Media root folder
+        $parentNodeId = 43;
 
         $contentObject = $this->getContentObject(array(
             'title' => 'Test title',

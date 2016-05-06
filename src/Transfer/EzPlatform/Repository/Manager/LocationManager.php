@@ -126,6 +126,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
         }
 
         $contentInfo = $this->repository->getContentService()->loadContentInfo($object->data['content_id']);
+
         $locationCreateStruct = $this->locationService->newLocationCreateStruct($object->data['parent_location_id']);
 
         $object->getMapper()->getNewLocationCreateStruct($locationCreateStruct);
@@ -192,7 +193,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * Creates/updates/deletes locations in ContentObject->parent_locations
+     * Creates/updates/deletes locations in ContentObject->parent_locations.
      *
      * @param ContentObject $object
      */
@@ -207,9 +208,10 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             }
 
             $existingLocations = [];
+            $deleteThese = [];
             foreach ($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
                 if (!array_key_exists($existingLocation->parentLocationId, $addOrUpdate)) {
-                    $this->locationService->deleteLocation($existingLocation);
+                    $deleteThese[] = $existingLocation;
                 } else {
                     $existingLocations[$existingLocation->parentLocationId] = $existingLocation;
                 }
@@ -222,6 +224,10 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
                     $locationObject = $this->createOrUpdate($locationObject);
                     $object->addParentLocation($locationObject);
                 }
+            }
+
+            foreach ($deleteThese as $delete) {
+                $this->locationService->deleteLocation($delete);
             }
         }
     }

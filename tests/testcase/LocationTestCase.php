@@ -51,14 +51,13 @@ class LocationTestCase extends ContentTestCase
 
     protected function setUpLocations()
     {
-
         // First one
-        $locationObject = $this->getLocationObject('_integration_location_location_0_0', $this->_test_contentId_0, 60);
+        $locationObject = $this->getLocationObject('test_integration_location_1', $this->_test_contentId_0, 60);
         $co = static::$locationManager->createOrUpdate($locationObject);
         $this->_test_locationId_0 = $co->getProperty('id');
 
         // Another one
-        $locationObject = $this->getLocationObject('_integration_location_location_0_1', $this->_test_contentId_1, 62);
+        $locationObject = $this->getLocationObject('test_integration_location_2', $this->_test_contentId_1, 63);
         $co = static::$locationManager->createOrUpdate($locationObject);
         $this->_test_locationId_1 = $co->getProperty('id');
     }
