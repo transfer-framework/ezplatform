@@ -20,7 +20,7 @@ use Transfer\EzPlatform\Repository\Values\Mapper\UserGroupMapper;
         parent_id               => int      // Defaults to 12
         main_language_code      => string   // Defaults to eng-GB
         content_type_identifier => string   // Defaults to user_group
-        fields                  => FieldDefinition[] {@link see ContentObject and FieldDefinitionObject}
+        fields                  => array [field definition identifier => value]
     ],
     $properties = [
         id                      => int (same as contentInfo->id)

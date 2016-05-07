@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
+use eZ\Publish\API\Repository\Values\User\UserGroup;
 use eZ\Publish\API\Repository\Values\User\UserGroupCreateStruct;
 use eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct;
 use Transfer\EzPlatform\Repository\Values\UserGroupObject;
@@ -31,6 +32,17 @@ class UserGroupMapper
     public function __construct(UserGroupObject $userGroupObject)
     {
         $this->userGroupObject = $userGroupObject;
+    }
+    
+    public function userGroupToObject(UserGroup $userGroup)
+    {
+        if(!isset($this->userGroupObject->data['parent_id'])) {
+            $this->userGroupObject->data['parent_id'] = $userGroup->parentId;
+        }
+
+        $this->userGroupObject->setProperty('id', $userGroup->contentInfo->id);
+        $this->userGroupObject->setProperty('content_info', $userGroup->contentInfo);
+        $this->userGroupObject->setProperty('version_info', $userGroup->versionInfo);
     }
 
     /**

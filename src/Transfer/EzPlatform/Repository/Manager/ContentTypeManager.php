@@ -107,8 +107,6 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             return false;
         }
 
-        //$object->getMapper()->contentTypeToObject($contentType);
-
         return $contentType;
     }
 
@@ -228,9 +226,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function createOrUpdate(ObjectInterface $object)
     {
-        $contentObject = $this->find($object);
-
-        if (!$contentObject) {
+        if (!$this->find($object)) {
             return $this->create($object);
         } else {
             return $this->update($object);

@@ -70,11 +70,10 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
      * Find LanguageObject by code.
      * Returns Language.
      *
-     * @param LanguageObject $object
-     * @param bool           $throwExceptions
+     * @param ValueObject $object
+     * @param bool $throwExceptions
      *
      * @return Language
-     *
      * @throws NotFoundException
      */
     public function find(ValueObject $object, $throwExceptions = false)
@@ -131,7 +130,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             throw new UnsupportedObjectOperationException(LanguageObject::class, get_class($object));
         }
 
-        $language = $this->find($object);
+        $language = $this->find($object, true);
         $language = $this->languageService->updateLanguageName($language, $object->data['name']);
 
         $object->getMapper()->languageToObject($language);

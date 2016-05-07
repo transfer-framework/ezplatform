@@ -149,8 +149,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
         // Create usergroup
         $userGroup = $this->userService->createUserGroup($userGroupCreateStruct, $parentUserGroup);
 
-        /* @todo update with mapper */
-        $object->setProperty('id', $userGroup->id);
+        $object->getMapper()->userGroupToObject($userGroup);
 
         return $object;
     }
@@ -171,14 +170,14 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
 
         $object->getMapper()->populateUserGroupUpdateStruct($userGroupUpdateStruct);
 
-        $this->userService->updateUserGroup($userGroup, $userGroupUpdateStruct);
+        $userGroup = $this->userService->updateUserGroup($userGroup, $userGroupUpdateStruct);
 
         if ($userGroup->parentId !== $object->data['parent_id']) {
             $newParentGroup = $this->findById($object->data['parent_id'], true);
             $this->userService->moveUserGroup($userGroup, $newParentGroup);
         }
 
-        /* @todo update object */
+        $object->getMapper()->userGroupToObject($userGroup);
 
         return $object;
     }

@@ -2,42 +2,27 @@
 
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
-use Psr\Log\LoggerInterface;
+use eZ\Publish\API\Repository\Values\User\UserGroup;
 use Transfer\Adapter\Transaction\Request;
-use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Repository\Values\UserGroupObject;
-use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\UserGroupTestCase;
 
-class UserGroupTest extends EzPlatformTestCase
+class UserGroupTest extends UserGroupTestCase
 {
-    /**
-     * @var EzPlatformAdapter
-     */
-    protected $adapter;
-
-    public function setUp()
-    {
-        $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository,
-        ));
-        $this->adapter->setLogger(
-            $this->getMock(LoggerInterface::class)
-        );
-    }
 
     public function testCreateAndUpdateUsergroup()
     {
-        $parentUsergroup = static::$repository->getUserService()->loadUserGroup(12);
+        $rootUsergroup = $this->getRootUserGroup();
 
-        $countOriginal = count(static::$repository->getUserService()->loadSubUserGroups($parentUsergroup));
+        $countOriginal = count(static::$repository->getUserService()->loadSubUserGroups($rootUsergroup));
 
-        $name = 'TestUsergroup';
-        $raw = $this->getUsergroup($name);
+        $name = 'Test Usergroup';
+
+        $raw = $this->getUsergroup(array('name' => $name));
         $this->adapter->send(new Request(array(
             $raw,
         )));
 
-        $userGroups = static::$repository->getUserService()->loadSubUserGroups($parentUsergroup);
+        $userGroups = static::$repository->getUserService()->loadSubUserGroups($rootUsergroup);
         $this->assertCount(($countOriginal + 1), $userGroups);
 
         $real = null;
@@ -49,31 +34,23 @@ class UserGroupTest extends EzPlatformTestCase
             }
         }
 
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\User\UserGroup', $real);
-        $this->assertEquals('TestUsergroup', $real->contentInfo->name);
+        $this->assertInstanceOf(UserGroup::class, $real);
+        $this->assertEquals('Test Usergroup', $real->contentInfo->name);
 
-        $raw->data['fields']['name'] = 'MyUpdatedTestgroup';
+        $raw->data['fields']['name'] = 'My Updated Testgroup';
+        $raw->data['parent_id'] = 14;
+
         $this->adapter->send(new Request(array(
             $raw,
         )));
+
         $real = static::$repository->getUserService()->loadUserGroup($raw->data['id']);
 
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\User\UserGroup', $real);
-        $this->assertEquals('MyUpdatedTestgroup', $real->getField('name')->value->text);
+        $this->assertInstanceOf(UserGroup::class, $real);
+        $this->assertEquals('My Updated Testgroup', $real->getField('name')->value->text);
 
-        $userGroups = static::$repository->getUserService()->loadSubUserGroups($parentUsergroup);
-        $this->assertCount(($countOriginal + 1), $userGroups);
+        // Checks that the usergroup has been moved.
+        $this->assertEquals(14, $real->parentId);
     }
 
-    protected function getUsergroup($name)
-    {
-        return new UserGroupObject(array(
-            'parent_id' => 12,
-            'content_type_identifier' => 'user_group',
-            'main_language_code' => 'eng-GB',
-            'fields' => array(
-                'name' => $name,
-            ),
-        ));
-    }
 }
