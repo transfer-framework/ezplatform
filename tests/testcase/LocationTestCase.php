@@ -70,7 +70,7 @@ class LocationTestCase extends ContentTestCase
         $this->_test_locationId_1 = $co->getProperty('id');
     }
 
-    protected function getLocationObject($remote_id, $contentId = false, $parentLocationId = false, $mainLocation = false)
+    protected function getLocationObject($remote_id, $contentId = false, $parentLocationId = false)
     {
         $locationObject = new LocationObject(array(
             'remote_id' => $remote_id,

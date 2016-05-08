@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\Repository\Values;
 
+use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Values\Mapper\ContentMapper;
@@ -83,18 +84,22 @@ class ContentObject extends EzPlatformObject
     /**
      * Constructs content object.
      *
-     * @param array $data       Field data
+     * @param array|Content $data       Field data
      * @param array $properties Additional properties
      */
-    public function __construct(array $data, array $properties = array())
+    public function __construct($data, array $properties = array())
     {
-        parent::__construct($data, array_merge(
-            array(
-                'main_object' => true,
-                'parent_locations' => [],
-            ),
-            $properties
-        ));
+        if($data instanceof Content) {
+            $this->getMapper()->contentToObject($data);
+        }else {
+            parent::__construct($data, array_merge(
+                array(
+                    'main_object' => true,
+                    'parent_locations' => [],
+                ),
+                $properties
+            ));
+        }
 
         if (isset($properties['parent_locations'])) {
             $this->setParentLocations($properties['parent_locations']);
