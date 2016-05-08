@@ -8,7 +8,6 @@ use Transfer\EzPlatform\tests\testcase\UserGroupTestCase;
 
 class UserGroupTest extends UserGroupTestCase
 {
-
     public function testCreateAndUpdateUsergroup()
     {
         $rootUsergroup = $this->getRootUserGroup();
@@ -52,5 +51,4 @@ class UserGroupTest extends UserGroupTestCase
         // Checks that the usergroup has been moved.
         $this->assertEquals(14, $real->parentId);
     }
-
 }

@@ -85,13 +85,13 @@ class ContentObject extends EzPlatformObject
      * Constructs content object.
      *
      * @param array|Content $data       Field data
-     * @param array $properties Additional properties
+     * @param array         $properties Additional properties
      */
     public function __construct($data, array $properties = array())
     {
-        if($data instanceof Content) {
+        if ($data instanceof Content) {
             $this->getMapper()->contentToObject($data);
-        }else {
+        } else {
             parent::__construct($data, array_merge(
                 array(
                     'main_object' => true,

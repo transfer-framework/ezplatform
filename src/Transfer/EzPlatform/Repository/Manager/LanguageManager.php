@@ -71,9 +71,10 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
      * Returns Language.
      *
      * @param ValueObject $object
-     * @param bool $throwExceptions
+     * @param bool        $throwExceptions
      *
      * @return Language
+     *
      * @throws NotFoundException
      */
     public function find(ValueObject $object, $throwExceptions = false)

@@ -124,8 +124,8 @@ class ContentTreeTest extends ContentTreeTestCase
         $locations = static::$repository->getLocationService()->loadLocations($childFolderContentInfo);
 
         $childLocation = null;
-        foreach($locations as $location) {
-            if($location->contentId == $childFolderContentInfo->id) {
+        foreach ($locations as $location) {
+            if ($location->contentId == $childFolderContentInfo->id) {
                 $childLocation = $location;
                 break;
             }

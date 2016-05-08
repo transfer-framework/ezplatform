@@ -2,17 +2,13 @@
 
 namespace Transfer\EzPlatform\tests\testcase;
 
-use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\User\UserGroup;
 use Psr\Log\LoggerInterface;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Repository\Values\ContentObject;
-use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 
 class UserGroupTestCase extends EzPlatformTestCase
 {
-
     protected $main_usergroup_id = 12;
     protected $main_language_code = 'eng-GB';
     protected $contentype_identifier = 'user_group';
@@ -30,16 +26,16 @@ class UserGroupTestCase extends EzPlatformTestCase
         $this->adapter->setLogger(
             $this->getMock(LoggerInterface::class)
         );
-
     }
 
     /**
      * @param array $fields
+     *
      * @return UserGroupObject
      */
     protected function getUsergroup(array $fields, $parentId = false)
     {
-        if(!$parentId) {
+        if (!$parentId) {
             $parentId = $this->main_usergroup_id;
         }
 
@@ -47,7 +43,7 @@ class UserGroupTestCase extends EzPlatformTestCase
             'parent_id' => $parentId,
             'content_type_identifier' => $this->contentype_identifier,
             'main_language_code' => $this->main_language_code,
-            'fields' => $fields
+            'fields' => $fields,
         ));
     }
 

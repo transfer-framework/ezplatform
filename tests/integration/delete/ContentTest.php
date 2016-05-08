@@ -29,5 +29,4 @@ class ContentTest extends ContentTestCase
         $this->setExpectedException(NotFoundException::class);
         static::$repository->getContentService()->loadContentByRemoteId('test_integration_content_1');
     }
-
 }
