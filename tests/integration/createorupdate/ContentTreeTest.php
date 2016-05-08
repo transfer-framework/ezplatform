@@ -103,7 +103,6 @@ class ContentTreeTest extends ContentTreeTestCase
 
     public function testTreeContentInTreeContent()
     {
-
         $topFolderContent = static::$repository->getContentService()->loadContentByRemoteId('tree_folder_0');
         $topFolder = new ContentObject([]);
         $topFolder->getMapper()->contentToObject($topFolderContent);
@@ -115,12 +114,23 @@ class ContentTreeTest extends ContentTreeTestCase
         $tree1 = $this->getTreeObject(2, $topFolder);
         $tree2 = $this->getTreeObject($topFolder->getProperty('content_info')->mainLocationId, $folder);
 
-
         $tree1->addNode($tree2);
 
         $this->adapter->send(new Request(array(
             $tree1,
         )));
 
+        $childFolderContentInfo = static::$repository->getContentService()->loadContentInfoByRemoteId('tree_folder_1');
+        $locations = static::$repository->getLocationService()->loadLocations($childFolderContentInfo);
+
+        $childLocation = null;
+        foreach($locations as $location) {
+            if($location->contentId == $childFolderContentInfo->id) {
+                $childLocation = $location;
+                break;
+            }
+        }
+
+        $this->assertEquals($topFolderContent->contentInfo->mainLocationId, $childLocation->parentLocationId);
     }
 }
