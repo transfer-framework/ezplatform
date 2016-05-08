@@ -5,6 +5,7 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Adapter\Transaction\Request;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\tests\testcase\ContentTreeTestCase;
 
 class ContentTreeTest extends ContentTreeTestCase
@@ -72,6 +73,7 @@ class ContentTreeTest extends ContentTreeTestCase
         ), 'tree_folder_0', 'folder');
 
         $tree = $this->getTreeObject(2, $folder);
+
         $tree->addNode($article);
 
         $this->adapter->send(new Request(array(
@@ -97,5 +99,28 @@ class ContentTreeTest extends ContentTreeTestCase
 
         $this->assertEquals($originalLocationFolderId, $locationFolder->id);
         $this->assertEquals($originalLocationArticleId, $locationArticle->id);
+    }
+
+    public function testTreeContentInTreeContent()
+    {
+
+        $topFolderContent = static::$repository->getContentService()->loadContentByRemoteId('tree_folder_0');
+        $topFolder = new ContentObject([]);
+        $topFolder->getMapper()->contentToObject($topFolderContent);
+
+        $folder = $this->getContentObject(array(
+            'name' => 'Updated folder',
+        ), 'tree_folder_1', 'folder');
+
+        $tree1 = $this->getTreeObject(2, $topFolder);
+        $tree2 = $this->getTreeObject($topFolder->getProperty('content_info')->mainLocationId, $folder);
+
+
+        $tree1->addNode($tree2);
+
+        $this->adapter->send(new Request(array(
+            $tree1,
+        )));
+
     }
 }
