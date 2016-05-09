@@ -1,12 +1,14 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration\createorupdate;
+namespace Transfer\EzPlatform\tests\integration\delete;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\Core\Base\Exceptions\NotFoundException;
 use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
+use Transfer\EzPlatform\Repository\Values\Action\Enum\Action;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\tests\testcase\ContentTypeTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
@@ -14,9 +16,9 @@ use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 class ContentTypeTest extends ContentTypeTestCase
 {
 
-    public function testCreateAndUpdateContentType()
+    public function testDelete()
     {
-        $identifier = '_product';
+        $identifier = '_integration_contenttype_delete_test';
 
         $raw = $this->getContentType($identifier);
 
@@ -26,17 +28,14 @@ class ContentTypeTest extends ContentTypeTestCase
         $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
 
         $this->assertInstanceOf(ContentType::class, $real);
-        $this->assertEquals('Product', $real->getName('eng-GB'));
 
-        $raw = $this->getContentType($identifier);
-        $raw->data['names']['eng-GB'] = 'Updated name';
+        $raw->setProperty('action', Action::DELETE);
 
         $this->adapter->send(new Request(array(
             $raw,
         )));
-        $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
 
-        $this->assertInstanceOf(ContentType::class, $real);
-        $this->assertEquals('Updated name', $real->getName('eng-GB'));
+        $this->setExpectedException(NotFoundException::class);
+        static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
     }
 }
