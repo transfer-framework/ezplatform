@@ -17,10 +17,12 @@ use Transfer\EzPlatform\Repository\Values\Mapper\LanguageMapper;
 ** Available keys: **
 
     $data = [
-        code => string
-        name => string
+        code    => string
+        name    => string
+        enabled => bool
     ],
     $properties = [
+        id     => int
         action => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
     ]
 

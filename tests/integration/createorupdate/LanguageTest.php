@@ -1,30 +1,13 @@
 <?php
 
-namespace Transfer\EzPlatform\tests\integration;
+namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
-use Psr\Log\LoggerInterface;
+use eZ\Publish\API\Repository\Values\Content\Language;
 use Transfer\Adapter\Transaction\Request;
-use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
-use Transfer\EzPlatform\Repository\Values\LanguageObject;
-use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\LanguageTestCase;
 
-class LanguageTest extends EzPlatformTestCase
+class LanguageTest extends LanguageTestCase
 {
-    /**
-     * @var EzPlatformAdapter
-     */
-    protected $adapter;
-
-    public function setUp()
-    {
-        $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository,
-        ));
-        $this->adapter->setLogger(
-            $this->getMock(LoggerInterface::class)
-        );
-    }
-
     public function testCreateAndUpdateLanguage()
     {
         $code = 'chi-CN';
@@ -34,23 +17,18 @@ class LanguageTest extends EzPlatformTestCase
         )));
 
         $real = static::$repository->getContentLanguageService()->loadLanguage($code);
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\Content\Language', $real);
+        $this->assertInstanceOf(Language::class, $real);
         $this->assertEquals('Simplified Chinese', $real->name);
 
         $raw = $this->getLanguage($code);
         $raw->data['name'] = 'Advanced Chinese';
+
         $this->adapter->send(new Request(array(
             $raw,
         )));
-        $real = static::$repository->getContentLanguageService()->loadLanguage($code);
-        $this->assertInstanceOf('\eZ\Publish\API\Repository\Values\Content\Language', $real);
-        $this->assertEquals('Advanced Chinese', $real->name);
-    }
 
-    protected function getLanguage($code)
-    {
-        return new LanguageObject(array(
-            'code' => $code,
-        ));
+        $real = static::$repository->getContentLanguageService()->loadLanguage($code);
+        $this->assertInstanceOf(Language::class, $real);
+        $this->assertEquals('Advanced Chinese', $real->name);
     }
 }
