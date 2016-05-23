@@ -9,76 +9,50 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
-use Transfer\EzPlatform\Repository\Values\LanguageObject;
-use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
+use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
+use Transfer\EzPlatform\tests\testcase\LanguageTestCase;
 
 /**
- * Language manager tests.
+ * Language manager unit tests.
  */
-class LanguageManagerTest extends EzPlatformTestCase
+class LanguageManagerTest extends LanguageTestCase
 {
-    public function testEnableLanguage()
+    public function setUp()
     {
-        $manager = static::$languageManager;
-        $engGB = new LanguageObject(array('code' => 'eng-GB'));
-        $language = $manager->create($engGB);
-        $this->assertInstanceOf(LanguageObject::class, $language);
-        $this->assertEquals('eng-GB', $language->data['code']);
-        $this->assertTrue($language->data['enabled']);
+        parent::setUp();
     }
 
-    public function testCreateLanguage()
+    public function testInvalidClassOnCreate()
     {
-        $manager = static::$languageManager;
-        $sweSE = new LanguageObject(array('code' => 'swe-SE'));
-        $language = $manager->create($sweSE);
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
 
-        $this->assertInstanceOf(LanguageObject::class, $language);
-        $this->assertEquals('swe-SE', $language->data['code']);
-        $this->assertTrue($language->data['enabled']);
+        $object = new ValueObject([]);
+        static::$languageManager->create($object);
     }
 
-    public function testUpdateLanguage()
+    public function testInvalidClassOnUpdate()
     {
-        $manager = static::$languageManager;
-        $engGB = new LanguageObject(array('code' => 'eng-GB'));
-        $engGB->data['name'] = 'New name';
-        $language = $manager->update($engGB);
-        $this->assertEquals('New name', $language->data['name']);
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
+
+        $object = new ValueObject([]);
+        static::$languageManager->update($object);
     }
 
-    public function testCreateOrUpdate()
+    public function testInvalidClassOnCreateOrUpdate()
     {
-        $code = 'rus-RU';
-        $manager = static::$languageManager;
-        $rusRU = new LanguageObject(array('code' => $code));
-        /** @var LanguageObject $language */
-        $language = $manager->createOrUpdate($rusRU);
-        $this->assertEquals($code, $language->data['code']);
-        $language = $manager->createOrUpdate($rusRU);
-        $this->assertEquals($code, $language->data['code']);
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
+
+        $object = new ValueObject([]);
+        static::$languageManager->createOrUpdate($object);
     }
 
-    public function testRemove()
+    public function testInvalidClassOnDelete()
     {
-        $manager = static::$languageManager;
-        $gerDE = new LanguageObject(array('code' => 'ger-DE'));
-        $manager->createOrUpdate($gerDE);
-        $manager->remove($gerDE);
-        $this->assertFalse($manager->find($gerDE));
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
+
+        $object = new ValueObject([]);
+        static::$languageManager->remove($object);
     }
 
-    public function testRemoveNotFound()
-    {
-        $manager = static::$languageManager;
-        $object = new LanguageObject(array('code' => 'ita-IT'));
-        $this->assertTrue($manager->remove($object));
-    }
-
-    public function testRemoveMainLanguage()
-    {
-        $manager = static::$languageManager;
-        $object = new LanguageObject(array('code' => 'eng-GB'));
-        $this->assertFalse($manager->remove($object));
-    }
 }

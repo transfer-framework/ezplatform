@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\Repository\Values\UserObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
@@ -109,7 +110,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof UserObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
 
         $userCreateStruct = $this->userService->newUserCreateStruct(
@@ -141,7 +142,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof UserObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
 
         $user = $this->find($object, true);
@@ -168,7 +169,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof UserObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
 
         if (!$this->find($object)) {
@@ -184,7 +185,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof UserObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
 
         $user = $this->find($object);

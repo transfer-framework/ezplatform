@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
@@ -131,7 +132,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof UserGroupObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserGroupObject::class, get_class($object));
         }
 
         $parentUserGroup = $this->findById($object->data['parent_id'], true);
@@ -160,7 +161,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof UserGroupObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserGroupObject::class, get_class($object));
         }
 
         $userGroup = $this->find($object, true);
@@ -188,7 +189,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof UserGroupObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserGroupObject::class, get_class($object));
         }
 
         if (!$this->find($object)) {
@@ -204,7 +205,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof UserGroupObject) {
-            return;
+            throw new UnsupportedObjectOperationException(UserGroupObject::class, get_class($object));
         }
 
         $userGroup = $this->find($object, true);

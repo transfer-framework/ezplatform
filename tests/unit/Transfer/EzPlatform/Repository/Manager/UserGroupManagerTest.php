@@ -10,115 +10,49 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Repository\Values\UserGroupObject;
-use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
+use Transfer\EzPlatform\tests\testcase\UserGroupTestCase;
 
 /**
- * User manager tests.
+ * UserGroup manager unit tests.
  */
-class UserGroupManagerTest extends EzPlatformTestCase
+class UserGroupManagerTest extends UserGroupTestCase
 {
-    public function testLogger()
+    public function setUp()
     {
-        $manager = static::$userGroupManager;
-        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
-        $manager->setLogger($mockLogger);
+        parent::setUp();
     }
 
-    public function testCreate()
+    public function testInvalidClassOnCreate()
     {
-        $manager = static::$userGroupManager;
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
 
-        /** @var UserGroupObject $usergroup */
-        $usergroup = $manager->create($this->getUserGroup());
-
-        $this->assertInstanceOf(UserGroupObject::class, $usergroup);
-        $this->assertGreaterThan(60, $usergroup->getProperty('id'));
+        $object = new ValueObject([]);
+        static::$userGroupManager->create($object);
     }
 
-    public function testCreateEmpty()
+    public function testInvalidClassOnUpdate()
     {
-        $manager = static::$userGroupManager;
-        $this->assertNull($manager->create(new ValueObject(array())));
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
+
+        $object = new ValueObject([]);
+        static::$userGroupManager->update($object);
     }
 
-    public function testUpdate()
+    public function testInvalidClassOnCreateOrUpdate()
     {
-        $manager = static::$userGroupManager;
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
 
-        /** @var UserGroupObject $usergroup */
-        $usergroup = $manager->create($this->getUserGroup());
-        $id = $usergroup->getProperty('id');
-        $this->assertEquals('My User Group', $usergroup->data['fields']['name']);
-        $usergroup->data['fields']['name'] = 'My updated group';
-        $usergroup = $manager->update($usergroup);
-        $this->assertInstanceOf(UserGroupObject::class, $usergroup);
-        $this->assertEquals('My updated group', $usergroup->data['fields']['name']);
-        $this->assertEquals($id, $usergroup->getProperty('id'));
+        $object = new ValueObject([]);
+        static::$userGroupManager->createOrUpdate($object);
     }
 
-    public function testUpdateMoveParent()
+    public function testInvalidClassOnDelete()
     {
-        $manager = static::$userGroupManager;
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
 
-        /* @var UserGroupObject $usergroup */
-        $newParentUsergroup = $manager->create($this->getUserGroup());
-        $usergroup = $manager->create($this->getUserGroup());
-        $this->assertEquals(12, $usergroup->data['parent_id']);
-        $usergroup->data['parent_id'] = $newParentUsergroup->getProperty('id');
-        $usergroup = $manager->update($usergroup);
-        $this->assertEquals($newParentUsergroup->getProperty('id'), $usergroup->data['parent_id']);
+        $object = new ValueObject([]);
+        static::$userGroupManager->remove($object);
     }
 
-    public function testUpdateEmpty()
-    {
-        $manager = static::$userGroupManager;
-        $this->assertNull($manager->update(new ValueObject(array())));
-    }
-
-    public function testCreateOrUpdate()
-    {
-        $manager = static::$userGroupManager;
-
-        /** @var UserGroupObject $usergroup */
-        $usergroup = $manager->createOrUpdate($this->getUserGroup());
-        $usergroup = $manager->createOrUpdate($usergroup);
-        $this->assertInstanceOf(UserGroupObject::class, $usergroup);
-    }
-
-    public function testCreateOrUpdateEmpty()
-    {
-        $manager = static::$userGroupManager;
-        $this->assertNull($manager->createOrUpdate(new ValueObject(array())));
-    }
-
-    public function testRemove()
-    {
-        $manager = static::$userGroupManager;
-
-        /** @var UserGroupObject $usergroup */
-        $usergroup = $manager->createOrUpdate($this->getUserGroup());
-        $deleted = $manager->remove($usergroup);
-        $this->assertTrue($deleted);
-        $found = $manager->find($usergroup);
-        $this->assertFalse($found);
-    }
-
-    public function testRemoveInvalid()
-    {
-        $manager = static::$userGroupManager;
-        $this->assertNull($manager->remove(new ValueObject(array())));
-    }
-
-    protected function getUserGroup()
-    {
-        return new UserGroupObject(array(
-            'parent_id' => 12,
-            'content_type_identifier' => 'user_group',
-            'main_language_code' => 'eng-GB',
-            'fields' => array(
-                'name' => 'My User Group',
-            ),
-        ));
-    }
 }

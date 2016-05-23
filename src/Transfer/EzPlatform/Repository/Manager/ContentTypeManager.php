@@ -226,6 +226,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function createOrUpdate(ObjectInterface $object)
     {
+        if (!$object instanceof ContentTypeObject) {
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
+        }
+
         if (!$this->find($object)) {
             return $this->create($object);
         } else {
@@ -238,6 +242,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      */
     public function remove(ObjectInterface $object)
     {
+        if (!$object instanceof ContentTypeObject) {
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
+        }
+
         $contentType = $this->find($object);
 
         if (!$contentType) {

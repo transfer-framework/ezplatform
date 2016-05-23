@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\Repository\Manager\Core;
 
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Values\LanguageObject;

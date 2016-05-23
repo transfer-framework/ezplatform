@@ -134,7 +134,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      * @param ObjectInterface           $object
      * @param AbstractRepositoryService $service
      *
-     * @return ObjectInterface
+     * @return ObjectInterface|null
      */
     protected function executeAction(ObjectInterface $object, AbstractRepositoryService $service)
     {
@@ -151,11 +151,12 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
                     break;
                 case Action::SKIP:
                 default:
-                    break;
             }
         } else {
             return $service->createOrUpdate($object);
         }
+
+        return;
     }
 
     /**

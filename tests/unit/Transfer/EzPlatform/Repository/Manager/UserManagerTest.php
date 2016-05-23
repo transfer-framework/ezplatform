@@ -9,155 +9,50 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
-use eZ\Publish\API\Repository\Values\User\User;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Repository\Values\UserGroupObject;
-use Transfer\EzPlatform\Repository\Values\UserObject;
-use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
+use Transfer\EzPlatform\tests\testcase\UserTestCase;
 
 /**
- * User manager tests.
+ * User manager unit tests.
  */
-class UserManagerTest extends EzPlatformTestCase
+class UserManagerTest extends UserTestCase
 {
-    public function testLogger()
+    public function setUp()
     {
-        $manager = static::$userManager;
-        $mockLogger = $this->getMock('Psr\Log\AbstractLogger', array('log'), array(), '', false);
-        $manager->setLogger($mockLogger);
+        parent::setUp();
     }
 
-    public function testFind()
+    public function testInvalidClassOnCreate()
     {
-        $manager = static::$userManager;
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
 
-        /** @var UserObject $user */
-        $user = $manager->createOrUpdate($this->getUser());
-        /** @var User $result */
-        $result = $manager->find($user);
-
-        $this->assertInstanceOf('eZ\Publish\Core\Repository\Values\User\User', $result);
-        $this->assertEquals($user->data['username'], $result->login);
+        $object = new ValueObject([]);
+        static::$userManager->create($object);
     }
 
-    public function testCreate()
+    public function testInvalidClassOnUpdate()
     {
-        $manager = static::$userManager;
-        $user = $this->getUser();
-        $user->data['username'] = 'new_user';
-        /** @var UserObject $newUser */
-        $newUser = $manager->create($user);
-        $this->assertGreaterThan(1, $newUser->data['id']);
-        $this->assertEquals($user->getData(), $newUser->getData());
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
+
+        $object = new ValueObject([]);
+        static::$userManager->update($object);
     }
 
-    public function testCreateEmpty()
+    public function testInvalidClassOnCreateOrUpdate()
     {
-        $manager = static::$userManager;
-        $this->assertNull($manager->create(new ValueObject(array())));
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
+
+        $object = new ValueObject([]);
+        static::$userManager->createOrUpdate($object);
     }
 
-    public function testUpdate()
+    public function testInvalidClassOnDelete()
     {
-        $manager = static::$userManager;
+        $this->setExpectedException(UnsupportedObjectOperationException::class);
 
-        $manager->update($this->getUpdateUser());
-
-        /** @var User $updatedUser */
-        $updatedUser = $manager->find($this->getUpdateUser());
-        $this->assertEquals('updated@example.com', $updatedUser->email);
-        $this->assertEquals('da9287bf067f474372b58fd3d8470da9', $updatedUser->passwordHash);
-        $this->assertEquals('Updated', $updatedUser->getField('first_name')->value);
-        $this->assertEquals('Updatesen', $updatedUser->getField('last_name')->value);
+        $object = new ValueObject([]);
+        static::$userManager->remove($object);
     }
 
-    public function testUpdateInvalid()
-    {
-        $manager = static::$userManager;
-        $null = $manager->update(new ValueObject(array()));
-        $this->assertNull($null);
-    }
-
-    public function testCreate_CreateOrUpdate()
-    {
-        $manager = static::$userManager;
-        $user = $this->getUser();
-        $user->data['username'] = 'create_createOrUpdate';
-        $user = $manager->createOrUpdate($user);
-        $this->assertInstanceOf(UserObject::class, $user);
-    }
-
-    public function testUpdate_CreateOrUpdate()
-    {
-        $manager = static::$userManager;
-        $user = $this->getUser();
-        $user = $manager->createOrUpdate($user);
-        $this->assertInstanceOf(UserObject::class, $user);
-    }
-
-    public function testCreateOrUpdateInvalid()
-    {
-        $manager = static::$userManager;
-        $null = $manager->createOrUpdate(new ValueObject(array()));
-        $this->assertNull($null);
-    }
-
-    public function testRemove()
-    {
-        $manager = static::$userManager;
-        $this->assertTrue($manager->remove($this->getUser()));
-    }
-
-    public function testRemoveInvalid()
-    {
-        $manager = static::$userManager;
-        $null = $manager->remove(new ValueObject(array()));
-        $this->assertNull($null);
-    }
-
-    public function testRemoveNotFound()
-    {
-        $manager = static::$userManager;
-        $user = $this->getUser();
-        $user->data['username'] = 'some_random_username';
-        $this->assertTrue($manager->remove($user));
-    }
-
-    protected function getUser()
-    {
-        return new UserObject(array(
-            'username' => 'test_user',
-            'email' => 'test@example.com',
-            'password' => 'test123',
-            'main_language_code' => 'eng-GB',
-            'enabled' => true,
-            'fields' => array(
-                'first_name' => 'Test',
-                'last_name' => 'User',
-            ),
-            'parents' => array(
-                new UserGroupObject(array(
-                    'parent_id' => 12,
-                    'content_type_identifier' => 'user_group',
-                    'main_language_code' => 'eng-GB',
-                    'fields' => array(
-                        'name' => 'My User Group',
-                    ),
-                )),
-            ),
-        ));
-    }
-
-    protected function getUpdateUser()
-    {
-        $user = $this->getUser();
-        $user->data['email'] = 'updated@example.com';
-        $user->data['password'] = 'test456';
-        $user->data['fields'] = array(
-            'first_name' => 'Updated',
-            'last_name' => 'Updatesen',
-        );
-
-        return $user;
-    }
 }

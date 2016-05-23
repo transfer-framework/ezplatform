@@ -6,7 +6,7 @@
          convertNoticesToExceptions  = "true"
          convertWarningsToExceptions = "true"
          processIsolation            = "false"
-         stopOnFailure               = "true"
+         stopOnFailure               = "false"
          syntaxCheck                 = "false"
          bootstrap                   = "tests/bootstrap.php">
 
@@ -14,11 +14,9 @@
         <testsuite name="Transfer eZ Platform Integration Tests">
             <directory suffix="Test.php">./tests/integration</directory>
         </testsuite>
-        <!--
         <testsuite name="Transfer eZ Platform Unit Tests">
             <directory suffix="Test.php">./tests/unit</directory>
         </testsuite>
-        -->
     </testsuites>
 
     <filter>

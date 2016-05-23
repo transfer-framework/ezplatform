@@ -13,6 +13,7 @@ use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\LocationList;
 use Transfer\Data\TreeObject;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 
 /**
@@ -43,8 +44,8 @@ class ContentTreeService extends AbstractRepositoryService
      */
     public function createOrUpdate($object)
     {
-        if (!($object instanceof TreeObject)) {
-            throw new \InvalidArgumentException(sprintf('Invalid argument, expected object of type %s.', TreeObject::class));
+        if (!$object instanceof TreeObject) {
+            throw new UnsupportedObjectOperationException(TreeObject::class, get_class($object));
         }
 
         $this->publishContentObjects($object);

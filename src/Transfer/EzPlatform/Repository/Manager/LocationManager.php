@@ -18,6 +18,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
@@ -122,7 +123,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof LocationObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LocationObject::class, get_class($object));
         }
 
         $contentInfo = $this->repository->getContentService()->loadContentInfo($object->data['content_id']);
@@ -148,7 +149,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof LocationObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LocationObject::class, get_class($object));
         }
 
         $location = $this->find($object, true);
@@ -182,7 +183,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof LocationObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LocationObject::class, get_class($object));
         }
 
         if ($this->find($object)) {
@@ -238,7 +239,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof LocationObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LocationObject::class, get_class($object));
         }
 
         if ($location = $this->find($object)) {
