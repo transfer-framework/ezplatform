@@ -13,6 +13,8 @@ class UserGroupTestCase extends EzPlatformTestCase
     protected $main_language_code = 'eng-GB';
     protected $contentype_identifier = 'user_group';
 
+    protected $_to_be_deleted_usergroup_id;
+
     /**
      * @var EzPlatformAdapter
      */
@@ -26,6 +28,18 @@ class UserGroupTestCase extends EzPlatformTestCase
         $this->adapter->setLogger(
             $this->getMock(LoggerInterface::class)
         );
+
+        $this->setUpUserGroups();
+    }
+
+    protected function setUpUserGroups()
+    {
+        // UserGroup to be deleted
+        $userGroupObjectToBeDeleted = $this->getUsergroup(array(
+            'name' => 'To be deleted usergroup',
+        ));
+        $userGroupToBeDeleted = static::$userGroupManager->createOrUpdate($userGroupObjectToBeDeleted);
+        $this->_to_be_deleted_usergroup_id = $userGroupToBeDeleted->getProperty('id');
     }
 
     /**

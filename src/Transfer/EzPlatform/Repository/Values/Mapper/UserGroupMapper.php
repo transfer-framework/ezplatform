@@ -40,6 +40,11 @@ class UserGroupMapper
             $this->userGroupObject->data['parent_id'] = $userGroup->parentId;
         }
 
+        $this->userGroupObject->data['fields'] = [];
+        foreach ($userGroup->getFields() as $field) {
+            $this->userGroupObject->data['fields'][$field->fieldDefIdentifier] = $field->value->text;
+        }
+
         $this->userGroupObject->setProperty('id', $userGroup->contentInfo->id);
         $this->userGroupObject->setProperty('content_info', $userGroup->contentInfo);
         $this->userGroupObject->setProperty('version_info', $userGroup->versionInfo);

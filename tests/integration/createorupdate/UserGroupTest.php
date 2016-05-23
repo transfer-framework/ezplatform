@@ -8,6 +8,11 @@ use Transfer\EzPlatform\tests\testcase\UserGroupTestCase;
 
 class UserGroupTest extends UserGroupTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+    }
+
     public function testCreateAndUpdateUsergroup()
     {
         $rootUsergroup = $this->getRootUserGroup();
