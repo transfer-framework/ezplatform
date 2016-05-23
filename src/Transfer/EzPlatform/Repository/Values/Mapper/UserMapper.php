@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
+use eZ\Publish\API\Repository\Values\User\User;
 use eZ\Publish\API\Repository\Values\User\UserCreateStruct;
 use eZ\Publish\API\Repository\Values\User\UserUpdateStruct;
 use eZ\Publish\Core\Repository\Values\Content\ContentUpdateStruct;
@@ -32,6 +33,17 @@ class UserMapper
     public function __construct(UserObject $userObject)
     {
         $this->userObject = $userObject;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function userToObject(User $user)
+    {
+        $this->userObject->data['username'] = $user->login;
+        $this->userObject->data['email'] = $user->email;
+        $this->userObject->data['enabled'] = $user->enabled;
+        $this->userObject->data['max_login'] = $user->maxLogin;
     }
 
     /**

@@ -24,6 +24,7 @@ use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
+use eZ\Publish\API\Repository\Exceptions\InvalidArgumentException;
 
 /**
  * User manager.
@@ -212,7 +213,11 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
                 $ezUserGroup = $this->userGroupManager->find($userGroup);
                 if ($ezUserGroup) {
                     $ezUserGroups[$ezUserGroup->id] = $ezUserGroup;
-                    $this->userService->assignUserToUserGroup($user, $ezUserGroup);
+                    try {
+                        $this->userService->assignUserToUserGroup($user, $ezUserGroup);
+                    } catch (InvalidArgumentException $alreadyAssignedException) {
+                        // Ignore error about: user already assigned to usergroup.
+                    }
                 }
             }
         }

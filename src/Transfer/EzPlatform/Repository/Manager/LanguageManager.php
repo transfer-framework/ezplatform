@@ -170,9 +170,10 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
         } catch (NotFoundException $e) {
             return true;
         } catch (InvalidArgumentException $ee) {
-            if($this->logger) {
+            if ($this->logger) {
                 $this->logger->warning('Tried to delete the main language, or a language that still has existing translations (is in use).');
             }
+
             return false;
         }
 
