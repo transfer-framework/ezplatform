@@ -31,7 +31,7 @@ class ContentTypeTestCase extends EzPlatformTestCase
             'fields' => array(
                 'title' => array(),
                 'content' => array(),
-            )
+            ),
         ));
     }
 

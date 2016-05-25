@@ -54,5 +54,4 @@ class ContentTypeManagerTest extends ContentTypeTestCase
         $object = new ValueObject([]);
         static::$contentTypeManager->remove($object);
     }
-
 }

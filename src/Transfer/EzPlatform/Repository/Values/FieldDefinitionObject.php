@@ -111,7 +111,7 @@ class FieldDefinitionObject extends EzPlatformObject
             );
         }
 
-        if(isset($this->data['priority'])) {
+        if (isset($this->data['priority'])) {
             $this->data['priority'] = 10;
         }
     }

@@ -28,7 +28,7 @@ class ContentManagerTest extends ContentTestCase
     public function testAddInvalidParentLocation()
     {
         $this->setExpectedException(InvalidDataStructureException::class);
-        
+
         $contentObject = new ContentObject([]);
         $contentObject->addParentLocation([]);
     }
@@ -64,5 +64,4 @@ class ContentManagerTest extends ContentTestCase
         $object = new ValueObject([]);
         static::$contentManager->remove($object);
     }
-
 }

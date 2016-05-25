@@ -4,7 +4,6 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use Transfer\Adapter\Transaction\Request;
-use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\tests\testcase\ContentTypeTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 

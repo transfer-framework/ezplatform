@@ -12,9 +12,7 @@ namespace Transfer\EzPlatform\Repository\Values\Mapper;
 use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
-use eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
-use eZ\Publish\Core\REST\Client\Values\ContentType\ContentType as RESTContentType;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 
 /**
@@ -70,32 +68,23 @@ class ContentTypeMapper
     {
         $contentTypeCreateStruct->remoteId = sha1(microtime());
 
-        if(isset($this->contentTypeObject->data['names'])) {
-            $contentTypeCreateStruct->names = $this->contentTypeObject->data['names'];
-        }
-        if(isset($this->contentTypeObject->data['descriptions'])) {
-            $contentTypeCreateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
-        }
-        if(isset($this->contentTypeObject->data['main_language_code'])) {
-            $contentTypeCreateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
-        }
-        if(isset($this->contentTypeObject->data['name_schema'])) {
-            $contentTypeCreateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
-        }
-        if(isset($this->contentTypeObject->data['url_alias_schema'])) {
-            $contentTypeCreateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
-        }
-        if(isset($this->contentTypeObject->data['is_container'])) {
-            $contentTypeCreateStruct->isContainer = $this->contentTypeObject->data['is_container'];
-        }
-        if(isset($this->contentTypeObject->data['default_always_available'])) {
-            $contentTypeCreateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
-        }
-        if(isset($this->contentTypeObject->data['default_sort_field'])) {
-            $contentTypeCreateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
-        }
-        if(isset($this->contentTypeObject->data['default_sort_order'])) {
-            $contentTypeCreateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
+        // Name collection (ez => transfer)
+        $keys = array(
+            'names' => 'names',
+            'descriptions' => 'descriptions',
+            'mainLanguageCode' => 'main_language_code',
+            'nameSchema' => 'name_schema',
+            'urlAliasSchema' => 'url_alias_schema',
+            'isContainer' => 'is_container',
+            'defaultAlwaysAvailable' => 'default_always_available',
+            'defaultSortField' => 'default_sort_field',
+            'defaultSortOrder' => 'default_sort_order',
+        );
+
+        foreach ($keys as $ezKey => $transferKey) {
+            if (isset($this->contentTypeObject->data[$transferKey])) {
+                $contentTypeCreateStruct->$ezKey = $this->contentTypeObject->data[$transferKey];
+            }
         }
     }
 
@@ -104,32 +93,23 @@ class ContentTypeMapper
      */
     public function fillContentTypeUpdateStruct(ContentTypeUpdateStruct $contentTypeUpdateStruct)
     {
-        if(isset($this->contentTypeObject->data['names'])) {
-            $contentTypeUpdateStruct->names = $this->contentTypeObject->data['names'];
-        }
-        if(isset($this->contentTypeObject->data['descriptions'])) {
-            $contentTypeUpdateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
-        }
-        if(isset($this->contentTypeObject->data['main_language_code'])) {
-            $contentTypeUpdateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
-        }
-        if(isset($this->contentTypeObject->data['name_schema'])) {
-            $contentTypeUpdateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
-        }
-        if(isset($this->contentTypeObject->data['url_alias_schema'])) {
-            $contentTypeUpdateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
-        }
-        if(isset($this->contentTypeObject->data['is_container'])) {
-            $contentTypeUpdateStruct->isContainer = $this->contentTypeObject->data['is_container'];
-        }
-        if(isset($this->contentTypeObject->data['default_always_available'])) {
-            $contentTypeUpdateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
-        }
-        if(isset($this->contentTypeObject->data['default_sort_field'])) {
-            $contentTypeUpdateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
-        }
-        if(isset($this->contentTypeObject->data['default_sort_order'])) {
-            $contentTypeUpdateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
+        // Name collection (ez => transfer)
+        $keys = array(
+            'names' => 'names',
+            'descriptions' => 'descriptions',
+            'mainLanguageCode' => 'main_language_code',
+            'nameSchema' => 'name_schema',
+            'urlAliasSchema' => 'url_alias_schema',
+            'isContainer' => 'is_container',
+            'defaultAlwaysAvailable' => 'default_always_available',
+            'defaultSortField' => 'default_sort_field',
+            'defaultSortOrder' => 'default_sort_order',
+        );
+
+        foreach ($keys as $ezKey => $transferKey) {
+            if (isset($this->contentTypeObject->data[$transferKey])) {
+                $contentTypeUpdateStruct->$ezKey = $this->contentTypeObject->data[$transferKey];
+            }
         }
     }
 }

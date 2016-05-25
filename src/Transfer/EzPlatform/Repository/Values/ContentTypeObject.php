@@ -81,7 +81,6 @@ class ContentTypeObject extends EzPlatformObject
         $this->sortFieldDefinitionsByPosition();
     }
 
-
     /**
      * Values in array must be of type Location, LocationObject or int.
      *
@@ -100,6 +99,7 @@ class ContentTypeObject extends EzPlatformObject
      *
      * @param string $identifier
      * @param $fieldDefinitionObject
+     *
      * @internal param array|FieldDefinitionObject $fieldDefinition
      */
     public function addFieldDefinitionObject($identifier, $fieldDefinitionObject)
@@ -109,8 +109,9 @@ class ContentTypeObject extends EzPlatformObject
     }
 
     /**
-     * @param string $identifier
+     * @param string                      $identifier
      * @param FieldDefinitionObject|array $fieldDefinition
+     *
      * @return FieldDefinitionObject
      */
     private function convertToFieldDefintitionObject($identifier, $fieldDefinition)
@@ -151,9 +152,8 @@ class ContentTypeObject extends EzPlatformObject
      */
     private function sortFieldDefinitionsByPosition()
     {
-        if(!$this->notSetOrEmpty($this->data, 'fields')) {
-
-            usort($this->data['fields'], function($a, $b) {
+        if (!$this->notSetOrEmpty($this->data, 'fields')) {
+            usort($this->data['fields'], function ($a, $b) {
                 return
                     (isset($a->data['position']) ? $a->data['position'] : 100)
                     >
@@ -161,7 +161,7 @@ class ContentTypeObject extends EzPlatformObject
             });
 
             $priority = 10;
-            foreach($this->data['fields'] as $field) {
+            foreach ($this->data['fields'] as $field) {
                 $field->data['position'] = $priority;
                 $priority += 5;
             }

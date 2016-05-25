@@ -83,7 +83,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
      * Finds content type object by identifier.
      *
      * @param ObjectInterface|ValueObject|EzPlatformObject $object
-     * @param bool $throwException
+     * @param bool                                         $throwException
      *
      * @return ContentType|false
      *
@@ -129,7 +129,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $object->getMapper()->fillContentTypeCreateStruct($contentTypeCreateStruct);
 
         foreach ($object->data['fields'] as $field) {
-            /** @var FieldDefinitionObject $field */
+            /* @var FieldDefinitionObject $field */
             $fieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->data['identifier'], $field->data['type']);
             $field->getMapper()->populateFieldDefinitionCreateStruct($fieldCreateStruct);
             $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
@@ -151,7 +151,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $object->getMapper()->contentTypeToObject(
             $this->find($object)
         );
-        
+
         return $object;
     }
 

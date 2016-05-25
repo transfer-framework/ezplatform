@@ -54,5 +54,4 @@ class LocationManagerTest extends LocationTestCase
         $object = new ValueObject([]);
         static::$locationManager->remove($object);
     }
-
 }

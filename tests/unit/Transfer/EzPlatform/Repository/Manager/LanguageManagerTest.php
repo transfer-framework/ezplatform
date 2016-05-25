@@ -54,5 +54,4 @@ class LanguageManagerTest extends LanguageTestCase
         $object = new ValueObject([]);
         static::$languageManager->remove($object);
     }
-
 }

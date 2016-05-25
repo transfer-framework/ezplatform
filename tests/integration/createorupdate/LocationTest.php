@@ -106,7 +106,7 @@ class LocationTest extends LocationTestCase
         $countLocations = count($locations);
 
         $contentObject = new ContentObject($content, array(
-            'parent_locations' => $locations
+            'parent_locations' => $locations,
         ));
 
         $contentObject->addParentLocation(65);

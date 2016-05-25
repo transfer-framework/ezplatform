@@ -54,5 +54,4 @@ class UserManagerTest extends UserTestCase
         $object = new ValueObject([]);
         static::$userManager->remove($object);
     }
-
 }

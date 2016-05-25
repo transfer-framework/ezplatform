@@ -203,7 +203,6 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
         /** @var LocationObject[] $parentLocations */
         $parentLocations = $object->getProperty('parent_locations');
         if (is_array($parentLocations) && count($parentLocations) > 0) {
-
             $addOrUpdate = [];
             foreach ($parentLocations as $parentLocation) {
                 $addOrUpdate[$parentLocation->data['parent_location_id']] = $parentLocation;
@@ -228,7 +227,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * @param ContentObject $object
+     * @param ContentObject    $object
      * @param LocationObject[] $locationsToKeep
      *
      * @return Location[]

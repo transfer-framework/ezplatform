@@ -15,6 +15,7 @@ use eZ\Publish\API\Repository\Values\Content\LocationList;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
+use Transfer\EzPlatform\Repository\Values\EzPlatformObject;
 
 /**
  * Content tree service.
@@ -182,5 +183,17 @@ class ContentTreeService extends AbstractRepositoryService
     private function updateLocationVisibility(Location $location)
     {
         $this->objectService->getLocationManager()->toggleVisibility($location);
+    }
+
+    /**
+     * Bulk-deletions like this is not supported.
+     */
+    public function remove($object)
+    {
+        if ($this->logger) {
+            $this->logger->warning(sprintf('Attempted to delete using %s, which is not supported. Use the implementations of %s instead.', __CLASS__, EzPlatformObject::class));
+        }
+
+        return;
     }
 }

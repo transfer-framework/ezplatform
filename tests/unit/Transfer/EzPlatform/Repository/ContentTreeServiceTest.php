@@ -9,16 +9,12 @@
 
 namespace Transfer\EzPlatform\tests\Repository\Manager;
 
-use Psr\Log\NullLogger;
 use Transfer\Data\TreeObject;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
-use Transfer\EzPlatform\Repository\Manager\Core\ContentTreeService;
-use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\ContentTreeTestCase;
-use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class ContentTreeServiceTest extends ContentTreeTestCase
 {

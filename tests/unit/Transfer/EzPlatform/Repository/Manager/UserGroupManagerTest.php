@@ -54,5 +54,4 @@ class UserGroupManagerTest extends UserGroupTestCase
         $object = new ValueObject([]);
         static::$userGroupManager->remove($object);
     }
-
 }
