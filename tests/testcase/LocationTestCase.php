@@ -2,6 +2,7 @@
 
 namespace Transfer\EzPlatform\tests\testcase;
 
+use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
 
 class LocationTestCase extends ContentTestCase
@@ -82,6 +83,11 @@ class LocationTestCase extends ContentTestCase
         if ($parentLocationId) {
             $locationObject->data['parent_location_id'] = $parentLocationId;
         }
+
+        $locationObject->data['hidden'] = false;
+        $locationObject->data['priority'] = 1;
+        $locationObject->data['sort_field'] = Location::SORT_FIELD_PRIORITY;
+        $locationObject->data['sort_order'] = Location::SORT_ORDER_DESC;
 
         return $locationObject;
     }

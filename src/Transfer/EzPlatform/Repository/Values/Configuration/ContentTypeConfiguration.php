@@ -79,7 +79,6 @@ class ContentTypeConfiguration implements ConfigurationInterface
                                     ->then(function ($v) { return array('eng-GB' => $v); })
                                 ->end()
                                 ->prototype('scalar')->end()
-
                             ->end()
                             ->arrayNode('descriptions')
                                 ->normalizeKeys(false)

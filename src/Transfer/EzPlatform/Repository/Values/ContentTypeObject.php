@@ -28,7 +28,7 @@ use Transfer\EzPlatform\Repository\Values\Mapper\ContentTypeMapper;
         default_always_available => bool
         default_sort_field       => int 1-12 Location::SORT_FIELD_*
         default_sort_order       => int 0-1  Location::SORT_ORDER_DESC/SORT_ORDER_ASC
-        fields                   => FieldDefinition[] {@link see FieldDefinitionObject}
+        fields                   => FieldDefinitionObject[] {@link see FieldDefinitionObject}
     ],
     $properties = [
         id                       => int
@@ -67,25 +67,65 @@ class ContentTypeObject extends EzPlatformObject
     private $mapper;
 
     /**
-     * @var FieldDefinitionObject[]
-     */
-    public $fields = array();
-
-    /**
      * {@inheritdoc}
      */
     public function __construct($data, $properties = array())
     {
         parent::__construct($data, $properties);
+
         if (isset($data['fields'])) {
-            foreach ($data['fields'] as $fieldIdentifier => $field) {
-                $this->fields[] = new FieldDefinitionObject($fieldIdentifier, $this, $field);
-            }
-            unset($data['fields']);
-            $this->setMissingDefaults();
+            $this->setFieldDefinitions($data['fields']);
+        }
+
+        $this->setMissingDefaults();
+        $this->sortFieldDefinitionsByPosition();
+    }
+
+
+    /**
+     * Values in array must be of type Location, LocationObject or int.
+     *
+     * @param array $fieldDefinitionObjects
+     */
+    public function setFieldDefinitions(array $fieldDefinitionObjects)
+    {
+        $this->data['fields'] = [];
+        foreach ($fieldDefinitionObjects as $identifier => $fieldDefinitionObject) {
+            $this->addFieldDefinitionObject($identifier, $fieldDefinitionObject);
         }
     }
 
+    /**
+     * Convert parameters to FieldDefinitionObject and stores it on the ContentTypeObject.
+     *
+     * @param string $identifier
+     * @param $fieldDefinitionObject
+     * @internal param array|FieldDefinitionObject $fieldDefinition
+     */
+    public function addFieldDefinitionObject($identifier, $fieldDefinitionObject)
+    {
+        $fieldDefinitionObject = $this->convertToFieldDefintitionObject($identifier, $fieldDefinitionObject);
+        $this->data['fields'][] = $fieldDefinitionObject;
+    }
+
+    /**
+     * @param string $identifier
+     * @param FieldDefinitionObject|array $fieldDefinition
+     * @return FieldDefinitionObject
+     */
+    private function convertToFieldDefintitionObject($identifier, $fieldDefinition)
+    {
+        switch (true) {
+            case is_array($fieldDefinition):
+                return new FieldDefinitionObject($identifier, $this, $fieldDefinition);
+        }
+
+        return $fieldDefinition;
+    }
+
+    /**
+     * Build default values.
+     */
     private function setMissingDefaults()
     {
         if ($this->notSetOrEmpty($this->data, 'main_language_code')) {
@@ -100,7 +140,30 @@ class ContentTypeObject extends EzPlatformObject
 
         foreach (array('name_schema', 'url_alias_schema') as $schema) {
             if ($this->notSetOrEmpty($this->data, $schema)) {
-                $this->data[$schema] = sprintf('<%s>', $this->fields[0]->data['identifier']);
+                $this->data[$schema] = sprintf('<%s>', $this->data['fields'][0]->data['identifier']);
+            }
+        }
+    }
+
+    /**
+     * Makes sure all fieldDefinition positions are set,
+     * and consist of only unique values.
+     */
+    private function sortFieldDefinitionsByPosition()
+    {
+        if(!$this->notSetOrEmpty($this->data, 'fields')) {
+
+            usort($this->data['fields'], function($a, $b) {
+                return
+                    (isset($a->data['position']) ? $a->data['position'] : 100)
+                    >
+                    (isset($b->data['position']) ? $b->data['position'] : 100);
+            });
+
+            $priority = 10;
+            foreach($this->data['fields'] as $field) {
+                $field->data['position'] = $priority;
+                $priority += 5;
             }
         }
     }

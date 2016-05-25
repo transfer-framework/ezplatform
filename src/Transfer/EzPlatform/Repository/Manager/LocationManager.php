@@ -200,37 +200,50 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
      */
     public function syncronizeLocationsFromContentObject(ContentObject $object)
     {
-        /** @var LocationObject[] $locationObjects */
-        $locationObjects = $object->getProperty('parent_locations');
-        if (is_array($locationObjects) && count($locationObjects) > 0) {
+        /** @var LocationObject[] $parentLocations */
+        $parentLocations = $object->getProperty('parent_locations');
+        if (is_array($parentLocations) && count($parentLocations) > 0) {
+
             $addOrUpdate = [];
-            foreach ($locationObjects as $locationObject) {
-                $addOrUpdate[$locationObject->data['parent_location_id']] = $locationObject;
+            foreach ($parentLocations as $parentLocation) {
+                $addOrUpdate[$parentLocation->data['parent_location_id']] = $parentLocation;
             }
 
-            $existingLocations = [];
-            $deleteThese = [];
-            foreach ($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
-                if (!array_key_exists($existingLocation->parentLocationId, $addOrUpdate)) {
-                    $deleteThese[] = $existingLocation;
-                } else {
-                    $existingLocations[$existingLocation->parentLocationId] = $existingLocation;
-                }
+            // Filter which Locations should be created/updated and deleted.
+            $delible = $this->filterLocationsToBeDeleted($object, $addOrUpdate);
+
+            // Create or update locations, and attach to Content
+            foreach ($addOrUpdate as $parentLocation) {
+                $parentLocation->data['content_id'] = $object->getProperty('content_info')->id;
+                $object->addParentLocation(
+                    $this->createOrUpdate($parentLocation)
+                );
             }
 
-            foreach ($addOrUpdate as $locationObject) {
-                if (!array_key_exists($locationObject->data['parent_location_id'], $existingLocations)) {
-                    // create or update
-                    $locationObject->data['content_id'] = $object->getProperty('content_info')->id;
-                    $locationObject = $this->createOrUpdate($locationObject);
-                    $object->addParentLocation($locationObject);
-                }
-            }
-
-            foreach ($deleteThese as $delete) {
+            // Lastly delete, cannot delete first because Content cannot have zero locations.
+            foreach ($delible as $delete) {
                 $this->locationService->deleteLocation($delete);
             }
         }
+    }
+
+    /**
+     * @param ContentObject $object
+     * @param LocationObject[] $locationsToKeep
+     *
+     * @return Location[]
+     */
+    private function filterLocationsToBeDeleted(ContentObject $object, $locationsToKeep)
+    {
+        $toBeDeleted = [];
+
+        foreach ($this->locationService->loadLocations($object->getProperty('content_info')) as $existingLocation) {
+            if (!array_key_exists($existingLocation->parentLocationId, $locationsToKeep)) {
+                $toBeDeleted[] = $existingLocation;
+            }
+        }
+
+        return $toBeDeleted;
     }
 
     /**

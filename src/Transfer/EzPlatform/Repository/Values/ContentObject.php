@@ -156,12 +156,12 @@ class ContentObject extends EzPlatformObject
             case $parentLocation instanceof Location:
                 $locationObject->getMapper()->locationToObject($parentLocation);
                 break;
-            case $parentLocation instanceof LocationObject:
-                $locationObject = $parentLocation;
-                break;
             case is_int($parentLocation):
                 $locationObject->data['parent_location_id'] = $parentLocation;
                 break;
+            case $parentLocation instanceof LocationObject:
+            default:
+                $locationObject = $parentLocation;
         }
 
         return $locationObject;

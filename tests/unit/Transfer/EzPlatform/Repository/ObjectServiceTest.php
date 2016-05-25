@@ -22,39 +22,19 @@ use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
 class ObjectServiceTest extends EzPlatformTestCase
 {
-    /**
-     * @var ObjectService
-     */
-    protected $service;
-
     public function setUp()
     {
-        /** @var Repository $repository */
-        $repository = $this->getMock(Repository::class);
-        $this->service = new ObjectService($repository);
-
-        $this->service->setLogger($this->getMock(LoggerInterface::class));
+        parent::setUp();
     }
 
     public function testGetters()
     {
-        $contentManager = $this->service->getContentManager();
-
-        // Simulate several calls
-        $this->service->getLocationManager();
-        $locationManager = $this->service->getLocationManager();
-
-        $this->service->getContentTypeManager();
-        $contentTypeManager = $this->service->getContentTypeManager();
-
-        $this->service->getLanguageManager();
-        $languageManager = $this->service->getLanguageManager();
-
-        $this->service->getUserManager();
-        $userManager = $this->service->getUserManager();
-
-        $this->service->getUserGroupManager();
-        $userGroupManager = $this->service->getUserGroupManager();
+        $contentManager = static::$objectService->getContentManager();
+        $locationManager = static::$objectService->getLocationManager();
+        $contentTypeManager = static::$objectService->getContentTypeManager();
+        $languageManager = static::$objectService->getLanguageManager();
+        $userManager = static::$objectService->getUserManager();
+        $userGroupManager = static::$objectService->getUserGroupManager();
 
         $this->assertInstanceOf(ContentManager::class, $contentManager);
         $this->assertInstanceOf(LocationManager::class, $locationManager);
@@ -68,6 +48,6 @@ class ObjectServiceTest extends EzPlatformTestCase
     {
         $this->setExpectedException(\InvalidArgumentException::class);
 
-        $this->service->createOrUpdate(null);
+        static::$objectService->createOrUpdate(null);
     }
 }

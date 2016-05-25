@@ -24,7 +24,18 @@ class ContentTypeTestCase extends EzPlatformTestCase
         );
     }
 
-    protected function getContentType($identifier)
+    protected function getContentTypeMini($identifier)
+    {
+        return array(array(
+            'identifier' => $identifier,
+            'fields' => array(
+                'title' => array(),
+                'content' => array(),
+            )
+        ));
+    }
+
+    protected function getContentTypeFull($identifier)
     {
         return new ContentTypeObject(array(
             'identifier' => $identifier,

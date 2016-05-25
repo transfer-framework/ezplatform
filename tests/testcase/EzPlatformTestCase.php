@@ -16,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
+use Transfer\EzPlatform\Repository\Manager\Core\ContentTreeService;
+use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
 use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
@@ -67,6 +69,16 @@ abstract class EzPlatformTestCase extends KernelTestCase
     protected static $userManager;
 
     /**
+     * @var ObjectService
+     */
+    protected static $objectService;
+
+    /**
+     * @var ContentTreeService
+     */
+    protected static $contentTreeService;
+
+    /**
      * @var bool
      */
     protected static $hasDatabase;
@@ -86,6 +98,10 @@ abstract class EzPlatformTestCase extends KernelTestCase
         static::$userManager = new UserManager(static::$repository, static::$userGroupManager);
         static::$locationManager = new LocationManager(static::$repository);
         static::$contentManager = new ContentManager(static::$repository, static::$locationManager);
+
+        static::$objectService = new ObjectService(static::$repository);
+        static::$contentTreeService = new ContentTreeService(static::$repository, static::$objectService);
+
         static::$hasDatabase = true;
     }
 
@@ -98,5 +114,8 @@ abstract class EzPlatformTestCase extends KernelTestCase
         static::$userManager->setLogger($logger);
         static::$locationManager->setLogger($logger);
         static::$contentManager->setLogger($logger);
+
+        static::$objectService->setLogger($logger);
+        static::$contentTreeService->setLogger($logger);
     }
 }

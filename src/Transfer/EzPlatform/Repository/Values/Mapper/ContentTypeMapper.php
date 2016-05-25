@@ -12,7 +12,9 @@ namespace Transfer\EzPlatform\Repository\Values\Mapper;
 use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
+use eZ\Publish\Core\REST\Client\Values\ContentType\ContentType as RESTContentType;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 
 /**
@@ -43,38 +45,8 @@ class ContentTypeMapper
     }
 
     /**
-     * @param ContentTypeCreateStruct $contentTypeCreateStruct
+     * @param ContentType $contentType
      */
-    public function fillContentTypeCreateStruct(ContentTypeCreateStruct $contentTypeCreateStruct)
-    {
-        $contentTypeCreateStruct->names = $this->contentTypeObject->data['names'];
-        $contentTypeCreateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
-        $contentTypeCreateStruct->remoteId = sha1(microtime());
-        $contentTypeCreateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
-        $contentTypeCreateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
-        $contentTypeCreateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
-        $contentTypeCreateStruct->isContainer = $this->contentTypeObject->data['is_container'];
-        $contentTypeCreateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
-        $contentTypeCreateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
-        $contentTypeCreateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
-    }
-
-    /**
-     * @param ContentTypeUpdateStruct $contentTypeUpdateStruct
-     */
-    public function fillContentTypeUpdateStruct(ContentTypeUpdateStruct $contentTypeUpdateStruct)
-    {
-        $contentTypeUpdateStruct->names = $this->contentTypeObject->data['names'];
-        $contentTypeUpdateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
-        $contentTypeUpdateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
-        $contentTypeUpdateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
-        $contentTypeUpdateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
-        $contentTypeUpdateStruct->isContainer = $this->contentTypeObject->data['is_container'];
-        $contentTypeUpdateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
-        $contentTypeUpdateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
-        $contentTypeUpdateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
-    }
-
     public function contentTypeToObject(ContentType $contentType)
     {
         $this->contentTypeObject->data['identifier'] = $contentType->identifier;
@@ -89,5 +61,75 @@ class ContentTypeMapper
 
         $this->contentTypeObject->setProperty('id', $contentType->id);
         $this->contentTypeObject->setProperty('content_type_groups', $contentType->contentTypeGroups);
+    }
+
+    /**
+     * @param ContentTypeCreateStruct $contentTypeCreateStruct
+     */
+    public function fillContentTypeCreateStruct(ContentTypeCreateStruct $contentTypeCreateStruct)
+    {
+        $contentTypeCreateStruct->remoteId = sha1(microtime());
+
+        if(isset($this->contentTypeObject->data['names'])) {
+            $contentTypeCreateStruct->names = $this->contentTypeObject->data['names'];
+        }
+        if(isset($this->contentTypeObject->data['descriptions'])) {
+            $contentTypeCreateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
+        }
+        if(isset($this->contentTypeObject->data['main_language_code'])) {
+            $contentTypeCreateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
+        }
+        if(isset($this->contentTypeObject->data['name_schema'])) {
+            $contentTypeCreateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
+        }
+        if(isset($this->contentTypeObject->data['url_alias_schema'])) {
+            $contentTypeCreateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
+        }
+        if(isset($this->contentTypeObject->data['is_container'])) {
+            $contentTypeCreateStruct->isContainer = $this->contentTypeObject->data['is_container'];
+        }
+        if(isset($this->contentTypeObject->data['default_always_available'])) {
+            $contentTypeCreateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
+        }
+        if(isset($this->contentTypeObject->data['default_sort_field'])) {
+            $contentTypeCreateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
+        }
+        if(isset($this->contentTypeObject->data['default_sort_order'])) {
+            $contentTypeCreateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
+        }
+    }
+
+    /**
+     * @param ContentTypeUpdateStruct $contentTypeUpdateStruct
+     */
+    public function fillContentTypeUpdateStruct(ContentTypeUpdateStruct $contentTypeUpdateStruct)
+    {
+        if(isset($this->contentTypeObject->data['names'])) {
+            $contentTypeUpdateStruct->names = $this->contentTypeObject->data['names'];
+        }
+        if(isset($this->contentTypeObject->data['descriptions'])) {
+            $contentTypeUpdateStruct->descriptions = $this->contentTypeObject->data['descriptions'];
+        }
+        if(isset($this->contentTypeObject->data['main_language_code'])) {
+            $contentTypeUpdateStruct->mainLanguageCode = $this->contentTypeObject->data['main_language_code'];
+        }
+        if(isset($this->contentTypeObject->data['name_schema'])) {
+            $contentTypeUpdateStruct->nameSchema = $this->contentTypeObject->data['name_schema'];
+        }
+        if(isset($this->contentTypeObject->data['url_alias_schema'])) {
+            $contentTypeUpdateStruct->urlAliasSchema = $this->contentTypeObject->data['url_alias_schema'];
+        }
+        if(isset($this->contentTypeObject->data['is_container'])) {
+            $contentTypeUpdateStruct->isContainer = $this->contentTypeObject->data['is_container'];
+        }
+        if(isset($this->contentTypeObject->data['default_always_available'])) {
+            $contentTypeUpdateStruct->defaultAlwaysAvailable = $this->contentTypeObject->data['default_always_available'];
+        }
+        if(isset($this->contentTypeObject->data['default_sort_field'])) {
+            $contentTypeUpdateStruct->defaultSortField = $this->contentTypeObject->data['default_sort_field'];
+        }
+        if(isset($this->contentTypeObject->data['default_sort_order'])) {
+            $contentTypeUpdateStruct->defaultSortOrder = $this->contentTypeObject->data['default_sort_order'];
+        }
     }
 }

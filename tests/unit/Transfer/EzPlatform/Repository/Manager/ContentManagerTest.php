@@ -10,7 +10,9 @@
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 
 /**
@@ -21,6 +23,14 @@ class ContentManagerTest extends ContentTestCase
     public function setUp()
     {
         parent::setUp();
+    }
+
+    public function testAddInvalidParentLocation()
+    {
+        $this->setExpectedException(InvalidDataStructureException::class);
+        
+        $contentObject = new ContentObject([]);
+        $contentObject->addParentLocation([]);
     }
 
     public function testInvalidClassOnCreate()

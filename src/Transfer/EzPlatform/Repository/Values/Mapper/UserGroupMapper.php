@@ -36,9 +36,7 @@ class UserGroupMapper
 
     public function userGroupToObject(UserGroup $userGroup)
     {
-        if (!isset($this->userGroupObject->data['parent_id'])) {
-            $this->userGroupObject->data['parent_id'] = $userGroup->parentId;
-        }
+        $this->userGroupObject->data['parent_id'] = $userGroup->parentId;
 
         $this->userGroupObject->data['fields'] = [];
         foreach ($userGroup->getFields() as $field) {

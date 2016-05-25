@@ -45,11 +45,4 @@ class ContentMapper
             $this->contentObject->data[$field->fieldDefIdentifier][$field->languageCode] = $field->value;
         }
     }
-
-    public function setAfterUpdateProperties(array $properties)
-    {
-        foreach ($properties as $property => $value) {
-            $this->contentObject->setProperty($property, $value);
-        }
-    }
 }

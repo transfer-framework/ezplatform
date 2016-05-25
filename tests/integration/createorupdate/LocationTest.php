@@ -5,6 +5,7 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Adapter\Transaction\Request;
+use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\EzPlatform\tests\testcase\LocationTestCase;
 
@@ -95,5 +96,28 @@ class LocationTest extends LocationTestCase
         $this->assertEquals($newLocation1->contentId, $newContent->id);
         $this->assertEquals(58, $newLocation1->parentLocationId);
         $this->assertEquals(2, $newLocation2->parentLocationId);
+    }
+
+    public function testUpdateContentWithMoreLocations()
+    {
+        $content = static::$repository->getContentService()->loadContentByRemoteId($this->_test_content_remote_id_3);
+        $locations = static::$repository->getLocationService()->loadLocations($content->contentInfo);
+
+        $countLocations = count($locations);
+
+        $contentObject = new ContentObject($content, array(
+            'parent_locations' => $locations
+        ));
+
+        $contentObject->addParentLocation(65);
+
+        $this->adapter->send(new Request(array(
+            $contentObject,
+        )));
+
+        $this->assertCount(
+            $countLocations + 1,
+            static::$repository->getLocationService()->loadLocations($contentObject->getProperty('content_info'))
+        );
     }
 }

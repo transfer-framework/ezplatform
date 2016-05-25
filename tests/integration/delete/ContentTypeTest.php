@@ -12,9 +12,9 @@ class ContentTypeTest extends ContentTypeTestCase
 {
     public function testDelete()
     {
-        $identifier = '_integration_contenttype_delete_test';
+        $identifier = 'integration_contenttype_delete_test';
 
-        $raw = $this->getContentType($identifier);
+        $raw = $this->getContentTypeFull($identifier);
 
         $this->adapter->send(new Request(array(
             $raw,

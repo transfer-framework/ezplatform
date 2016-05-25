@@ -82,8 +82,8 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     /**
      * Finds content type object by identifier.
      *
-     * @param ObjectInterface|EzPlatformObject $object
-     * @param bool                             $throwException
+     * @param ObjectInterface|ValueObject|EzPlatformObject $object
+     * @param bool $throwException
      *
      * @return ContentType|false
      *
@@ -128,7 +128,8 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->data['identifier']);
         $object->getMapper()->fillContentTypeCreateStruct($contentTypeCreateStruct);
 
-        foreach ($object->fields as $field) {
+        foreach ($object->data['fields'] as $field) {
+            /** @var FieldDefinitionObject $field */
             $fieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->data['identifier'], $field->data['type']);
             $field->getMapper()->populateFieldDefinitionCreateStruct($fieldCreateStruct);
             $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
@@ -147,6 +148,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
 
         $this->updateContentTypeGroupsAssignment($object);
 
+        $object->getMapper()->contentTypeToObject(
+            $this->find($object)
+        );
+        
         return $object;
     }
 
@@ -177,7 +182,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $existingFieldDefinitions = $contentType->getFieldDefinitions();
 
         // Transfer fields
-        $updatedFieldDefinitions = $object->fields;
+        $updatedFieldDefinitions = $object->data['fields'];
 
         // Delete field definitions which no longer exist
         $updatedFieldIdentifiers = array();
@@ -217,6 +222,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         if ($this->logger) {
             $this->logger->info(sprintf('Updated contenttype %s.', $object->data['identifier']));
         }
+
+        $object->getMapper()->contentTypeToObject(
+            $this->find($object)
+        );
 
         return $object;
     }

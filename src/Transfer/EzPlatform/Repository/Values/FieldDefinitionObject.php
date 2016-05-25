@@ -59,7 +59,7 @@ class FieldDefinitionObject extends EzPlatformObject
     /**
      * @var ContentTypeObject
      */
-    private $parent;
+    private $contentType;
 
     /**
      * @var FieldDefinitionMapper
@@ -72,7 +72,7 @@ class FieldDefinitionObject extends EzPlatformObject
     public function __construct($identifier, ContentTypeObject $parent, $data = array())
     {
         $data['identifier'] = $identifier;
-        $this->parent = &$parent;
+        $this->contentType = &$parent;
         parent::__construct($data);
         $this->setMissingDefaults();
     }
@@ -107,8 +107,12 @@ class FieldDefinitionObject extends EzPlatformObject
     {
         if (!isset($this->data['names']) || empty($this->data['names'])) {
             $this->data['names'] = array(
-                $this->parent->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
+                $this->contentType->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
             );
+        }
+
+        if(isset($this->data['priority'])) {
+            $this->data['priority'] = 10;
         }
     }
 }

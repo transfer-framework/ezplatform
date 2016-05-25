@@ -17,19 +17,14 @@ use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Manager\Core\ContentTreeService;
 use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
+use Transfer\EzPlatform\tests\testcase\ContentTreeTestCase;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
 
-class ContentTreeServiceTest extends EzPlatformTestCase
+class ContentTreeServiceTest extends ContentTreeTestCase
 {
-    /** @var ContentTreeService $service */
-    private $service;
-
     public function setUp()
     {
-        $objectService = new ObjectService(static::$repository);
-        $objectService->setLogger(new NullLogger());
-        $this->service = new ContentTreeService(static::$repository, $objectService);
-        $this->service->setLogger(new NullLogger());
+        parent::setUp();
     }
 
     public function testCreate()
@@ -66,13 +61,13 @@ class ContentTreeServiceTest extends EzPlatformTestCase
         $treeObject->addNode($secondaryContentObject);
         $treeObject->addNode(new TreeObject($secondaryContentObject));
 
-        $this->service->createOrUpdate($treeObject);
+        static::$contentTreeService->createOrUpdate($treeObject);
     }
 
     public function testCreateWithInvalidArgument()
     {
         $this->setExpectedException(UnsupportedObjectOperationException::class);
 
-        $this->service->createOrUpdate(new ValueObject(null));
+        static::$contentTreeService->createOrUpdate(new ValueObject(null));
     }
 }
