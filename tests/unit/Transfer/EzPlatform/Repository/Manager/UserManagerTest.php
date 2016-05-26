@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\tests\testcase\UserTestCase;
@@ -21,6 +22,18 @@ class UserManagerTest extends UserTestCase
     public function setUp()
     {
         parent::setUp();
+    }
+
+    public function testFindNotFoundException()
+    {
+        $this->setExpectedException(NotFoundException::class);
+
+        static::$userManager->find(
+            new ValueObject([
+                'username' => 'i_dont_exist_3y437824y',
+            ]),
+            true
+        );
     }
 
     public function testInvalidClassOnCreate()

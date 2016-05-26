@@ -99,8 +99,6 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         try {
             if ($object->getProperty('remote_id')) {
                 $content = $this->contentService->loadContentByRemoteId($object->getProperty('remote_id'));
-            } elseif ($object->getProperty('id')) {
-                $content = $this->contentService->loadContent($object->getProperty('id'));
             }
         } catch (NotFoundException $notFoundException) {
             $exception = $notFoundException;

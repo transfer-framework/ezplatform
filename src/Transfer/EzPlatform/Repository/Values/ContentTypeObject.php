@@ -104,24 +104,7 @@ class ContentTypeObject extends EzPlatformObject
      */
     public function addFieldDefinitionObject($identifier, $fieldDefinitionObject)
     {
-        $fieldDefinitionObject = $this->convertToFieldDefintitionObject($identifier, $fieldDefinitionObject);
-        $this->data['fields'][] = $fieldDefinitionObject;
-    }
-
-    /**
-     * @param string                      $identifier
-     * @param FieldDefinitionObject|array $fieldDefinition
-     *
-     * @return FieldDefinitionObject
-     */
-    private function convertToFieldDefintitionObject($identifier, $fieldDefinition)
-    {
-        switch (true) {
-            case is_array($fieldDefinition):
-                return new FieldDefinitionObject($identifier, $this, $fieldDefinition);
-        }
-
-        return $fieldDefinition;
+        $this->data['fields'][] = new FieldDefinitionObject($identifier, $this, $fieldDefinitionObject);
     }
 
     /**
@@ -129,10 +112,6 @@ class ContentTypeObject extends EzPlatformObject
      */
     private function setMissingDefaults()
     {
-        if ($this->notSetOrEmpty($this->data, 'main_language_code')) {
-            $this->data['main_language_code'] = 'eng-GB';
-        }
-
         if ($this->notSetOrEmpty($this->data, 'names')) {
             $this->data['names'] = array(
                 $this->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),

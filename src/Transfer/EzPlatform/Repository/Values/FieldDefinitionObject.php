@@ -110,9 +110,5 @@ class FieldDefinitionObject extends EzPlatformObject
                 $this->contentType->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
             );
         }
-
-        if (isset($this->data['priority'])) {
-            $this->data['priority'] = 10;
-        }
     }
 }

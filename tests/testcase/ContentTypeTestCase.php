@@ -40,7 +40,7 @@ class ContentTypeTestCase extends EzPlatformTestCase
         return new ContentTypeObject(array(
             'identifier' => $identifier,
             'main_language_code' => 'eng-GB',
-            'contenttype_groups' => array('Content'),
+            'contenttype_groups' => array('Content', 'My new group'),
             'name_schema' => '<title>',
             'url_alias_schema' => '<title>',
             'names' => array('eng-GB' => 'Product'),

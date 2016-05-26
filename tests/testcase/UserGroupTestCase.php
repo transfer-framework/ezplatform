@@ -10,6 +10,7 @@ use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 class UserGroupTestCase extends EzPlatformTestCase
 {
     protected $main_usergroup_id = 12;
+    protected $main_usergroup_remote_id = 'f5c88a2209584891056f987fd965b0ba';
     protected $main_language_code = 'eng-GB';
     protected $contentype_identifier = 'user_group';
 
@@ -44,21 +45,28 @@ class UserGroupTestCase extends EzPlatformTestCase
 
     /**
      * @param array $fields
+     * @param bool|int $parentId
+     * @param bool|string $remote_id
      *
      * @return UserGroupObject
      */
-    protected function getUsergroup(array $fields, $parentId = false)
+    protected function getUsergroup(array $fields, $parentId = false, $remote_id = false)
     {
-        if (!$parentId) {
-            $parentId = $this->main_usergroup_id;
-        }
-
-        return new UserGroupObject(array(
-            'parent_id' => $parentId,
+        $data = array(
             'content_type_identifier' => $this->contentype_identifier,
             'main_language_code' => $this->main_language_code,
             'fields' => $fields,
-        ));
+        );
+        
+        if ($parentId) {
+            $data['parent_id'] = $parentId;
+        }
+
+        if($remote_id) {
+            $data['remote_id'] = $remote_id;
+        }
+
+        return new UserGroupObject($data);
     }
 
     /**

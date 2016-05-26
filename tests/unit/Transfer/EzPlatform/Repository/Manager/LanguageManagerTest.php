@@ -9,8 +9,11 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
+use Transfer\EzPlatform\Repository\Values\LanguageObject;
 use Transfer\EzPlatform\tests\testcase\LanguageTestCase;
 
 /**
@@ -21,6 +24,22 @@ class LanguageManagerTest extends LanguageTestCase
     public function setUp()
     {
         parent::setUp();
+    }
+
+    public function testRemoveNotFound()
+    {
+        $languageObject = $this->getLanguage('ukr-UA');
+        $this->assertTrue(
+            static::$languageManager->remove($languageObject)
+        );
+    }
+
+    public function testRemoveLanguageInUse()
+    {
+        $languageObject = $this->getLanguage('eng-GB');
+        $this->assertFalse(
+            static::$languageManager->remove($languageObject)
+        );
     }
 
     public function testInvalidClassOnCreate()

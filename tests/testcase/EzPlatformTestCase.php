@@ -105,6 +105,12 @@ abstract class EzPlatformTestCase extends KernelTestCase
         static::$hasDatabase = true;
     }
 
+    public function setUp()
+    {
+        parent::setUp();
+        $this->setLoggers();
+    }
+
     protected function setLoggers()
     {
         $logger = $this->getMock(LoggerInterface::class);

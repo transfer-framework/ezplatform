@@ -9,8 +9,8 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
@@ -24,15 +24,30 @@ class ContentManagerTest extends ContentTestCase
     {
         parent::setUp();
     }
-
-    public function testAddInvalidParentLocation()
+    
+    public function testFindNotFoundException()
     {
-        $this->setExpectedException(InvalidDataStructureException::class);
+        $this->setExpectedException(NotFoundException::class);
 
-        $contentObject = new ContentObject([]);
-        $contentObject->addParentLocation([]);
+        static::$contentManager->find(
+            new ValueObject([], [
+                'remote_id' => 'i_dont_exist_321123',
+            ]),
+            true
+        );
     }
 
+    public function testRemoveNotFound()
+    {
+        $this->assertFalse(
+            static::$contentManager->remove(
+                new ContentObject([], [
+                    'remote_id' => 'i_dont_exist_321123',
+                ])
+            )
+        );
+    }
+    
     public function testInvalidClassOnCreate()
     {
         $this->setExpectedException(UnsupportedObjectOperationException::class);

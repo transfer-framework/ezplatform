@@ -176,6 +176,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
         if ($userGroup->parentId !== $object->data['parent_id']) {
             $newParentGroup = $this->findById($object->data['parent_id'], true);
             $this->userService->moveUserGroup($userGroup, $newParentGroup);
+            $userGroup = $this->find($object, true);
         }
 
         $object->getMapper()->userGroupToObject($userGroup);

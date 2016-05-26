@@ -12,6 +12,7 @@ namespace Transfer\EzPlatform\Repository\Manager\Core;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\LocationList;
+use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
@@ -187,6 +188,8 @@ class ContentTreeService extends AbstractRepositoryService
 
     /**
      * Bulk-deletions like this is not supported.
+     *
+     * @param ObjectInterface $object
      */
     public function remove($object)
     {

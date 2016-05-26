@@ -15,6 +15,7 @@ class LanguageTestCase extends EzPlatformTestCase
 
     public function setUp()
     {
+        parent::setUp();
         $this->adapter = new EzPlatformAdapter(array(
             'repository' => static::$repository,
         ));

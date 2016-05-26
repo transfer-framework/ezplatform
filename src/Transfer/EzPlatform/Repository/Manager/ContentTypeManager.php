@@ -149,7 +149,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $this->updateContentTypeGroupsAssignment($object);
 
         $object->getMapper()->contentTypeToObject(
-            $this->find($object)
+            $this->find($object, true)
         );
 
         return $object;
@@ -264,16 +264,6 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $this->contentTypeService->deleteContentType($contentType);
 
         return true;
-    }
-
-    /**
-     * @param string $identifier
-     *
-     * @return bool
-     */
-    public function removeByIdentifier($identifier)
-    {
-        return $this->remove(new ValueObject(['identifier' => $identifier]));
     }
 
     /**

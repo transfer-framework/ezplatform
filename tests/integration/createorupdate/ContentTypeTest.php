@@ -36,4 +36,26 @@ class ContentTypeTest extends ContentTypeTestCase
         $this->assertInstanceOf(ContentType::class, $real);
         $this->assertEquals('Updated name', $real->getName('eng-GB'));
     }
+
+    public function testDetatchContentGroup()
+    {
+        $identifier = 'product';
+
+        $raw = $this->getContentTypeFull($identifier);
+        $this->adapter->send(new Request(array(
+            $raw,
+        )));
+
+        $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
+        $this->assertCount(2, $real->getContentTypeGroups());
+
+        $raw = $this->getContentTypeFull($identifier);
+        $raw->data['contenttype_groups'] = array('Content');
+        $this->adapter->send(new Request(array(
+            $raw,
+        )));
+
+        $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
+        $this->assertCount(1, $real->getContentTypeGroups());
+    }
 }

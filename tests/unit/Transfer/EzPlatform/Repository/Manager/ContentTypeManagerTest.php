@@ -9,8 +9,10 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\tests\testcase\ContentTypeTestCase;
 
 /**
@@ -21,6 +23,27 @@ class ContentTypeManagerTest extends ContentTypeTestCase
     public function setUp()
     {
         parent::setUp();
+    }
+
+    public function testFindNotFoundException()
+    {
+        $this->setExpectedException(NotFoundException::class);
+
+        static::$contentTypeManager->find(
+            new ValueObject([
+                'identifier' => 'i_dont_exist_321123',
+            ]),
+            true
+        );
+    }
+
+    public function testRemoveNotFound()
+    {
+        $contentTypeObject = $this->getContentTypeFull('i_dont_exist_321123');
+
+        $this->assertFalse(
+            static::$contentTypeManager->remove($contentTypeObject)
+        );
     }
 
     public function testInvalidClassOnCreate()

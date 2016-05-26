@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
+use eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct;
 use eZ\Publish\API\Repository\Values\User\UserGroup;
 use eZ\Publish\API\Repository\Values\User\UserGroupCreateStruct;
 use eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct;
@@ -53,6 +54,10 @@ class UserGroupMapper
      */
     public function populateUserGroupCreateStruct(UserGroupCreateStruct $userGroupCreateStruct)
     {
+        if(isset($this->userGroupObject->data['remote_id'])) {
+            $userGroupCreateStruct->remoteId = $this->userGroupObject->data['remote_id'];
+        }
+
         $fields = array_flip($this->userGroupObject->data['fields']);
         array_walk($fields, array($userGroupCreateStruct, 'setField'));
     }
@@ -62,6 +67,11 @@ class UserGroupMapper
      */
     public function populateUserGroupUpdateStruct(UserGroupUpdateStruct $userGroupUpdateStruct)
     {
+        if(isset($this->userGroupObject->data['remote_id'])) {
+            $userGroupUpdateStruct->contentMetadataUpdateStruct = new ContentMetadataUpdateStruct();
+            $userGroupUpdateStruct->contentMetadataUpdateStruct->remoteId = $this->userGroupObject->data['remote_id'];
+        }
+
         $fields = array_flip($this->userGroupObject->data['fields']);
         array_walk($fields, array($userGroupUpdateStruct->contentUpdateStruct, 'setField'));
     }
