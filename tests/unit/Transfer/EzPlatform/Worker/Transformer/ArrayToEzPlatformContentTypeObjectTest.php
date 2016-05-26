@@ -163,7 +163,8 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testMini()
     {
-        $array = $this->getMiniArrayExample('contenttype_mini');
+        $identifier = 'contenttype_mini';
+        $array = $this->getMiniArrayExample($identifier);
 
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
@@ -171,11 +172,11 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $ct0 = $ct[0];
 
         $this->assertInstanceOf(ContentTypeObject::class, $ct0);
-        $this->assertEquals('article', $ct0->data['identifier']);
+        $this->assertEquals($identifier, $ct0->data['identifier']);
         $this->assertCount(1, $ct0->data['contenttype_groups']);
         $this->assertEquals('Content', $ct0->data['contenttype_groups'][0]);
         $this->assertArrayHasKey('eng-GB', $ct0->data['names']);
-        $this->assertEquals('Article', $ct0->data['names']['eng-GB']);
+        $this->assertEquals('Contenttype Mini', $ct0->data['names']['eng-GB']);
         $this->assertCount(0, $ct0->data['descriptions']);
         $this->assertEquals('<title>', $ct0->data['name_schema']);
         $this->assertEquals('<title>', $ct0->data['url_alias_schema']);
