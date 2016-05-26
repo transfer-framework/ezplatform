@@ -145,10 +145,8 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
             switch ($object->getAction()) {
                 case Action::CREATEORUPDATE:
                     return $service->createOrUpdate($object);
-                    break;
                 case Action::DELETE:
                     return $service->remove($object);
-                    break;
                 case Action::SKIP:
                 default:
             }
