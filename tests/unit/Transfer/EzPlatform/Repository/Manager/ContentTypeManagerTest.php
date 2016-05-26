@@ -12,7 +12,6 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
-use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\tests\testcase\ContentTypeTestCase;
 
 /**

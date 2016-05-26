@@ -163,7 +163,7 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testMini()
     {
-        $array = $this->getMiniArrayExample();
+        $array = $this->getMiniArrayExample('contenttype_mini');
 
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $ct = $transformer->handle($array);
@@ -217,10 +217,10 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($f1->data['is_info_collector']);
     }
 
-    protected function getMiniArrayExample()
+    protected function getMiniArrayExample($identifier = 'article')
     {
         return array(array(
-            'identifier' => 'article',
+            'identifier' => $identifier,
             'fields' => array(
                 'title' => array(),
                 'content' => array(),

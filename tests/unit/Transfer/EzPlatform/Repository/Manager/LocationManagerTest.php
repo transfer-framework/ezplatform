@@ -48,7 +48,6 @@ class LocationManagerTest extends LocationTestCase
         $hidden = !$hidden;
         $location = static::$locationManager->toggleVisibility($location);
         $this->assertEquals(!$hidden, $location->hidden);
-
     }
 
     public function testInvalidClassOnCreate()

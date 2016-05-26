@@ -4,7 +4,6 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\User\UserGroup;
 use Transfer\Adapter\Transaction\Request;
-use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\tests\testcase\UserGroupTestCase;
 
 class UserGroupTest extends UserGroupTestCase

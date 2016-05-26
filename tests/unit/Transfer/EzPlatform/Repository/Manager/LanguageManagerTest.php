@@ -9,11 +9,8 @@
 
 namespace Transfer\EzPlatform\Tests\Repository\Manager;
 
-use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
-use Transfer\EzPlatform\Repository\Values\LanguageObject;
 use Transfer\EzPlatform\tests\testcase\LanguageTestCase;
 
 /**

@@ -24,7 +24,7 @@ class ContentManagerTest extends ContentTestCase
     {
         parent::setUp();
     }
-    
+
     public function testFindNotFoundException()
     {
         $this->setExpectedException(NotFoundException::class);
@@ -47,7 +47,7 @@ class ContentManagerTest extends ContentTestCase
             )
         );
     }
-    
+
     public function testInvalidClassOnCreate()
     {
         $this->setExpectedException(UnsupportedObjectOperationException::class);

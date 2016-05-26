@@ -17,7 +17,7 @@ class LanguageObjectTest extends LanguageTestCase
 {
     public function setUp()
     {
-        parent::setUp(); 
+        parent::setUp();
     }
 
     public function testUnknownLanguage()

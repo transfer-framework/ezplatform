@@ -44,8 +44,8 @@ class UserGroupTestCase extends EzPlatformTestCase
     }
 
     /**
-     * @param array $fields
-     * @param bool|int $parentId
+     * @param array       $fields
+     * @param bool|int    $parentId
      * @param bool|string $remote_id
      *
      * @return UserGroupObject
@@ -57,12 +57,12 @@ class UserGroupTestCase extends EzPlatformTestCase
             'main_language_code' => $this->main_language_code,
             'fields' => $fields,
         );
-        
+
         if ($parentId) {
             $data['parent_id'] = $parentId;
         }
 
-        if($remote_id) {
+        if ($remote_id) {
             $data['remote_id'] = $remote_id;
         }
 

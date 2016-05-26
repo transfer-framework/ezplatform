@@ -54,7 +54,7 @@ class UserGroupMapper
      */
     public function populateUserGroupCreateStruct(UserGroupCreateStruct $userGroupCreateStruct)
     {
-        if(isset($this->userGroupObject->data['remote_id'])) {
+        if (isset($this->userGroupObject->data['remote_id'])) {
             $userGroupCreateStruct->remoteId = $this->userGroupObject->data['remote_id'];
         }
 
@@ -67,7 +67,7 @@ class UserGroupMapper
      */
     public function populateUserGroupUpdateStruct(UserGroupUpdateStruct $userGroupUpdateStruct)
     {
-        if(isset($this->userGroupObject->data['remote_id'])) {
+        if (isset($this->userGroupObject->data['remote_id'])) {
             $userGroupUpdateStruct->contentMetadataUpdateStruct = new ContentMetadataUpdateStruct();
             $userGroupUpdateStruct->contentMetadataUpdateStruct->remoteId = $this->userGroupObject->data['remote_id'];
         }
