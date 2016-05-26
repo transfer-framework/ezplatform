@@ -9,6 +9,7 @@
 
 namespace Transfer\EzPlatform\tests\Repository\Manager;
 
+use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
@@ -39,6 +40,13 @@ class ObjectServiceTest extends EzPlatformTestCase
         $this->assertInstanceOf(LanguageManager::class, $languageManager);
         $this->assertInstanceOf(UserManager::class, $userManager);
         $this->assertInstanceOf(UserGroupManager::class, $userGroupManager);
+    }
+
+    public function testDelete()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+
+        static::$objectService->remove(new ValueObject([]));
     }
 
     public function testCreateWithNullArgument()

@@ -60,6 +60,11 @@ class ContentTreeServiceTest extends ContentTreeTestCase
         static::$contentTreeService->createOrUpdate($treeObject);
     }
 
+    public function testDelete()
+    {
+        $this->assertNull(static::$contentTreeService->remove(new ValueObject([])));
+    }
+
     public function testCreateWithInvalidArgument()
     {
         $this->setExpectedException(UnsupportedObjectOperationException::class);
