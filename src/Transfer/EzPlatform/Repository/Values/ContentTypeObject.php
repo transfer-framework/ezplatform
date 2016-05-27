@@ -78,7 +78,6 @@ class ContentTypeObject extends EzPlatformObject
         }
 
         $this->setMissingDefaults();
-        $this->sortFieldDefinitionsByPosition();
     }
 
     /**
@@ -104,7 +103,7 @@ class ContentTypeObject extends EzPlatformObject
      */
     public function addFieldDefinitionObject($identifier, $fieldDefinitionObject)
     {
-        $this->data['fields'][] = new FieldDefinitionObject($identifier, $this, $fieldDefinitionObject);
+        $this->data['fields'][$identifier] = new FieldDefinitionObject($identifier, $this, $fieldDefinitionObject);
     }
 
     /**
@@ -120,29 +119,7 @@ class ContentTypeObject extends EzPlatformObject
 
         foreach (array('name_schema', 'url_alias_schema') as $schema) {
             if ($this->notSetOrEmpty($this->data, $schema)) {
-                $this->data[$schema] = sprintf('<%s>', $this->data['fields'][0]->data['identifier']);
-            }
-        }
-    }
-
-    /**
-     * Makes sure all fieldDefinition positions are set,
-     * and consist of only unique values.
-     */
-    private function sortFieldDefinitionsByPosition()
-    {
-        if (!$this->notSetOrEmpty($this->data, 'fields')) {
-            usort($this->data['fields'], function ($a, $b) {
-                return
-                    (isset($a->data['position']) ? $a->data['position'] : 100)
-                    >
-                    (isset($b->data['position']) ? $b->data['position'] : 100);
-            });
-
-            $priority = 10;
-            foreach ($this->data['fields'] as $field) {
-                $field->data['position'] = $priority;
-                $priority += 5;
+                $this->data[$schema] = sprintf('<%s>', $this->data['fields'][key($this->data['fields'])]->data['identifier']);
             }
         }
     }

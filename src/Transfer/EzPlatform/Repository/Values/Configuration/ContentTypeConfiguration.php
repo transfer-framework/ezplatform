@@ -63,6 +63,7 @@ class ContentTypeConfiguration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('fields')
                     ->fixXmlConfig('name')
+                    ->useAttributeAsKey('name')
                     ->requiresAtLeastOneElement()
                     ->prototype('array')
                         ->children()
