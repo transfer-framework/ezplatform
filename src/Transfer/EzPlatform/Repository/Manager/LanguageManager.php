@@ -83,19 +83,13 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             try {
                 $language = $this->languageService->loadLanguage($object->data['code']);
             } catch (NotFoundException $notFoundException) {
-                $exception = $notFoundException;
+                if($throwExceptions) {
+                    throw $notFoundException;
+                }
             }
         }
 
-        if (!isset($language)) {
-            if (isset($exception) && $throwExceptions) {
-                throw $exception;
-            }
-
-            return false;
-        }
-
-        return $language;
+        return isset($language) ? $language : false;
     }
 
     /**
