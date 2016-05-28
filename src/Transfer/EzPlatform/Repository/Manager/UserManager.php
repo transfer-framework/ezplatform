@@ -90,18 +90,12 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
                 $user = $this->userService->loadUserByLogin($object->data['username']);
             }
         } catch (NotFoundException $notFoundException) {
-            $exception = $notFoundException;
-        }
-
-        if (!isset($user)) {
-            if (isset($exception) && $throwException) {
-                throw $exception;
+            if($throwException) {
+                throw $notFoundException;
             }
-
-            return false;
         }
-
-        return $user;
+        
+        return isset($user) ? $user : false;
     }
 
     /**
@@ -147,18 +141,20 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
 
         $user = $this->find($object, true);
 
-        // Populate struct
-        $userUpdateStruct = $this->userService->newUserUpdateStruct();
-        $object->getMapper()->getNewUserUpdateStruct($userUpdateStruct);
+        if($user) {
+            // Populate struct
+            $userUpdateStruct = $this->userService->newUserUpdateStruct();
+            $object->getMapper()->getNewUserUpdateStruct($userUpdateStruct);
 
-        // Update user
-        $ezuser = $this->userService->updateUser($user, $userUpdateStruct);
+            // Update user
+            $user = $this->userService->updateUser($user, $userUpdateStruct);
 
-        // Assign user to usergroups
-        $ezUserGroups = $this->assignUserToUserGroups($ezuser, $object->parents);
+            // Assign user to usergroups
+            $userGroups = $this->assignUserToUserGroups($user, $object->parents);
 
-        // Unassign user from usergroups
-        $this->unassignUserFromUserGroups($ezuser, $ezUserGroups);
+            // Unassign user from usergroups
+            $this->unassignUserFromUserGroups($user, $userGroups);
+        }
 
         return $object;
     }
