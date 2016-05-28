@@ -13,6 +13,7 @@ use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct;
+use eZ\Publish\API\Repository\Values\ValueObject as eZValueObject;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 
 /**
@@ -81,11 +82,7 @@ class ContentTypeMapper
             'defaultSortOrder' => 'default_sort_order',
         );
 
-        foreach ($keys as $ezKey => $transferKey) {
-            if (isset($this->contentTypeObject->data[$transferKey])) {
-                $contentTypeCreateStruct->$ezKey = $this->contentTypeObject->data[$transferKey];
-            }
-        }
+        $this->arrayToStruct($contentTypeCreateStruct, $keys);
     }
 
     /**
@@ -106,9 +103,23 @@ class ContentTypeMapper
             'defaultSortOrder' => 'default_sort_order',
         );
 
+        $this->arrayToStruct($contentTypeUpdateStruct, $keys);
+    }
+
+    /**
+     * Assigns $this->contentTypeObject->data() to a ContentType Struct.
+     *
+     * @param ContentTypeCreateStruct|ContentTypeUpdateStruct|eZValueObject $contentTypeStruct
+     * @param array $keys   array (
+     *                          eZPropertyAsKey => TransferKeyAsValue
+     *                          ...
+     *                      )
+     */
+    private function arrayToStruct($contentTypeStruct, $keys)
+    {
         foreach ($keys as $ezKey => $transferKey) {
             if (isset($this->contentTypeObject->data[$transferKey])) {
-                $contentTypeUpdateStruct->$ezKey = $this->contentTypeObject->data[$transferKey];
+                $contentTypeStruct->$ezKey = $this->contentTypeObject->data[$transferKey];
             }
         }
     }
