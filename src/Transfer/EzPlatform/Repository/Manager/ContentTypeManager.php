@@ -95,19 +95,13 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             try {
                 $contentType = $this->contentTypeService->loadContentTypeByIdentifier($object->data['identifier']);
             } catch (NotFoundException $notFoundException) {
-                $exception = $notFoundException;
+                if($throwException) {
+                    throw $notFoundException;
+                }
             }
         }
 
-        if (!isset($contentType)) {
-            if (isset($exception) && $throwException) {
-                throw $exception;
-            }
-
-            return false;
-        }
-
-        return $contentType;
+        return isset($contentType) ? $contentType : false;
     }
 
     /**
