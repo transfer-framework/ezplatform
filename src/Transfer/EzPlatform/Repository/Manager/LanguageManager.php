@@ -9,17 +9,20 @@
 
 namespace Transfer\EzPlatform\Repository\Manager;
 
-use eZ\Publish\API\Repository\Exceptions\InvalidArgumentException;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LanguageService;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Language;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
-use Transfer\EzPlatform\Data\LanguageObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
+use Transfer\EzPlatform\Repository\Values\LanguageObject;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 
@@ -30,7 +33,7 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class LanguageManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class LanguageManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
      * @var Repository
@@ -65,31 +68,23 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * Checks if language exists without throwing exceptions.
-     *
-     * @param string $code
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function exists($code)
+    public function find(ValueObject $object)
     {
         try {
-            $this->findByCode($code);
-        } catch (\Exception $e) {
-            return false;
+            if (isset($object->data['code'])) {
+                $language = $this->languageService->loadLanguage($object->data['code']);
+            }
+        } catch (NotFoundException $notFoundException) {
+            // We'll throw our own exception later instead.
         }
 
-        return true;
-    }
+        if (!isset($language)) {
+            throw new ObjectNotFoundException(Language::class, array('code'));
+        }
 
-    /**
-     * @param $code
-     *
-     * @return Language
-     */
-    public function findByCode($code)
-    {
-        return $this->languageService->loadLanguage($code);
+        return $language;
     }
 
     /**
@@ -98,20 +93,22 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof LanguageObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LanguageObject::class, get_class($object));
         }
 
         try {
-            $language = $this->findByCode($object->data['code']);
+            $language = $this->find($object);
             $this->languageService->enableLanguage($language);
         } catch (NotFoundException $notFoundException) {
             $languageCreateStruct = $this->languageService->newLanguageCreateStruct();
             $languageCreateStruct->languageCode = $object->data['code'];
             $languageCreateStruct->name = $object->data['name'];
-            $this->languageService->createLanguage($languageCreateStruct);
+            $language = $this->languageService->createLanguage($languageCreateStruct);
         }
 
-        return new ValueObject($this->findByCode($object->data['code']));
+        $object->getMapper()->languageToObject($language);
+
+        return $object;
     }
 
     /**
@@ -120,13 +117,15 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof LanguageObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LanguageObject::class, get_class($object));
         }
 
-        $language = $this->findByCode($object->data['code']);
-        $this->languageService->updateLanguageName($language, $object->data['name']);
+        $language = $this->find($object);
+        $language = $this->languageService->updateLanguageName($language, $object->data['name']);
 
-        return new ValueObject($this->findByCode($object->data['code']));
+        $object->getMapper()->languageToObject($language);
+
+        return $object;
     }
 
     /**
@@ -135,12 +134,15 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof LanguageObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LanguageObject::class, get_class($object));
         }
-        if (!$this->exists($object->data['code'])) {
-            return $this->create($object);
-        } else {
+
+        try {
+            $this->find($object);
+
             return $this->update($object);
+        } catch (ObjectNotFoundException $notFound) {
+            return $this->create($object);
         }
     }
 
@@ -150,15 +152,19 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof LanguageObject) {
-            return;
+            throw new UnsupportedObjectOperationException(LanguageObject::class, get_class($object));
         }
 
         try {
-            $language = $this->findByCode($object->data['code']);
+            $language = $this->find($object);
             $this->languageService->deleteLanguage($language);
-        } catch (NotFoundException $notFoundException) {
+        } catch (NotFoundException $e) {
             return true;
-        } catch (InvalidArgumentException $notFoundException) {
+        } catch (InvalidArgumentException $ee) {
+            if ($this->logger) {
+                $this->logger->warning('Tried to delete the main language, or a language that still has existing translations (is in use).');
+            }
+
             return false;
         }
 

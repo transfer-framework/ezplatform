@@ -13,18 +13,23 @@ use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
-use Transfer\EzPlatform\Data\ContentTypeObject;
-use Transfer\EzPlatform\Data\FieldDefinitionObject;
-use Transfer\EzPlatform\Data\LanguageObject;
-use Transfer\EzPlatform\Exception\ContentTypeNotFoundException;
+use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
+use Transfer\EzPlatform\Repository\Values\LanguageObject;
+use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
+use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\RemoverInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 
@@ -35,7 +40,7 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface
+class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
      * @var Repository
@@ -77,22 +82,20 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     }
 
     /**
-     * Finds content type object by identifier.
-     *
-     * @param string $identifier Identifier
-     *
-     * @return ContentType|false
+     * {@inheritdoc}
      */
-    public function findContentTypeByIdentifier($identifier)
+    public function find(ValueObject $object)
     {
-        if (!is_string($identifier)) {
-            return false;
+        try {
+            if (isset($object->data['identifier'])) {
+                $contentType = $this->contentTypeService->loadContentTypeByIdentifier($object->data['identifier']);
+            }
+        } catch (NotFoundException $notFoundException) {
+            // We'll throw our own exception later instead.
         }
 
-        try {
-            $contentType = $this->contentTypeService->loadContentTypeByIdentifier($identifier);
-        } catch (NotFoundException $e) {
-            return false;
+        if (!isset($contentType)) {
+            throw new ObjectNotFoundException(ContentType::class, array('identifier'));
         }
 
         return $contentType;
@@ -104,7 +107,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function create(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
         if ($this->logger) {
@@ -116,7 +119,8 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->data['identifier']);
         $object->getMapper()->fillContentTypeCreateStruct($contentTypeCreateStruct);
 
-        foreach ($object->fields as $field) {
+        foreach ($object->data['fields'] as $field) {
+            /* @var FieldDefinitionObject $field */
             $fieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->data['identifier'], $field->data['type']);
             $field->getMapper()->populateFieldDefinitionCreateStruct($fieldCreateStruct);
             $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
@@ -135,6 +139,10 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
 
         $this->updateContentTypeGroupsAssignment($object);
 
+        $object->getMapper()->contentTypeToObject(
+            $this->find($object)
+        );
+
         return $object;
     }
 
@@ -144,39 +152,70 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function update(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
         if ($this->logger) {
             $this->logger->info(sprintf('Updating contenttype %s.', $object->data['identifier']));
         }
 
-        $contentType = $this->findContentTypeByIdentifier($object->data['identifier']);
-
-        if (!$contentType) {
-            throw new ContentTypeNotFoundException(sprintf('Contenttype "%s" not found.', $object->data['identifier']));
-        }
+        $contentType = $this->find($object);
 
         $this->updateContentTypeLanguages($object);
 
+        $contentTypeDraft = $this->getNewContentTypeDraft($contentType);
+
+        // Creating or updating the fielddefinitions
+        $this->createOrUpdateFieldDefinitions(
+            $object->data['fields'],
+            $contentType->getFieldDefinitions(),
+            $contentTypeDraft
+        );
+
+        $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
+        $object->getMapper()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
+
+        $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
+        $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
+
+        $this->updateContentTypeGroupsAssignment($object);
+
+        if ($this->logger) {
+            $this->logger->info(sprintf('Updated contenttype %s.', $object->data['identifier']));
+        }
+
+        $object->getMapper()->contentTypeToObject(
+            $this->find($object)
+        );
+
+        return $object;
+    }
+
+    /**
+     * @param ContentType $contentType
+     *
+     * @return ContentTypeDraft
+     */
+    private function getNewContentTypeDraft(ContentType $contentType)
+    {
         try {
             $contentTypeDraft = $this->contentTypeService->loadContentTypeDraft($contentType->id);
         } catch (NotFoundException $e) {
             $contentTypeDraft = $this->contentTypeService->createContentTypeDraft($contentType);
         }
 
-        // eZ fields
-        $existingFieldDefinitions = $contentType->getFieldDefinitions();
+        return $contentTypeDraft;
+    }
 
-        // Transfer fields
-        $updatedFieldDefinitions = $object->fields;
-
-        // Delete field definitions which no longer exist
-        $updatedFieldIdentifiers = array();
-        foreach ($updatedFieldDefinitions as $updatedFieldDefinition) {
-            $updatedFieldIdentifiers[] = $updatedFieldDefinition->data['identifier'];
-        }
-
+    /**
+     * Delete field definitions which no longer exist; Updating existing field definitions;.
+     *
+     * @param FieldDefinitionObject[] $updatedFieldDefinitions
+     * @param FieldDefinition[]       $existingFieldDefinitions
+     * @param ContentTypeDraft        $contentTypeDraft
+     */
+    private function createOrUpdateFieldDefinitions($updatedFieldDefinitions, $existingFieldDefinitions, ContentTypeDraft $contentTypeDraft)
+    {
         foreach ($updatedFieldDefinitions as $updatedField) {
 
             // Updating existing field definitions
@@ -197,20 +236,6 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
                 $this->createFieldDefinition($updatedField)
             );
         }
-
-        $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
-        $object->getMapper()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
-
-        $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
-        $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
-
-        $this->updateContentTypeGroupsAssignment($object);
-
-        if ($this->logger) {
-            $this->logger->info(sprintf('Updated contenttype %s.', $object->data['identifier']));
-        }
-
-        return $object;
     }
 
     /**
@@ -219,14 +244,15 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function createOrUpdate(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
-        $contentObject = $this->findContentTypeByIdentifier($object->data['identifier']);
-        if (!$contentObject) {
-            return $this->create($object);
-        } else {
+        try {
+            $this->find($object);
+
             return $this->update($object);
+        } catch (NotFoundException $notFound) {
+            return $this->create($object);
         }
     }
 
@@ -236,28 +262,17 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     public function remove(ObjectInterface $object)
     {
         if (!$object instanceof ContentTypeObject) {
-            return;
+            throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
-        return $this->removeContentTypeByIdentifier($object->data['identifier']);
-    }
+        try {
+            $contentType = $this->find($object);
+            $this->contentTypeService->deleteContentType($contentType);
 
-    /**
-     * @param string $identifier
-     *
-     * @return bool
-     */
-    public function removeContentTypeByIdentifier($identifier)
-    {
-        $contentType = $this->findContentTypeByIdentifier($identifier);
-
-        if (!$contentType) {
             return true;
+        } catch (NotFoundException $notFound) {
+            return false;
         }
-
-        $this->contentTypeService->deleteContentType($contentType);
-
-        return true;
     }
 
     /**

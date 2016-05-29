@@ -7,6 +7,8 @@
  * in the root directory.
  */
 
+error_reporting(E_ALL);
+
 $configDir = __DIR__.'/../vendor/ezsystems/ezpublish-kernel';
 
 if (!file_exists($configDir.'/config.php')) {
@@ -15,6 +17,5 @@ if (!file_exists($configDir.'/config.php')) {
     }
 }
 
+/** @var Composer\Autoload\ClassLoader $loader */
 $loader = require __DIR__.'/../vendor/autoload.php';
-$loader->addPsr4('Transfer\\EzPlatform\\', __DIR__.'/../src/Transfer/EzPlatform');
-$loader->addPsr4('Transfer\\EzPlatform\\Tests\\', __DIR__.'/unit/Transfer/EzPlatform/Tests');

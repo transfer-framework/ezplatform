@@ -3,7 +3,7 @@
     "type": "transfer-extension",
     "description": "eZ Platform extension for Transfer",
     "keywords": ["transfer", "ezpublish", "ezplatform"],
-    "minimun-stability": "dev",
+    "minimun-stability": "stable",
     "license": "MIT",
     "author": [
         {
@@ -18,7 +18,7 @@
     "require": {
         "php": "~5.5|~7.0",
         "transfer/transfer": "~1.0.0",
-        "ezsystems/ezpublish-kernel": "~6.0.0",
+        "ezsystems/ezpublish-kernel": "~6.3",
         "symfony/config": "~2.7.7"
     },
     "require-dev": {
@@ -26,5 +26,12 @@
     },
     "autoload": {
         "psr-4": { "Transfer\\EzPlatform\\": "src/Transfer/EzPlatform/" }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Transfer\\EzPlatform\\tests\\testcase\\": "tests/testcase/",
+            "Transfer\\EzPlatform\\tests\\integration\\": "tests/integration/",
+            "Transfer\\EzPlatform\\tests\\unit\\": "tests/unit/Transfer/EzPlatform/"
+        }
     }
 }
