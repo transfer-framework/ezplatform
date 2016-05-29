@@ -80,14 +80,18 @@ class UserGroupTest extends UserGroupTestCase
         $response = $this->adapter->send(new Request(array(
             $userGroupObject,
         )));
-        $userGroupObject = current($response->getData());
+
+
+        $userGroupObject = $response->getData();
+        $userGroupObject = $userGroupObject[0];
         $this->assertEquals($users_members_node_id, $userGroupObject->data['parent_id']);
 
         $userGroupObject->data['parent_id'] = $users_administrators_node_id;
         $response = $this->adapter->send(new Request(array(
             $userGroupObject,
         )));
-        $userGroupObject = current($response->getData());
+        $userGroupObject = $response->getData();
+        $userGroupObject = $userGroupObject[0];
         $this->assertEquals($users_administrators_node_id, $userGroupObject->data['parent_id']);
     }
 }
