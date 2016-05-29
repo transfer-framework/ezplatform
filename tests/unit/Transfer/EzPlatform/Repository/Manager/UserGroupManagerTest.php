@@ -12,6 +12,7 @@ namespace Transfer\EzPlatform\Tests\Repository\Manager;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\tests\testcase\UserGroupTestCase;
 
 /**
@@ -33,6 +34,17 @@ class UserGroupManagerTest extends UserGroupTestCase
                 'remote_id' => 'i_dont_exist_321123',
             ]),
             true
+        );
+    }
+
+    public function testDeleteNotFound()
+    {
+        $this->assertFalse(
+            static::$userGroupManager->remove(
+                new UserGroupObject([
+                    'remote_id' => 'i_dont_exist_321123',
+                ])
+            )
         );
     }
 
