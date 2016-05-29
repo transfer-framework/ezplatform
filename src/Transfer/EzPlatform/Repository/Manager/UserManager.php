@@ -135,22 +135,20 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
 
-        $user = $this->find($object, true);
+        $user = $this->find($object);
 
-        if ($user) {
-            // Populate struct
-            $userUpdateStruct = $this->userService->newUserUpdateStruct();
-            $object->getMapper()->getNewUserUpdateStruct($userUpdateStruct);
+        // Populate struct
+        $userUpdateStruct = $this->userService->newUserUpdateStruct();
+        $object->getMapper()->getNewUserUpdateStruct($userUpdateStruct);
 
-            // Update user
-            $user = $this->userService->updateUser($user, $userUpdateStruct);
+        // Update user
+        $user = $this->userService->updateUser($user, $userUpdateStruct);
 
-            // Assign user to usergroups
-            $userGroups = $this->assignUserToUserGroups($user, $object->parents);
+        // Assign user to usergroups
+        $userGroups = $this->assignUserToUserGroups($user, $object->parents);
 
-            // Unassign user from usergroups
-            $this->unassignUserFromUserGroups($user, $userGroups);
-        }
+        // Unassign user from usergroups
+        $this->unassignUserFromUserGroups($user, $userGroups);
 
         return $object;
     }

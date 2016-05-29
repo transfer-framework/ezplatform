@@ -142,12 +142,12 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             throw new UnsupportedObjectOperationException(LocationObject::class, get_class($object));
         }
 
-        $location = $this->find($object, true);
+        $location = $this->find($object);
 
         // Move if parent_location_id differs.
         if (isset($object->data['parent_location_id'])) {
             if ($object->data['parent_location_id'] !== $location->parentLocationId) {
-                $parentLocation = $this->findById($object->data['parent_location_id'], true);
+                $parentLocation = $this->findById($object->data['parent_location_id']);
                 $this->locationService->moveSubtree($location, $parentLocation);
             }
         }

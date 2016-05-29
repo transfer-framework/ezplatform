@@ -97,7 +97,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
         }
 
         try {
-            $language = $this->find($object, true);
+            $language = $this->find($object);
             $this->languageService->enableLanguage($language);
         } catch (NotFoundException $notFoundException) {
             $languageCreateStruct = $this->languageService->newLanguageCreateStruct();
@@ -120,7 +120,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             throw new UnsupportedObjectOperationException(LanguageObject::class, get_class($object));
         }
 
-        $language = $this->find($object, true);
+        $language = $this->find($object);
         $language = $this->languageService->updateLanguageName($language, $object->data['name']);
 
         $object->getMapper()->languageToObject($language);
@@ -156,7 +156,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
         }
 
         try {
-            $language = $this->find($object, true);
+            $language = $this->find($object);
             $this->languageService->deleteLanguage($language);
         } catch (NotFoundException $e) {
             return true;

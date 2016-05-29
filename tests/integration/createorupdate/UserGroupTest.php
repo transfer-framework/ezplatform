@@ -81,7 +81,6 @@ class UserGroupTest extends UserGroupTestCase
             $userGroupObject,
         )));
 
-
         $userGroupObject = $response->getData();
         $userGroupObject = $userGroupObject[0];
         $this->assertEquals($users_members_node_id, $userGroupObject->data['parent_id']);

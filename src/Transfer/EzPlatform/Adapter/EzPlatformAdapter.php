@@ -12,18 +12,17 @@ namespace Transfer\EzPlatform\Adapter;
 use eZ\Publish\API\Repository\Repository;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Transfer\Adapter\TargetAdapterInterface;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Adapter\Transaction\Response;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\TreeObject;
-use Transfer\EzPlatform\Repository\Values\Action\ActionInterface;
 use Transfer\EzPlatform\Repository\Values\Action\Enum\Action;
 use Transfer\EzPlatform\Repository\Manager\Core\AbstractRepositoryService;
 use Transfer\EzPlatform\Repository\Manager\Core\ContentTreeService;
 use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
+use Transfer\EzPlatform\Repository\Values\EzPlatformObject;
 
 /**
  * eZ Platform adapter.
@@ -138,10 +137,8 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     protected function executeAction(ObjectInterface $object, AbstractRepositoryService $service)
     {
-        $reflection = new ReflectionClass($object);
-
-        if ($reflection->implementsInterface(ActionInterface::class)) {
-            /** @var ActionInterface $object */
+        if (is_subclass_of($object, EzPlatformObject::class)) {
+            /** @var EzPlatformObject $object */
             switch ($object->getAction()) {
                 case Action::CREATEORUPDATE:
                     return $service->createOrUpdate($object);

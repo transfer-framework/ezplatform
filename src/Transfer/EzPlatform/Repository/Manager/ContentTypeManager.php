@@ -138,7 +138,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $this->updateContentTypeGroupsAssignment($object);
 
         $object->getMapper()->contentTypeToObject(
-            $this->find($object, true)
+            $this->find($object)
         );
 
         return $object;
@@ -157,7 +157,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             $this->logger->info(sprintf('Updating contenttype %s.', $object->data['identifier']));
         }
 
-        $contentType = $this->find($object, true);
+        $contentType = $this->find($object);
 
         $this->updateContentTypeLanguages($object);
 
