@@ -18,6 +18,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
@@ -71,17 +72,9 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * Attempts to load Location based on id or remoteId.
-     * Returns false if not found.
-     *
-     * @param ValueObject $object
-     * @param bool        $throwException
-     *
-     * @return Location|false
-     *
-     * @throws NotFoundException
+     * {@inheritdoc}
      */
-    public function find(ValueObject $object, $throwException = false)
+    public function find(ValueObject $object)
     {
         try {
             if (isset($object->data['remote_id'])) {
@@ -89,32 +82,29 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             } elseif ($object->getProperty('id')) {
                 $location = $this->locationService->loadLocation($object->getProperty('id'));
             }
-        } catch (NotFoundException $notFound) {
-            $exception = $notFound;
+        } catch (NotFoundException $notFoundException) {
+            // We'll throw our own exception later instead.
         }
 
         if (!isset($location)) {
-            if (isset($exception) && $throwException) {
-                throw $exception;
-            }
-
-            return false;
+            throw new ObjectNotFoundException(Location::class, array('remote_id', 'id'));
         }
 
-        return isset($location) ? $location : false;
+        return $location;
     }
 
     /**
      * Shortcut to find, mainly for locating parents.
      *
-     * @param int  $id
-     * @param bool $throwException
+     * @param int $id
      *
-     * @return Location|false
+     * @return Location
+     *
+     * @throws ObjectNotFoundException
      */
-    public function findById($id, $throwException = false)
+    public function findById($id)
     {
-        return $this->find(new ValueObject([], ['id' => $id]), $throwException);
+        return $this->find(new ValueObject([], ['id' => $id]));
     }
 
     /**
@@ -186,9 +176,11 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             throw new UnsupportedObjectOperationException(LocationObject::class, get_class($object));
         }
 
-        if ($this->find($object)) {
+        try {
+            $this->find($object);
+
             return $this->update($object);
-        } else {
+        } catch (NotFoundException $notFound) {
             return $this->create($object);
         }
     }
@@ -214,9 +206,8 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             // Create or update locations, and attach to Content
             foreach ($addOrUpdate as $parentLocation) {
                 $parentLocation->data['content_id'] = $object->getProperty('content_info')->id;
-                $object->addParentLocation(
-                    $this->createOrUpdate($parentLocation)
-                );
+                $locationObject = $this->createOrUpdate($parentLocation);
+                $object->addParentLocation($locationObject);
             }
 
             // Lastly delete, cannot delete first because Content cannot have zero locations.

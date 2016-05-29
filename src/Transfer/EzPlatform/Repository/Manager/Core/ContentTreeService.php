@@ -194,7 +194,11 @@ class ContentTreeService extends AbstractRepositoryService
     public function remove($object)
     {
         if ($this->logger) {
-            $this->logger->warning(sprintf('Attempted to delete using %s, which is not supported. Use the implementations of %s instead.', __CLASS__, EzPlatformObject::class));
+            $this->logger->warning(sprintf(
+                'Attempted to delete using %s, which is not supported. Use the implementations of %s instead.',
+                __CLASS__,
+                EzPlatformObject::class
+            ));
         }
 
         return;

@@ -110,10 +110,10 @@ class ContentTypeMapper
      * Assigns $this->contentTypeObject->data() to a ContentType Struct.
      *
      * @param ContentTypeCreateStruct|ContentTypeUpdateStruct|eZValueObject $contentTypeStruct
-     * @param array $keys   array (
-     *                          eZPropertyAsKey => TransferKeyAsValue
-     *                          ...
-     *                      )
+     * @param array                                                         $keys              array (
+     *                                                                                         eZPropertyAsKey => TransferKeyAsValue
+     *                                                                                         ...
+     *                                                                                         )
      */
     private function arrayToStruct($contentTypeStruct, $keys)
     {

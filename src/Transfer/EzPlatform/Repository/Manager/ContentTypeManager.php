@@ -21,8 +21,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
-use Transfer\EzPlatform\Repository\Values\EzPlatformObject;
 use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
 use Transfer\EzPlatform\Repository\Values\LanguageObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
@@ -80,28 +80,23 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     }
 
     /**
-     * Finds content type object by identifier.
-     *
-     * @param ObjectInterface|ValueObject|EzPlatformObject $object
-     * @param bool                                         $throwException
-     *
-     * @return ContentType|false
-     *
-     * @throws NotFoundException
+     * {@inheritdoc}
      */
-    public function find(ValueObject $object, $throwException = false)
+    public function find(ValueObject $object)
     {
-        if (isset($object->data['identifier'])) {
-            try {
+        try {
+            if (isset($object->data['identifier'])) {
                 $contentType = $this->contentTypeService->loadContentTypeByIdentifier($object->data['identifier']);
-            } catch (NotFoundException $notFoundException) {
-                if($throwException) {
-                    throw $notFoundException;
-                }
             }
+        } catch (NotFoundException $notFoundException) {
+            // We'll throw our own exception later instead.
         }
 
-        return isset($contentType) ? $contentType : false;
+        if (!isset($contentType)) {
+            throw new ObjectNotFoundException(ContentType::class, array('identifier'));
+        }
+
+        return $contentType;
     }
 
     /**
@@ -233,10 +228,12 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
-        if (!$this->find($object)) {
-            return $this->create($object);
-        } else {
+        try {
+            $this->find($object);
+
             return $this->update($object);
+        } catch (NotFoundException $notFound) {
+            return $this->create($object);
         }
     }
 
@@ -249,15 +246,14 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
             throw new UnsupportedObjectOperationException(ContentTypeObject::class, get_class($object));
         }
 
-        $contentType = $this->find($object);
+        try {
+            $contentType = $this->find($object);
+            $this->contentTypeService->deleteContentType($contentType);
 
-        if (!$contentType) {
+            return true;
+        } catch (NotFoundException $notFound) {
             return false;
         }
-
-        $this->contentTypeService->deleteContentType($contentType);
-
-        return true;
     }
 
     /**

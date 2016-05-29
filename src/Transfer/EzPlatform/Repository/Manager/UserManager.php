@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\Repository\Values\UserObject;
@@ -74,28 +75,23 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     }
 
     /**
-     * Finds user object by username.
-     *
-     * @param ValueObject $object
-     * @param bool        $throwException
-     *
-     * @return User|false
-     *
-     * @throws NotFoundException
+     * {@inheritdoc}
      */
-    public function find(ValueObject $object, $throwException = false)
+    public function find(ValueObject $object)
     {
         try {
             if (isset($object->data['username'])) {
                 $user = $this->userService->loadUserByLogin($object->data['username']);
             }
         } catch (NotFoundException $notFoundException) {
-            if($throwException) {
-                throw $notFoundException;
-            }
+            // We'll throw our own exception later instead.
         }
-        
-        return isset($user) ? $user : false;
+
+        if (!isset($user)) {
+            throw new ObjectNotFoundException(User::class, array('username'));
+        }
+
+        return $user;
     }
 
     /**
@@ -141,7 +137,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
 
         $user = $this->find($object, true);
 
-        if($user) {
+        if ($user) {
             // Populate struct
             $userUpdateStruct = $this->userService->newUserUpdateStruct();
             $object->getMapper()->getNewUserUpdateStruct($userUpdateStruct);
@@ -168,10 +164,12 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
 
-        if (!$this->find($object)) {
-            return $this->create($object);
-        } else {
+        try {
+            $this->find($object);
+
             return $this->update($object);
+        } catch (NotFoundException $notFound) {
+            return $this->create($object);
         }
     }
 

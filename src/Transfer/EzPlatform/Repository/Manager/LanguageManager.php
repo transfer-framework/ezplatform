@@ -18,6 +18,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 use Transfer\EzPlatform\Repository\Values\LanguageObject;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
@@ -67,29 +68,23 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * Find LanguageObject by code.
-     * Returns Language.
-     *
-     * @param ValueObject $object
-     * @param bool        $throwExceptions
-     *
-     * @return Language
-     *
-     * @throws NotFoundException
+     * {@inheritdoc}
      */
-    public function find(ValueObject $object, $throwExceptions = false)
+    public function find(ValueObject $object)
     {
-        if (isset($object->data['code'])) {
-            try {
+        try {
+            if (isset($object->data['code'])) {
                 $language = $this->languageService->loadLanguage($object->data['code']);
-            } catch (NotFoundException $notFoundException) {
-                if($throwExceptions) {
-                    throw $notFoundException;
-                }
             }
+        } catch (NotFoundException $notFoundException) {
+            // We'll throw our own exception later instead.
         }
 
-        return isset($language) ? $language : false;
+        if (!isset($language)) {
+            throw new ObjectNotFoundException(Language::class, array('code'));
+        }
+
+        return $language;
     }
 
     /**
@@ -142,10 +137,12 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             throw new UnsupportedObjectOperationException(LanguageObject::class, get_class($object));
         }
 
-        if (!$this->find($object)) {
-            return $this->create($object);
-        } else {
+        try {
+            $this->find($object);
+
             return $this->update($object);
+        } catch (ObjectNotFoundException $notFound) {
+            return $this->create($object);
         }
     }
 

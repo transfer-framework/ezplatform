@@ -22,6 +22,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
@@ -84,46 +85,23 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     }
 
     /**
-     * Finds a content object by content ID or remote ID.
-     * Returns ContentObject with populated properties, or false|NotFoundException.
-     *
-     * @param ValueObject|ContentObject $object
-     * @param bool                      $throwException
-     *
-     * @return false|ContentObject
-     *
-     * @throws NotFoundException
+     * {@inheritdoc}
      */
-    public function find(ValueObject $object, $throwException = false)
+    public function find(ValueObject $object)
     {
         try {
             if ($object->getProperty('remote_id')) {
                 $content = $this->contentService->loadContentByRemoteId($object->getProperty('remote_id'));
             }
         } catch (NotFoundException $notFoundException) {
-            $exception = $notFoundException;
+            // We'll throw our own exception later instead.
         }
 
         if (!isset($content)) {
-            if (isset($exception) && $throwException) {
-                throw $exception;
-            }
-
-            return false;
+            throw new ObjectNotFoundException(Content::class, array('remote_id'));
         }
 
-        $object = new ContentObject(array());
-        $object->getMapper()->contentToObject($content);
-
-        if ($content->contentInfo->published) {
-            $locations = $this->locationService->loadLocations($content->contentInfo);
-            $object->setParentLocations($locations);
-        }
-
-        $type = $this->contentTypeService->loadContentType($content->contentInfo->contentTypeId);
-        $object->setProperty('content_type_identifier', $type->identifier);
-
-        return $object;
+        return $content;
     }
 
     /**
@@ -178,7 +156,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $existingContent = $this->find($object);
         if (null === $object->getProperty('content_info')) {
-            $object->setProperty('content_info', $existingContent->getProperty('content_info'));
+            $object->setProperty('content_info', $existingContent->contentInfo);
         }
 
         $contentDraft = $this->contentService->createContentDraft($object->getProperty('content_info'));
@@ -216,9 +194,11 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new MissingIdentificationPropertyException($object);
         }
 
-        if ($this->find($object)) {
+        try {
+            $this->find($object);
+
             return $this->update($object);
-        } else {
+        } catch (NotFoundException $notFound) {
             return $this->create($object);
         }
     }
@@ -232,15 +212,14 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
         }
 
-        $object = $this->find($object);
-
-        if ($object instanceof ContentObject && $object->getProperty('content_info')) {
-            $this->contentService->deleteContent($object->getProperty('content_info'));
+        try {
+            $content = $this->find($object);
+            $this->contentService->deleteContent($content->contentInfo);
 
             return true;
+        } catch (NotFoundException $notFound) {
+            return false;
         }
-
-        return false;
     }
 
     /**

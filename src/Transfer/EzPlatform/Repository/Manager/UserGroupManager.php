@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
 use Transfer\Data\ValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
@@ -78,14 +79,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     }
 
     /**
-     * Load a UserGroup by remote_id or id.
-     *
-     * @param ValueObject $object
-     * @param bool        $throwException
-     *
-     * @return UserGroup|false
-     *
-     * @throws NotFoundException
+     * {@inheritdoc}
      */
     public function find(ValueObject $object, $throwException = false)
     {
@@ -97,15 +91,11 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
                 $userGroup = $this->userService->loadUserGroup($object->getProperty('id'));
             }
         } catch (NotFoundException $notFoundException) {
-            $exception = $notFoundException;
+            // We'll throw our own exception later instead.
         }
 
         if (!isset($userGroup)) {
-            if (isset($exception) && $throwException) {
-                throw $exception;
-            }
-
-            return false;
+            throw new ObjectNotFoundException(UserGroup::class, array('remote_id', 'id'));
         }
 
         return $userGroup;
@@ -193,10 +183,12 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             throw new UnsupportedObjectOperationException(UserGroupObject::class, get_class($object));
         }
 
-        if (!$this->find($object)) {
-            return $this->create($object);
-        } else {
+        try {
+            $this->find($object);
+
             return $this->update($object);
+        } catch (NotFoundException $notFound) {
+            return $this->create($object);
         }
     }
 
@@ -209,10 +201,13 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             throw new UnsupportedObjectOperationException(UserGroupObject::class, get_class($object));
         }
 
-        $userGroup = $this->find($object, true);
+        try {
+            $userGroup = $this->find($object);
+            $this->userService->deleteUserGroup($userGroup);
 
-        $this->userService->deleteUserGroup($userGroup);
-
-        return true;
+            return true;
+        } catch (NotFoundException $notFound) {
+            return false;
+        }
     }
 }

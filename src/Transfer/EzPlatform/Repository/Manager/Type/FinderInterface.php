@@ -11,6 +11,7 @@ namespace Transfer\EzPlatform\Repository\Manager\Type;
 
 use eZ\Publish\API\Repository\Values\ValueObject as EzValueObject;
 use Transfer\Data\ValueObject as TransferValueObject;
+use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 
 /**
  * Finder interface.
@@ -23,9 +24,10 @@ interface FinderInterface
      * Find an eZ Object, based on a Transfer object.
      *
      * @param TransferValueObject $object
-     * @param bool                $throwException
      *
-     * @return EzValueObject|false
+     * @return EzValueObject
+     *
+     * @throws ObjectNotFoundException
      */
-    public function find(TransferValueObject $object, $throwException);
+    public function find(TransferValueObject $object);
 }
