@@ -137,7 +137,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     protected function executeAction(ObjectInterface $object, AbstractRepositoryService $service)
     {
-        if (is_subclass_of($object, EzPlatformObject::class)) {
+        if (is_a($object, EzPlatformObject::class)) {
             /** @var EzPlatformObject $object */
             switch ($object->getAction()) {
                 case Action::CREATEORUPDATE:
