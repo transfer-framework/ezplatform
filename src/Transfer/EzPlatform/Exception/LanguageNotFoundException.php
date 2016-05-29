@@ -9,11 +9,13 @@
 
 namespace Transfer\EzPlatform\Exception;
 
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
+
 /**
- * Exception class for cases when a default language name does not exists.
+ * Exception class for languages which cannot be found.
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
-class LanguageNotFoundException extends \Exception
+class LanguageNotFoundException extends NotFoundException
 {
 }

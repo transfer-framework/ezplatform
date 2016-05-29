@@ -12,7 +12,7 @@ namespace Transfer\EzPlatform\Worker\Transformer;
 use Transfer\Worker\WorkerInterface;
 
 /**
- * Transforms array to Transfer eZ Platform Content Type object.
+ * Transforms array to Transfer eZPlatform ContentType object.
  *
  * @author Harald Tollefsen <harald@netmaking.no>
  */
