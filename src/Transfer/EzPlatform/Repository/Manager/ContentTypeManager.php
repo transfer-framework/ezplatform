@@ -13,8 +13,10 @@ use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
 use Psr\Log\LoggerAwareInterface;
@@ -161,24 +163,59 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
 
         $this->updateContentTypeLanguages($object);
 
+        $contentTypeDraft = $this->getNewContentTypeDraft($contentType);
+
+        // Creating or updating the fielddefinitions
+        $this->createOrUpdateFieldDefinitions(
+            $object->data['fields'],
+            $contentType->getFieldDefinitions(),
+            $contentTypeDraft
+        );
+
+        $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
+        $object->getMapper()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
+
+        $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
+        $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
+
+        $this->updateContentTypeGroupsAssignment($object);
+
+        if ($this->logger) {
+            $this->logger->info(sprintf('Updated contenttype %s.', $object->data['identifier']));
+        }
+
+        $object->getMapper()->contentTypeToObject(
+            $this->find($object)
+        );
+
+        return $object;
+    }
+
+    /**
+     * @param ContentType $contentType
+     *
+     * @return ContentTypeDraft
+     */
+    private function getNewContentTypeDraft(ContentType $contentType)
+    {
         try {
             $contentTypeDraft = $this->contentTypeService->loadContentTypeDraft($contentType->id);
         } catch (NotFoundException $e) {
             $contentTypeDraft = $this->contentTypeService->createContentTypeDraft($contentType);
         }
 
-        // eZ fields
-        $existingFieldDefinitions = $contentType->getFieldDefinitions();
+        return $contentTypeDraft;
+    }
 
-        // Transfer fields
-        $updatedFieldDefinitions = $object->data['fields'];
-
-        // Delete field definitions which no longer exist
-        $updatedFieldIdentifiers = array();
-        foreach ($updatedFieldDefinitions as $updatedFieldDefinition) {
-            $updatedFieldIdentifiers[] = $updatedFieldDefinition->data['identifier'];
-        }
-
+    /**
+     * Delete field definitions which no longer exist; Updating existing field definitions;.
+     *
+     * @param FieldDefinitionObject[] $updatedFieldDefinitions
+     * @param FieldDefinition[]       $existingFieldDefinitions
+     * @param ContentTypeDraft        $contentTypeDraft
+     */
+    private function createOrUpdateFieldDefinitions($updatedFieldDefinitions, $existingFieldDefinitions, ContentTypeDraft $contentTypeDraft)
+    {
         foreach ($updatedFieldDefinitions as $updatedField) {
 
             // Updating existing field definitions
@@ -199,24 +236,6 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
                 $this->createFieldDefinition($updatedField)
             );
         }
-
-        $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
-        $object->getMapper()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
-
-        $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
-        $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
-
-        $this->updateContentTypeGroupsAssignment($object);
-
-        if ($this->logger) {
-            $this->logger->info(sprintf('Updated contenttype %s.', $object->data['identifier']));
-        }
-
-        $object->getMapper()->contentTypeToObject(
-            $this->find($object)
-        );
-
-        return $object;
     }
 
     /**
