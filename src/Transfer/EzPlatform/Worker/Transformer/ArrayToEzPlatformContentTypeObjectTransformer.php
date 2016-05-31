@@ -33,7 +33,11 @@ class ArrayToEzPlatformContentTypeObjectTransformer implements WorkerInterface
         $array = array_key_exists('contenttypes', $array) ? $array['contenttypes'] : $array;
 
         $cts = [];
-        foreach ($array as $contenttype) {
+        foreach ($array as $identifier => $contenttype) {
+            if (!isset($contenttype['identifier'])) {
+                $contenttype['identifier'] = $identifier;
+            }
+
             $processor = new ConfigProcessor();
             $processedConfiguration = $processor->processConfiguration(
                 new ContentTypeConfiguration(),

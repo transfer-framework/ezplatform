@@ -172,8 +172,6 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         reset($ct);
         $ct0 = current($ct);
 
-        //print_r($ct0);die;
-
         $this->assertInstanceOf(ContentTypeObject::class, $ct0);
         $this->assertEquals($identifier, $ct0->data['identifier']);
         $this->assertCount(1, $ct0->data['contenttype_groups']);
@@ -220,6 +218,30 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($f1->data['is_translatable']);
         $this->assertTrue($f1->data['is_searchable']);
         $this->assertFalse($f1->data['is_info_collector']);
+    }
+
+    public function testIdentifierAsKey()
+    {
+        $identifier = 'ct_id_as_key';
+        $contentTypeArray = [$identifier => [
+            'fields' => [
+                'title' => [
+                    'type' => 'ezstring',
+                ],
+                'content' => [
+                    'type' => 'ezstring',
+                ],
+            ],
+        ]];
+
+        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
+        $ct = $transformer->handle($contentTypeArray);
+
+        reset($ct);
+        $ct0 = current($ct);
+
+        $this->assertInstanceOf(ContentTypeObject::class, $ct0);
+        $this->assertEquals($identifier, $ct0->data['identifier']);
     }
 
     protected function getMiniArrayExample($identifier = 'article')
