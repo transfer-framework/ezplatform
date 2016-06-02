@@ -4,7 +4,6 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
@@ -125,20 +124,6 @@ class ContentTest extends ContentTestCase
         $this->assertEquals('Test updated title', $content->getField('title')->value->text);
         $this->assertEquals('eng-GB', $content->contentInfo->mainLanguageCode);
         $this->assertEquals(36, $content->contentInfo->contentTypeId);
-    }
-
-    /**
-     * Tests MissingIdentificationPropertyException.
-     */
-    public function testCreateOrUpdateWithAmbiguousObject()
-    {
-        $this->setExpectedException(MissingIdentificationPropertyException::class);
-
-        $object = new ContentObject(array());
-
-        $this->adapter->send(new Request(array(
-            $object,
-        )));
     }
 
     /**

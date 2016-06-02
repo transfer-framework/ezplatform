@@ -25,7 +25,6 @@ use Transfer\Data\ValueObject;
 use Transfer\EzPlatform\Exception\ObjectNotFoundException;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
-use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\Exception\UnsupportedObjectOperationException;
 use Transfer\EzPlatform\Repository\Manager\Type\CreatorInterface;
 use Transfer\EzPlatform\Repository\Manager\Type\FinderInterface;
@@ -188,10 +187,6 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     {
         if (!$object instanceof ContentObject) {
             throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
-        }
-
-        if (!$object->getProperty('content_id') && !$object->getProperty('remote_id')) {
-            throw new MissingIdentificationPropertyException($object);
         }
 
         try {
