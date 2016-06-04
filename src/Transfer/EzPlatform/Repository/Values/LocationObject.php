@@ -12,9 +12,9 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Repository\Values\Mapper\LocationMapper;
 
 /*
-  
+
 ** Available keys: **
- 
+
     $data = [
         content_id          => int
         remote_id           => string
