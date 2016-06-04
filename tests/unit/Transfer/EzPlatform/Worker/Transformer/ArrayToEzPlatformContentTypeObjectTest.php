@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This file is part of Transfer.
+ *
+ * For the full copyright and license information, please view the LICENSE file located
+ * in the root directory.
+ */
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
