@@ -60,26 +60,9 @@ use Transfer\EzPlatform\Repository\Values\Mapper\UserMapper;
 class UserObject extends EzPlatformObject
 {
     /**
-     * @var UserGroupObject[]
-     */
-    public $parents;
-
-    /**
      * @var UserMapper
      */
     protected $mapper;
-
-    public function __construct(array $data, array $properties = array())
-    {
-        if (isset($data['parents'])) {
-            $this->parents = $data['parents'];
-            unset($data['parents']);
-        }
-
-        $data['max_login'] = isset($data['max_login']) ? $data['max_login'] : null;
-
-        parent::__construct($data, $properties);
-    }
 
     /**
      * @return UserMapper
