@@ -11,51 +11,10 @@ namespace Transfer\EzPlatform\Repository\Values;
 
 use Transfer\EzPlatform\Repository\Values\Mapper\UserMapper;
 
-/*
-
-** Available keys: **
-
-    $parents = Transfer\EzPlatform\Data\UserGroupObject[]
-    $data = [
-        username => string
-        email => string
-        password => string
-        main_language_code => string
-        enabled => bool
-        max_login => int
-        fields => [ first_name => string
-                    last_name => string
-                    ...                 ]
-    ],
-    $properties = [
-        action => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
-    ]
-
-
-** Required on `create`:
-**** Required by transfer:
-    `username´
-    `email`
-    `password`
-
-**** Required by eZ:
-    `username´
-    `èmail`
-    `password`
-    `main_language_code`
-    And any required fields in `fields`
-
-** Required on `update`:
-**** Required by transfer:
-    `username`
-
-**** Required by eZ:
-    `username`
-
-*/
-
 /**
  * User object.
+ *
+ * @see http://transfer-framework.com/docs/1.0/sources_and_targets/ezplatform/the_objects/userobject.html
  */
 class UserObject extends EzPlatformObject
 {
