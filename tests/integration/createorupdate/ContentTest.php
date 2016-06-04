@@ -3,6 +3,7 @@
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
+use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\Adapter\Transaction\Request;
@@ -136,5 +137,31 @@ class ContentTest extends ContentTestCase
         $this->adapter->send(new Request(array(
             new ValueObject(null),
         )));
+    }
+
+    /**
+     * Tests content struct callback.
+     */
+    public function testStructCallback()
+    {
+        $remoteId = 'test_integration_content_3';
+
+        $contentObject = $this->getContentObject(array(
+            'title' => 'Test title',
+        ), $remoteId, static::_content_type_article);
+
+        $contentObject->setProperty('struct_callback', function (ContentCreateStruct $struct) {
+            $struct->sectionId = 44;
+            $struct->ownerId = 12;
+        });
+
+        $this->adapter->send(new Request(array(
+            $contentObject,
+        )));
+
+        $content = static::$repository->getContentService()->loadContentByRemoteId($remoteId);
+
+        $this->assertEquals(44, $content->contentInfo->sectionId);
+        $this->assertEquals(12, $content->contentInfo->ownerId);
     }
 }
