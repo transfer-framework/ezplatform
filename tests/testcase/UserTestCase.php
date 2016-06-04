@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This file is part of Transfer.
+ *
+ * For the full copyright and license information, please view the LICENSE file located
+ * in the root directory.
+ */
 namespace Transfer\EzPlatform\tests\testcase;
 
 use Psr\Log\LoggerInterface;
@@ -54,6 +60,7 @@ class UserTestCase extends EzPlatformTestCase
             'email' => $email,
             'password' => 'test123',
             'main_language_code' => 'eng-GB',
+            'max_login' => 1000,
             'enabled' => true,
             'fields' => array(
                 'first_name' => 'Test',

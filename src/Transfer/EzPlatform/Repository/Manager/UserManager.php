@@ -1,12 +1,11 @@
 <?php
 
-/*
+/**
  * This file is part of Transfer.
  *
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
-
 namespace Transfer\EzPlatform\Repository\Manager;
 
 use eZ\Publish\API\Repository\Repository;
@@ -113,7 +112,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
         $object->getMapper()->getNewUserCreateStruct($userCreateStruct);
 
         $groups = [];
-        foreach ($object->parents as $userGroup) {
+        foreach ($object->data['parents'] as $userGroup) {
             $userGroup = $this->userGroupManager->createOrUpdate($userGroup);
             if ($userGroup instanceof UserGroupObject) {
                 $groups[] = $this->userGroupManager->find($userGroup);
@@ -145,7 +144,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
         $user = $this->userService->updateUser($user, $userUpdateStruct);
 
         // Assign user to usergroups
-        $userGroups = $this->assignUserToUserGroups($user, $object->parents);
+        $userGroups = $this->assignUserToUserGroups($user, $object->data['parents']);
 
         // Unassign user from usergroups
         $this->unassignUserFromUserGroups($user, $userGroups);

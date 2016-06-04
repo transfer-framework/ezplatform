@@ -1,8 +1,15 @@
 <?php
 
+/**
+ * This file is part of Transfer.
+ *
+ * For the full copyright and license information, please view the LICENSE file located
+ * in the root directory.
+ */
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
+use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Repository\Values\LocationObject;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
@@ -109,7 +116,7 @@ class ContentTest extends ContentTestCase
                 'title' => 'Test updated title',
             ),
             array(
-                'language' => 'eng-GB',
+                'main_language_code' => 'eng-GB',
                 'content_type_identifier' => '_test_article',
                 'remote_id' => $remoteId,
             )
@@ -192,5 +199,31 @@ class ContentTest extends ContentTestCase
         $this->assertCount(2, $parentLocationIds);
         $this->assertContains(2, $parentLocationIds);
         $this->assertContains(43, $parentLocationIds);
+    }
+
+    /**
+     * Tests content struct callback.
+     */
+    public function testStructCallback()
+    {
+        $remoteId = 'test_integration_content_3';
+
+        $contentObject = $this->getContentObject(array(
+            'title' => 'Test title',
+        ), $remoteId, static::_content_type_article);
+
+        $contentObject->setProperty('struct_callback', function (ContentCreateStruct $struct) {
+            $struct->sectionId = 44;
+            $struct->ownerId = 12;
+        });
+
+        $this->adapter->send(new Request(array(
+            $contentObject,
+        )));
+
+        $content = static::$repository->getContentService()->loadContentByRemoteId($remoteId);
+
+        $this->assertEquals(44, $content->contentInfo->sectionId);
+        $this->assertEquals(12, $content->contentInfo->ownerId);
     }
 }

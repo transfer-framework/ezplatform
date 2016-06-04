@@ -1,12 +1,11 @@
 <?php
 
-/*
+/**
  * This file is part of Transfer.
  *
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
-
 namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
@@ -76,6 +75,8 @@ class LocationMapper
         if (isset($this->locationObject->data['sort_order'])) {
             $locationCreateStruct->sortOrder = $this->locationObject->data['sort_order'];
         }
+
+        $this->assignStructValues($this->locationObject, $locationCreateStruct);
     }
 
     /**
@@ -97,6 +98,20 @@ class LocationMapper
 
         if (isset($this->locationObject->data['sort_order'])) {
             $locationUpdateStruct->sortOrder = $this->locationObject->data['sort_order'];
+        }
+
+        $this->assignStructValues($this->locationObject, $locationUpdateStruct);
+    }
+
+    /**
+     * @param LocationObject                            $object
+     * @param LocationCreateStruct|LocationUpdateStruct $struct
+     */
+    private function assignStructValues(LocationObject $object, $struct)
+    {
+        if ($object->getProperty('struct_callback')) {
+            $callback = $object->getProperty('struct_callback');
+            $callback($struct);
         }
     }
 }

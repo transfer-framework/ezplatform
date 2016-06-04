@@ -1,12 +1,11 @@
 <?php
 
-/*
+/**
  * This file is part of Transfer.
  *
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
-
 namespace Transfer\EzPlatform\Repository\Manager;
 
 use eZ\Publish\API\Repository\ContentService;
@@ -15,8 +14,6 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Content;
-use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
-use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -114,10 +111,10 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $createStruct = $this->contentService->newContentCreateStruct(
             $this->contentTypeService->loadContentTypeByIdentifier($object->getProperty('content_type_identifier')),
-            $object->getProperty('language')
+            $object->getProperty('main_language_code')
         );
 
-        $this->mapObjectToContentStruct($object, $createStruct);
+        $object->getMapper()->mapObjectToCreateStruct($object, $createStruct);
 
         /** @var LocationObject[] $locationObjects */
         $locationObjects = $object->getProperty('parent_locations');
@@ -161,7 +158,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $contentDraft = $this->contentService->createContentDraft($object->getProperty('content_info'));
 
         $contentUpdateStruct = $this->contentService->newContentUpdateStruct();
-        $this->mapObjectToUpdateStruct($object, $contentUpdateStruct);
+        $object->getMapper()->mapObjectToUpdateStruct($object, $contentUpdateStruct);
 
         $contentDraft = $this->contentService->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
         $content = $this->contentService->publishVersion($contentDraft->versionInfo);
@@ -234,56 +231,5 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $object->setProperty('main_location_id', $location->id);
 
         return $this->contentService->updateContentMetadata($object->getProperty('content_info'), $contentMetadataUpdateStruct);
-    }
-
-    /**
-     * Maps object data to create struct.
-     *
-     * @param ContentObject       $object       Content object to map from
-     * @param ContentCreateStruct $createStruct Content create struct to map to
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function mapObjectToContentStruct(ContentObject $object, ContentCreateStruct $createStruct)
-    {
-        $this->assignStructFieldValues($object, $createStruct);
-
-        if ($object->getProperty('language')) {
-            $createStruct->mainLanguageCode = $object->getProperty('language');
-        }
-
-        if ($object->getProperty('remote_id')) {
-            $createStruct->remoteId = $object->getProperty('remote_id');
-        }
-    }
-
-    /**
-     * Maps object data to update struct.
-     *
-     * @param ContentObject       $object              Content object to map from
-     * @param ContentUpdateStruct $contentUpdateStruct Content update struct to map to
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function mapObjectToUpdateStruct(ContentObject $object, ContentUpdateStruct $contentUpdateStruct)
-    {
-        $this->assignStructFieldValues($object, $contentUpdateStruct);
-    }
-
-    /**
-     * Copies content object data from a struct.
-     *
-     * @param ContentObject $object Content object to get values from
-     * @param object        $struct Struct to assign values to
-     */
-    private function assignStructFieldValues(ContentObject $object, $struct)
-    {
-        foreach ($object->data as $key => $value) {
-            if (is_array($value)) {
-                $value = end($value);
-            }
-
-            $struct->setField($key, $value);
-        }
     }
 }
