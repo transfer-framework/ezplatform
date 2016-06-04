@@ -29,7 +29,9 @@ class ContentTypeConfiguration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                     ->beforeNormalization()
                     ->ifString()
-                        ->then(function ($v) { return array('eng-GB' => $v); })
+                        ->then(function ($v) {
+                            return array('eng-GB' => $v);
+                        })
                     ->end()
                 ->end()
                 ->arrayNode('descriptions')
@@ -37,7 +39,9 @@ class ContentTypeConfiguration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                     ->beforeNormalization()
                     ->ifString()
-                        ->then(function ($v) { return array('eng-GB' => $v); })
+                        ->then(function ($v) {
+                            return array('eng-GB' => $v);
+                        })
                     ->end()
                 ->end()
                 ->scalarNode('main_language_code')
@@ -48,7 +52,9 @@ class ContentTypeConfiguration implements ConfigurationInterface
                     ->defaultValue(array('Content'))
                     ->beforeNormalization()
                     ->ifString()
-                        ->then(function ($v) { return array(ucfirst($v)); })
+                        ->then(function ($v) {
+                            return array(ucfirst($v));
+                        })
                     ->end()
                 ->end()
                 ->scalarNode('name_schema')->end()
@@ -83,7 +89,9 @@ class ContentTypeConfiguration implements ConfigurationInterface
                                 ->normalizeKeys(false)
                                 ->beforeNormalization()
                                 ->ifString()
-                                    ->then(function ($v) { return array('eng-GB' => $v); })
+                                    ->then(function ($v) {
+                                        return array('eng-GB' => $v);
+                                    })
                                 ->end()
                                 ->prototype('scalar')->end()
                             ->end()
@@ -92,7 +100,9 @@ class ContentTypeConfiguration implements ConfigurationInterface
                                 ->prototype('scalar')->end()
                                 ->beforeNormalization()
                                 ->ifString()
-                                    ->then(function ($v) { return array('eng-GB' => $v); })
+                                    ->then(function ($v) {
+                                        return array('eng-GB' => $v);
+                                    })
                                 ->end()
                             ->end()
                             ->scalarNode('field_group')
