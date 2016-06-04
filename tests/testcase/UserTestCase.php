@@ -54,6 +54,7 @@ class UserTestCase extends EzPlatformTestCase
             'email' => $email,
             'password' => 'test123',
             'main_language_code' => 'eng-GB',
+            'max_login' => 1000,
             'enabled' => true,
             'fields' => array(
                 'first_name' => 'Test',
