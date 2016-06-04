@@ -115,7 +115,7 @@ class ContentTest extends ContentTestCase
                 'title' => 'Test updated title',
             ),
             array(
-                'language' => 'eng-GB',
+                'main_language_code' => 'eng-GB',
                 'content_type_identifier' => '_test_article',
                 'remote_id' => $remoteId,
             )

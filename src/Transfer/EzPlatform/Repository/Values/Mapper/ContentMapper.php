@@ -57,8 +57,8 @@ class ContentMapper
      */
     public function mapObjectToCreateStruct(ContentObject $object, ContentCreateStruct $createStruct)
     {
-        if ($object->getProperty('language')) {
-            $createStruct->mainLanguageCode = $object->getProperty('language');
+        if ($object->getProperty('main_language_code')) {
+            $createStruct->mainLanguageCode = $object->getProperty('main_language_code');
         }
 
         if ($object->getProperty('remote_id')) {
