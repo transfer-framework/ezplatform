@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This file is part of Transfer.
+ *
+ * For the full copyright and license information, please view the LICENSE file located
+ * in the root directory.
+ */
 namespace Transfer\EzPlatform\tests\testcase;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
@@ -47,7 +53,7 @@ class ContentTestCase extends EzPlatformTestCase
             array(
                 'remote_id' => $remoteId,
                 'content_type_identifier' => $contentTypeIdentifier,
-                'language' => $languageCode ?: 'eng-GB',
+                'main_language_code' => $languageCode ?: 'eng-GB',
             )
         );
 

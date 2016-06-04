@@ -1,21 +1,20 @@
 <?php
 
-/*
+/**
  * This file is part of Transfer.
  *
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
-
 namespace Transfer\EzPlatform\Repository\Values;
 
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Repository\Values\Mapper\LocationMapper;
 
 /*
-  
+
 ** Available keys: **
- 
+
     $data = [
         content_id          => int
         remote_id           => string

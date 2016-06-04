@@ -1,9 +1,16 @@
 <?php
 
+/**
+ * This file is part of Transfer.
+ *
+ * For the full copyright and license information, please view the LICENSE file located
+ * in the root directory.
+ */
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
+use eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
@@ -119,5 +126,27 @@ class LocationTest extends LocationTestCase
             $countLocations + 1,
             static::$repository->getLocationService()->loadLocations($contentObject->getProperty('content_info'))
         );
+    }
+
+    /**
+     * Tests location struct callback.
+     */
+    public function testStructCallback()
+    {
+        $remoteId = $this->_test_location_remote_id_1;
+        $parentLocationId = 2;
+
+        $locationObject = $this->getLocationObject($remoteId, $this->_test_content_id_1, $parentLocationId);
+        $locationObject->setProperty('struct_callback', function (LocationUpdateStruct $struct) {
+            $struct->priority = 1000;
+        });
+
+        $this->adapter->send(new Request(array(
+            $locationObject,
+        )));
+
+        $location = static::$repository->getLocationService()->loadLocationByRemoteId($remoteId);
+
+        $this->assertEquals(1000, $location->priority);
     }
 }

@@ -1,12 +1,11 @@
 <?php
 
-/*
+/**
  * This file is part of Transfer.
  *
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
-
 namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\Values\User\User;
@@ -51,7 +50,9 @@ class UserMapper
      */
     public function getNewUserCreateStruct(UserCreateStruct $userCreateStruct)
     {
-        $userCreateStruct->enabled = $this->userObject->data['enabled'];
+        if (isset($this->userObject->data['enabled'])) {
+            $userCreateStruct->enabled = $this->userObject->data['enabled'];
+        }
 
         $fields = array_flip($this->userObject->data['fields']);
         array_walk($fields, array($userCreateStruct, 'setField'));
@@ -63,8 +64,14 @@ class UserMapper
     public function getNewUserUpdateStruct(UserUpdateStruct $userUpdateStruct)
     {
         $userUpdateStruct->email = $this->userObject->data['email'];
-        $userUpdateStruct->maxLogin = $this->userObject->data['max_login'];
-        $userUpdateStruct->enabled = $this->userObject->data['enabled'];
+
+        if (isset($this->userObject->data['max_login'])) {
+            $userUpdateStruct->maxLogin = $this->userObject->data['max_login'];
+        }
+
+        if (isset($this->userObject->data['enabled'])) {
+            $userUpdateStruct->enabled = $this->userObject->data['enabled'];
+        }
 
         if (isset($this->userObject->data['fields'])) {
             $userUpdateStruct->contentUpdateStruct = new ContentUpdateStruct();

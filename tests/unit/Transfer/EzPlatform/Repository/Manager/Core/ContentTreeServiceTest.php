@@ -1,12 +1,11 @@
 <?php
 
-/*
+/**
  * This file is part of Transfer.
  *
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
-
 namespace Transfer\EzPlatform\tests\Repository\Manager\Core;
 
 use Transfer\Data\TreeObject;
@@ -31,7 +30,7 @@ class ContentTreeServiceTest extends ContentTreeTestCase
             ),
             array(
                 'content_type_identifier' => ContentTestCase::_content_type_article,
-                'language' => 'eng-GB',
+                'main_language_code' => 'eng-GB',
                 'remote_id' => 'content_tree_service_test_1',
                 'priority' => 1,
             )
@@ -43,7 +42,7 @@ class ContentTreeServiceTest extends ContentTreeTestCase
             ),
             array(
                 'content_type_identifier' => ContentTestCase::_content_type_article,
-                'language' => 'eng-GB',
+                'main_language_code' => 'eng-GB',
                 'remote_id' => 'content_tree_service_test_2',
                 'priority' => 1,
                 'hidden' => true,
