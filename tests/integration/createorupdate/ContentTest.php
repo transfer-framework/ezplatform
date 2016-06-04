@@ -161,7 +161,7 @@ class ContentTest extends ContentTestCase
             array(
                 'remote_id' => $remoteId,
                 'content_type_identifier' => static::_content_type_article,
-                'language' => 'eng-GB',
+                'main_language_code' => 'eng-GB',
                 'parent_locations' => array(
                     new LocationObject(
                         array(
