@@ -11,53 +11,10 @@ namespace Transfer\EzPlatform\Repository\Values;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Repository\Values\Mapper\LocationMapper;
 
-/*
-  
-** Available keys: **
- 
-    $data = [
-        content_id          => int
-        remote_id           => string
-        parent_location_id  => int
-        hidden              => bool
-        priority            => int
-        sort_field          => int 1-12 Location::SORT_FIELD_*
-        sort_order          => int 0-1  Location::SORT_ORDER_DESC/SORT_ORDER_ASC
-    ],
-    $properties = [
-        id                  => int
-        depth               => int
-        content_info        => \eZ\Publish\API\Repository\Values\Content\ContentInfo
-        invisible           => bool
-        path                => array
-        path_string         => string
-        action              => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
-    ]
-
-
-** Required on `create`:
-
-**** Required by Transfer:
-    * content_id
-    * parent_location_id
-
-**** Required by eZ:
-    * @todo finish requirements
-
-
-** Required on `update`:
-
-**** Required by Transfer:
-    * content_id or remote_id
-    * parent_location_id
-
-**** Required by eZ:
-    * @todo finish requirements
-
-*/
-
 /**
  * Location object.
+ *
+ * @see http://transfer-framework.com/docs/1.0/sources_and_targets/ezplatform/the_objects/locationobject.html
  */
 class LocationObject extends EzPlatformObject
 {

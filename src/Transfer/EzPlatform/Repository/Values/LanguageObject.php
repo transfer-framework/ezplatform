@@ -11,42 +11,10 @@ namespace Transfer\EzPlatform\Repository\Values;
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
 use Transfer\EzPlatform\Repository\Values\Mapper\LanguageMapper;
 
-/*
-
-** Available keys: **
-
-    $data = [
-        code    => string
-        name    => string
-        enabled => bool
-    ],
-    $properties = [
-        id     => int
-        action => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
-    ]
-
-
-** Required on `create`:
-**** Required by transfer:
-    code
-
-**** Required by eZ:
-    code
-    name
-
-** Required on `update`:
-**** Required by transfer:
-    code
-    name
-
-**** Required by eZ:
-    code
-    name
-
-*/
-
 /**
  * Content type object.
+ *
+ * @see http://transfer-framework.com/docs/1.0/sources_and_targets/ezplatform/the_objects/languageobject.html
  */
 class LanguageObject extends EzPlatformObject
 {
