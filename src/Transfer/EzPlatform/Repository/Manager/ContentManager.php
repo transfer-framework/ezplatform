@@ -118,7 +118,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $object->getProperty('language')
         );
 
-        $this->mapObjectToContentStruct($object, $createStruct);
+        $this->mapObjectToCreateStruct($object, $createStruct);
 
         /** @var LocationObject[] $locationObjects */
         $locationObjects = $object->getProperty('parent_locations');
@@ -249,10 +249,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      *
      * @throws \InvalidArgumentException
      */
-    private function mapObjectToContentStruct(ContentObject $object, ContentCreateStruct $createStruct)
+    private function mapObjectToCreateStruct(ContentObject $object, ContentCreateStruct $createStruct)
     {
-        $this->assignStructFieldValues($object, $createStruct);
-
         if ($object->getProperty('language')) {
             $createStruct->mainLanguageCode = $object->getProperty('language');
         }
@@ -260,6 +258,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         if ($object->getProperty('remote_id')) {
             $createStruct->remoteId = $object->getProperty('remote_id');
         }
+
+        $this->assignStructValues($object, $createStruct);
     }
 
     /**
@@ -272,7 +272,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      */
     private function mapObjectToUpdateStruct(ContentObject $object, ContentUpdateStruct $contentUpdateStruct)
     {
-        $this->assignStructFieldValues($object, $contentUpdateStruct);
+        $this->assignStructValues($object, $contentUpdateStruct);
     }
 
     /**
@@ -281,14 +281,18 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
      * @param ContentObject $object Content object to get values from
      * @param object        $struct Struct to assign values to
      */
-    private function assignStructFieldValues(ContentObject $object, $struct)
+    private function assignStructValues(ContentObject $object, $struct)
     {
         foreach ($object->data as $key => $value) {
             if (is_array($value)) {
                 $value = end($value);
             }
-
             $struct->setField($key, $value);
+        }
+
+        if ($object->getProperty('struct_callback')) {
+            $callback = $object->getProperty('struct_callback');
+            $callback($struct);
         }
     }
 }

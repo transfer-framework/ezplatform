@@ -76,6 +76,8 @@ class LocationMapper
         if (isset($this->locationObject->data['sort_order'])) {
             $locationCreateStruct->sortOrder = $this->locationObject->data['sort_order'];
         }
+
+        $this->assignStructValues($this->locationObject, $locationCreateStruct);
     }
 
     /**
@@ -97,6 +99,16 @@ class LocationMapper
 
         if (isset($this->locationObject->data['sort_order'])) {
             $locationUpdateStruct->sortOrder = $this->locationObject->data['sort_order'];
+        }
+
+        $this->assignStructValues($this->locationObject, $locationUpdateStruct);
+    }
+
+    private function assignStructValues(LocationObject $object, $struct)
+    {
+        if ($object->getProperty('struct_callback')) {
+            $callback = $object->getProperty('struct_callback');
+            $callback($struct);
         }
     }
 }
