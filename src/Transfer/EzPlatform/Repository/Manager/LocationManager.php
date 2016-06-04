@@ -81,6 +81,15 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
                 $location = $this->locationService->loadLocationByRemoteId($object->data['remote_id']);
             } elseif ($object->getProperty('id')) {
                 $location = $this->locationService->loadLocation($object->getProperty('id'));
+            } elseif (isset($object->data['content_id'])) {
+                $contentInfo = $this->contentService->loadContentInfo($object->data['content_id']);
+                $locations = $this->locationService->loadLocations($contentInfo);
+                foreach ($locations as $loc) {
+                    if ($loc->parentLocationId === $object->data['parent_location_id']) {
+                        $location = $loc;
+                        break;
+                    }
+                }
             }
         } catch (NotFoundException $notFoundException) {
             // We'll throw our own exception later instead.
@@ -210,7 +219,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
                 $object->addParentLocation($locationObject);
             }
 
-            // Lastly delete, cannot delete first because Content cannot have zero locations.
+            // Lastly delete. We cannot delete first because Content cannot remove it's last Location.
             foreach ($delible as $delete) {
                 $this->locationService->deleteLocation($delete);
             }
