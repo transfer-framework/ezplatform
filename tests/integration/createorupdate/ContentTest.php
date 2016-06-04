@@ -5,7 +5,6 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Transfer\EzPlatform\Exception\MissingIdentificationPropertyException;
 use Transfer\EzPlatform\tests\testcase\ContentTestCase;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\Data\ValueObject;
