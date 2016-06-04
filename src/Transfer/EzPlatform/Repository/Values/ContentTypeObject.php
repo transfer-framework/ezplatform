@@ -10,53 +10,10 @@ namespace Transfer\EzPlatform\Repository\Values;
 
 use Transfer\EzPlatform\Repository\Values\Mapper\ContentTypeMapper;
 
-/*
-
-** Available keys: **
-
-    $data = [
-        identifier               => string
-        contenttype_groups       => string[]
-        name                     => string
-        names                    => string[]
-        description              => string
-        descriptions             => string[]
-        name_schema              => string
-        url_alias_schema         => string
-        is_container             => bool
-        default_always_available => bool
-        default_sort_field       => int 1-12 Location::SORT_FIELD_*
-        default_sort_order       => int 0-1  Location::SORT_ORDER_DESC/SORT_ORDER_ASC
-        fields                   => FieldDefinitionObject[] {@link see FieldDefinitionObject}
-    ],
-    $properties = [
-        id                       => int
-        content_type_groups      => \eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup[]
-        action                   => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
-    ]
-
-
-** Required on `create`:
-**** Required by transfer:
-    A unique `identifier`
-    Atleast one field in `fields`
-
-**** Required by eZ:
-    A unique `identifier`
-    Atleast one `contenttype_groups` item
-    Atleast one field in `fields`
-
-** Required on `update`:
-**** Required by transfer:
-    An existing `identifier` and atleast one field in `fields`
-
-**** Required by eZ:
-    A unique `identifier`, and atleast one `contenttype_groups` item
-
-*/
-
 /**
  * Content type object.
+ *
+ * @see http://transfer-framework.com/docs/1.0/sources_and_targets/ezplatform/the_objects/contenttypeobject.html
  */
 class ContentTypeObject extends EzPlatformObject
 {
