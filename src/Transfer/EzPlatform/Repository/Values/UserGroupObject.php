@@ -11,49 +11,10 @@ namespace Transfer\EzPlatform\Repository\Values;
 
 use Transfer\EzPlatform\Repository\Values\Mapper\UserGroupMapper;
 
-/*
-
-** Available keys: **
-
-    $data = [
-        remote_id               => string
-        parent_id               => int      // Defaults to 12
-        main_language_code      => string   // Defaults to eng-GB
-        content_type_identifier => string   // Defaults to user_group
-        fields                  => array [field definition identifier => value]
-    ],
-    $properties = [
-        id                      => int (same as contentInfo->id)
-        content_info            => \eZ\Publish\API\Repository\Values\Content\ContentInfo
-        version_info            => \eZ\Publish\API\Repository\Values\Content\VersionInfo
-        action                  => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
-    ]
-
-
-** Required on `create`:
-**** Required by transfer:
-    Fields in `fields` marked as required by ContentType
-
-**** Required by eZ:
-    parent_id
-    content_type_identifier
-    language
-    Atleast one field defined in Fields
-
-
-** Required on `update`:
-**** Required by transfer:
-    `id`
-    Same as Content except for the defaults above
-
-**** Required by eZ:
-    id
-    Same as Content except for the defaults above
-
-*/
-
 /**
  * User Group object.
+ *
+ * @see http://transfer-framework.com/docs/1.0/sources_and_targets/ezplatform/the_objects/usergroupobject.html
  */
 class UserGroupObject extends EzPlatformObject
 {

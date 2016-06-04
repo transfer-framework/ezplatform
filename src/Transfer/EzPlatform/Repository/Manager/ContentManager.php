@@ -114,7 +114,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
 
         $createStruct = $this->contentService->newContentCreateStruct(
             $this->contentTypeService->loadContentTypeByIdentifier($object->getProperty('content_type_identifier')),
-            $object->getProperty('language')
+            $object->getProperty('main_language_code')
         );
 
         $this->mapObjectToContentStruct($object, $createStruct);
@@ -248,8 +248,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     {
         $this->assignStructFieldValues($object, $createStruct);
 
-        if ($object->getProperty('language')) {
-            $createStruct->mainLanguageCode = $object->getProperty('language');
+        if ($object->getProperty('main_language_code')) {
+            $createStruct->mainLanguageCode = $object->getProperty('main_language_code');
         }
 
         if ($object->getProperty('remote_id')) {

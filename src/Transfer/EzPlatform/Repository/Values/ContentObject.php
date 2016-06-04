@@ -14,53 +14,10 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\EzPlatform\Exception\InvalidDataStructureException;
 use Transfer\EzPlatform\Repository\Values\Mapper\ContentMapper;
 
-/*
-
-** Available keys: **
-
-    $data = [
-        my_first_field_identifier => my_first_field_value
-        my_second_field_identifier => my_second_field_value
-        ...
-    ],
-    $properties = [
-        id                      => int
-        name                    => string
-        remote_id               => string
-        content_info            => \eZ\Publish\API\Repository\Values\Content\ContentInfo
-        version_info            => \eZ\Publish\API\Repository\Values\Content\VersionInfo
-        main_object             => bool
-        parent_locations        => int|Location|LocationObject
-        content_type_identifier => string
-        language                => string
-        main_location_id        => int
-        action                  => int {@link see \Transfer\EzPlatform\Data\Action\Enum\Action}
-    ]
-
-
-** Required on `create`:
-**** Required by transfer:
-    * content_type_identifier
-    * $data with keys matching the required fields of the ContentType
-
-**** Required by eZ:
-    * `content_type_identifier`
-    * `language`
-    Fields matching the required fields of the ContentType
-
-** Required on `update`:
-**** Required by transfer:
-    One of `id`, or `remote_id` must be present
-    Atleast one fieldtype
-
-**** Required by eZ:
-    One of `id`, or `remote_id` must be present
-    Atleast one fieldtype
-
-*/
-
 /**
  * Content object.
+ *
+ * @see http://transfer-framework.com/docs/1.0/sources_and_targets/ezplatform/the_objects/contentobject.html
  */
 class ContentObject extends EzPlatformObject
 {

@@ -47,7 +47,7 @@ class ContentTestCase extends EzPlatformTestCase
             array(
                 'remote_id' => $remoteId,
                 'content_type_identifier' => $contentTypeIdentifier,
-                'language' => $languageCode ?: 'eng-GB',
+                'main_language_code' => $languageCode ?: 'eng-GB',
             )
         );
 
