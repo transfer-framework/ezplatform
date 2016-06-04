@@ -48,7 +48,6 @@ class ContentMapper
         }
     }
 
-
     /**
      * Maps object data to create struct.
      *

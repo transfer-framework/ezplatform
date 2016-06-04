@@ -4,7 +4,6 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
-use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\LocationUpdateStruct;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
@@ -122,7 +121,6 @@ class LocationTest extends LocationTestCase
             static::$repository->getLocationService()->loadLocations($contentObject->getProperty('content_info'))
         );
     }
-
 
     /**
      * Tests location struct callback.
