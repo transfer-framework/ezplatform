@@ -9,6 +9,7 @@
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\Content\Language;
+use eZ\Publish\API\Repository\Values\Content\LanguageCreateStruct;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\tests\testcase\LanguageTestCase;
 
@@ -36,5 +37,28 @@ class LanguageTest extends LanguageTestCase
         $real = static::$repository->getContentLanguageService()->loadLanguage($code);
         $this->assertInstanceOf(Language::class, $real);
         $this->assertEquals('Advanced Chinese', $real->name);
+    }
+
+    /**
+     * Tests language struct callback.
+     */
+    public function testStructCallback()
+    {
+        $code = 'swe-SE';
+        $name = 'Svensk';
+
+        $languageObject = $this->getLanguage($code);
+
+        $languageObject->setStructCallback(function (LanguageCreateStruct $struct) use ($name) {
+            $struct->name = $name;
+        });
+
+        $this->adapter->send(new Request(array(
+            $languageObject,
+        )));
+
+        $language = static::$repository->getContentLanguageService()->loadLanguage($code);
+
+        $this->assertEquals($name, $language->name);
     }
 }

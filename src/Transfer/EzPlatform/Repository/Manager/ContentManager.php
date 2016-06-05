@@ -114,7 +114,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             $object->getProperty('main_language_code')
         );
 
-        $object->getMapper()->mapObjectToCreateStruct($object, $createStruct);
+        $object->getMapper()->mapObjectToCreateStruct($createStruct);
 
         /** @var LocationObject[] $locationObjects */
         $locationObjects = $object->getProperty('parent_locations');
@@ -122,7 +122,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         if (is_array($locationObjects) && count($locationObjects) > 0) {
             foreach ($locationObjects as $locationObject) {
                 $locationCreateStruct = $this->locationService->newLocationCreateStruct($locationObject->data['parent_location_id']);
-                $locationObject->getMapper()->getNewLocationCreateStruct($locationCreateStruct);
+                $locationObject->getMapper()->mapObjectToCreateStruct($locationCreateStruct);
                 $locationCreateStructs[] = $locationCreateStruct;
             }
         }
@@ -158,7 +158,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         $contentDraft = $this->contentService->createContentDraft($object->getProperty('content_info'));
 
         $contentUpdateStruct = $this->contentService->newContentUpdateStruct();
-        $object->getMapper()->mapObjectToUpdateStruct($object, $contentUpdateStruct);
+        $object->getMapper()->mapObjectToUpdateStruct($contentUpdateStruct);
 
         $contentDraft = $this->contentService->updateContent($contentDraft->versionInfo, $contentUpdateStruct);
         $content = $this->contentService->publishVersion($contentDraft->versionInfo);

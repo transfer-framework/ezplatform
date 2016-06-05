@@ -34,6 +34,9 @@ class UserGroupMapper
         $this->userGroupObject = $userGroupObject;
     }
 
+    /**
+     * @param UserGroup $userGroup
+     */
     public function userGroupToObject(UserGroup $userGroup)
     {
         $this->userGroupObject->data['parent_id'] = $userGroup->parentId;
@@ -49,29 +52,81 @@ class UserGroupMapper
     }
 
     /**
-     * @param UserGroupCreateStruct $userGroupCreateStruct
+     * @param UserGroupCreateStruct $createStruct
      */
-    public function populateUserGroupCreateStruct(UserGroupCreateStruct $userGroupCreateStruct)
+    public function mapObjectToCreateStruct(UserGroupCreateStruct $createStruct)
     {
-        if (isset($this->userGroupObject->data['remote_id'])) {
-            $userGroupCreateStruct->remoteId = $this->userGroupObject->data['remote_id'];
-        }
+        // Name collection (ez => transfer)
+        $keys = array(
+            'remoteId' => 'remote_id',
+        );
 
-        $fields = array_flip($this->userGroupObject->data['fields']);
-        array_walk($fields, array($userGroupCreateStruct, 'setField'));
+        $this->arrayToStruct($createStruct, $keys);
+
+        $this->assignStructFieldValues($createStruct);
+
+        $this->callStruct($createStruct);
     }
 
     /**
-     * @param UserGroupUpdateStruct $userGroupUpdateStruct
+     * @param UserGroupUpdateStruct $updateStruct
      */
-    public function populateUserGroupUpdateStruct(UserGroupUpdateStruct $userGroupUpdateStruct)
+    public function mapObjectToUpdateStruct(UserGroupUpdateStruct $updateStruct)
     {
-        if (isset($this->userGroupObject->data['remote_id'])) {
-            $userGroupUpdateStruct->contentMetadataUpdateStruct = new ContentMetadataUpdateStruct();
-            $userGroupUpdateStruct->contentMetadataUpdateStruct->remoteId = $this->userGroupObject->data['remote_id'];
-        }
+        // Name collection (ez => transfer)
+        $keys = array(
+            'remoteId' => 'remote_id',
+        );
 
-        $fields = array_flip($this->userGroupObject->data['fields']);
-        array_walk($fields, array($userGroupUpdateStruct->contentUpdateStruct, 'setField'));
+        $this->arrayToStruct($updateStruct, $keys);
+
+        $this->assignStructFieldValues($updateStruct);
+
+        $this->callStruct($updateStruct);
+    }
+
+    /**
+     * @param UserGroupCreateStruct $struct Struct to assign values to
+     */
+    private function assignStructFieldValues($struct)
+    {
+        foreach ($this->userGroupObject->data['fields'] as $key => $value) {
+            if ($struct instanceof UserGroupUpdateStruct) {
+                $struct->contentUpdateStruct->setField($key, $value);
+            } else {
+                $struct->setField($key, $value);
+            }
+        }
+    }
+
+    /**
+     * @param UserGroupCreateStruct|UserGroupUpdateStruct $struct
+     * @param array                                       $keys
+     */
+    private function arrayToStruct($struct, $keys)
+    {
+        foreach ($keys as $ezKey => $transferKey) {
+            if (isset($this->userGroupObject->data[$transferKey])) {
+                if ($struct instanceof UserGroupUpdateStruct) {
+                    if (!$struct->contentMetadataUpdateStruct) {
+                        $struct->contentMetadataUpdateStruct = new ContentMetadataUpdateStruct();
+                    }
+                    $struct->contentMetadataUpdateStruct->$ezKey = $this->userGroupObject->data[$transferKey];
+                } else {
+                    $struct->$ezKey = $this->userGroupObject->data[$transferKey];
+                }
+            }
+        }
+    }
+
+    /**
+     * @param UserGroupCreateStruct|UserGroupUpdateStruct $struct
+     */
+    private function callStruct($struct)
+    {
+        if ($this->userGroupObject->getProperty('struct_callback')) {
+            $callback = $this->userGroupObject->getProperty('struct_callback');
+            $callback($struct);
+        }
     }
 }

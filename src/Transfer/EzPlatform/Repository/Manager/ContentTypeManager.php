@@ -116,12 +116,12 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         $this->updateContentTypeLanguages($object);
 
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($object->data['identifier']);
-        $object->getMapper()->fillContentTypeCreateStruct($contentTypeCreateStruct);
+        $object->getMapper()->mapObjectToCreateStruct($contentTypeCreateStruct);
 
         foreach ($object->data['fields'] as $field) {
             /* @var FieldDefinitionObject $field */
             $fieldCreateStruct = $this->contentTypeService->newFieldDefinitionCreateStruct($field->data['identifier'], $field->data['type']);
-            $field->getMapper()->populateFieldDefinitionCreateStruct($fieldCreateStruct);
+            $field->getMapper()->mapObjectToCreateStruct($fieldCreateStruct);
             $contentTypeCreateStruct->addFieldDefinition($fieldCreateStruct);
         }
 
@@ -172,7 +172,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
         );
 
         $contentTypeUpdateStruct = $this->contentTypeService->newContentTypeUpdateStruct();
-        $object->getMapper()->fillContentTypeUpdateStruct($contentTypeUpdateStruct);
+        $object->getMapper()->mapObjectToUpdateStruct($contentTypeUpdateStruct);
 
         $this->contentTypeService->updateContentTypeDraft($contentTypeDraft, $contentTypeUpdateStruct);
         $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
@@ -282,7 +282,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     private function createFieldDefinition(FieldDefinitionObject $field)
     {
         $definition = $this->contentTypeService->newFieldDefinitionCreateStruct($field->data['identifier'], $field->data['type']);
-        $field->getMapper()->populateFieldDefinitionCreateStruct($definition);
+        $field->getMapper()->mapObjectToCreateStruct($definition);
 
         return $definition;
     }
@@ -295,7 +295,7 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     private function updateFieldDefinition(FieldDefinitionObject $field)
     {
         $definition = $this->contentTypeService->newFieldDefinitionUpdateStruct();
-        $field->getMapper()->populateFieldDefinitionUpdateStruct($definition);
+        $field->getMapper()->mapObjectToUpdateStruct($definition);
 
         return $definition;
     }

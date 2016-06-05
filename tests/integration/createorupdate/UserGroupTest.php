@@ -9,7 +9,9 @@
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\User\UserGroup;
+use eZ\Publish\API\Repository\Values\User\UserGroupCreateStruct;
 use Transfer\Adapter\Transaction\Request;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
 use Transfer\EzPlatform\tests\testcase\UserGroupTestCase;
 
 class UserGroupTest extends UserGroupTestCase
@@ -98,5 +100,34 @@ class UserGroupTest extends UserGroupTestCase
         $userGroupObject = $response->getData();
         $userGroupObject = $userGroupObject[0];
         $this->assertEquals($users_administrators_node_id, $userGroupObject->data['parent_id']);
+    }
+
+    /**
+     * Tests usergroup struct callback.
+     */
+    public function testStructCallback()
+    {
+        $remote_id = 'integration_usergroup_struct_callback';
+        $nodeId = $this->main_usergroup_id;
+
+        $userGroupObject = $this->getUsergroup(
+            array('name' => 'Struct callback usergroup'),
+            $nodeId,
+            $remote_id
+        );
+
+        $userGroupObject->setStructCallback(function (UserGroupCreateStruct $struct) {
+            $struct->ownerId = 10;
+        });
+
+        $response = $this->adapter->send(new Request(array(
+            $userGroupObject,
+        )));
+
+        /** @var UserGroupObject $userGroupObject */
+        $userGroupObject = current($response->getData());
+        $userGroup = static::$repository->getUserService()->loadUserGroup($userGroupObject->getProperty('id'));
+
+        $this->assertEquals(10, $userGroup->contentInfo->ownerId);
     }
 }

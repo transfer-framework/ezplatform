@@ -53,4 +53,14 @@ class UserGroupObject extends EzPlatformObject
 
         return $this->mapper;
     }
+
+    /**
+     * Allows direct control in UserGroupCreateStruct and UserGroupUpdateStruct.
+     *
+     * @param \Closure $callback
+     */
+    public function setStructCallback(\Closure $callback)
+    {
+        $this->setProperty('struct_callback', $callback);
+    }
 }

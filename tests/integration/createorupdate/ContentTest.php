@@ -212,7 +212,7 @@ class ContentTest extends ContentTestCase
             'title' => 'Test title',
         ), $remoteId, static::_content_type_article);
 
-        $contentObject->setProperty('struct_callback', function (ContentCreateStruct $struct) {
+        $contentObject->setStructCallback(function (ContentCreateStruct $struct) {
             $struct->sectionId = 44;
             $struct->ownerId = 12;
         });

@@ -46,37 +46,78 @@ class UserMapper
     }
 
     /**
-     * @param UserCreateStruct $userCreateStruct
+     * @param UserCreateStruct $createStruct
      */
-    public function getNewUserCreateStruct(UserCreateStruct $userCreateStruct)
+    public function mapObjectToCreateStruct(UserCreateStruct $createStruct)
     {
-        if (isset($this->userObject->data['enabled'])) {
-            $userCreateStruct->enabled = $this->userObject->data['enabled'];
-        }
+        // Name collection (ez => transfer)
+        $keys = array(
+            'enabled' => 'enabled',
+        );
 
-        $fields = array_flip($this->userObject->data['fields']);
-        array_walk($fields, array($userCreateStruct, 'setField'));
+        $this->arrayToStruct($createStruct, $keys);
+
+        $this->assignStructFieldValues($createStruct);
+
+        $this->callStruct($createStruct);
     }
 
     /**
-     * @param UserUpdateStruct $userUpdateStruct
+     * @param UserUpdateStruct $updateStruct
      */
-    public function getNewUserUpdateStruct(UserUpdateStruct $userUpdateStruct)
+    public function mapObjectToUpdateStruct(UserUpdateStruct $updateStruct)
     {
-        $userUpdateStruct->email = $this->userObject->data['email'];
+        $updateStruct->contentUpdateStruct = new ContentUpdateStruct();
 
-        if (isset($this->userObject->data['max_login'])) {
-            $userUpdateStruct->maxLogin = $this->userObject->data['max_login'];
+        // Name collection (ez => transfer)
+        $keys = array(
+            'email' => 'email',
+            'maxLogin' => 'max_login',
+            'enabled' => 'enabled',
+        );
+
+        $this->arrayToStruct($updateStruct, $keys);
+
+        $this->assignStructFieldValues($updateStruct);
+
+        $this->callStruct($updateStruct);
+    }
+
+    /**
+     * @param UserCreateStruct|UserUpdateStruct $struct
+     * @param array                             $keys
+     */
+    private function arrayToStruct($struct, $keys)
+    {
+        foreach ($keys as $ezKey => $transferKey) {
+            if (isset($this->userObject->data[$transferKey])) {
+                $struct->$ezKey = $this->userObject->data[$transferKey];
+            }
         }
+    }
 
-        if (isset($this->userObject->data['enabled'])) {
-            $userUpdateStruct->enabled = $this->userObject->data['enabled'];
+    /**
+     * @param UserCreateStruct|UserUpdateStruct $struct
+     */
+    private function assignStructFieldValues($struct)
+    {
+        foreach ($this->userObject->data['fields'] as $key => $value) {
+            if ($struct instanceof UserUpdateStruct) {
+                $struct->contentUpdateStruct->setField($key, $value);
+            } else {
+                $struct->setField($key, $value);
+            }
         }
+    }
 
-        if (isset($this->userObject->data['fields'])) {
-            $userUpdateStruct->contentUpdateStruct = new ContentUpdateStruct();
-            $fields = array_flip($this->userObject->data['fields']);
-            array_walk($fields, array($userUpdateStruct->contentUpdateStruct, 'setField'));
+    /**
+     * @param UserCreateStruct|UserUpdateStruct $struct
+     */
+    private function callStruct($struct)
+    {
+        if ($this->userObject->getProperty('struct_callback')) {
+            $callback = $this->userObject->getProperty('struct_callback');
+            $callback($struct);
         }
     }
 }

@@ -102,6 +102,16 @@ class LanguageObject extends EzPlatformObject
     }
 
     /**
+     * Allows direct control in LanguageCreateStruct.
+     *
+     * @param \Closure $callback
+     */
+    public function setStructCallback(\Closure $callback)
+    {
+        $this->setProperty('struct_callback', $callback);
+    }
+
+    /**
      * @param string $code
      *
      * @return string

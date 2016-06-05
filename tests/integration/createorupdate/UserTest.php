@@ -9,6 +9,7 @@
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
 use eZ\Publish\API\Repository\Values\User\User;
+use eZ\Publish\API\Repository\Values\User\UserCreateStruct;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\tests\testcase\UserTestCase;
 
@@ -49,5 +50,28 @@ class UserTest extends UserTestCase
         $real = static::$repository->getUserService()->loadUserByLogin($username);
         $this->assertInstanceOf(User::class, $real);
         $this->assertEquals($newEmail, $real->email);
+    }
+
+    /**
+     * Tests user struct callback.
+     */
+    public function testStructCallback()
+    {
+        $username = 'structcallback@example.com';
+        $sectionId = 10;
+
+        $userObject = $this->getUser($username);
+
+        $userObject->setStructCallback(function (UserCreateStruct $struct) use ($sectionId) {
+            $struct->sectionId = $sectionId;
+        });
+
+        $this->adapter->send(new Request(array(
+            $userObject,
+        )));
+
+        $user = static::$repository->getUserService()->loadUserByLogin($username);
+
+        $this->assertEquals($sectionId, $user->contentInfo->sectionId);
     }
 }

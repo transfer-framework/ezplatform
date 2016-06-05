@@ -10,7 +10,6 @@ namespace Transfer\EzPlatform\Repository\Values\Mapper;
 
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct;
-use eZ\Publish\API\Repository\Values\ValueObject;
 use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
 
 /**
@@ -36,37 +35,64 @@ class FieldDefinitionMapper
     }
 
     /**
-     * @param FieldDefinitionCreateStruct $fieldDefinitionStruct
+     * @param FieldDefinitionCreateStruct $createStruct
      */
-    public function populateFieldDefinitionCreateStruct(FieldDefinitionCreateStruct $fieldDefinitionStruct)
+    public function mapObjectToCreateStruct(FieldDefinitionCreateStruct $createStruct)
     {
-        $this->populateStruct($fieldDefinitionStruct);
+        // Name collection (ez => transfer)
+        $keys = array(
+            'names' => 'names',
+            'descriptions' => 'descriptions',
+            'fieldGroup' => 'field_group',
+            'position' => 'position',
+            'isTranslatable' => 'is_translatable',
+            'isRequired' => 'is_required',
+            'isInfoCollector' => 'is_info_collector',
+            'isSearchable' => 'is_searchable',
+            'fieldSettings' => 'field_settings',
+            'defaultValue' => 'default_value',
+            'identifier' => 'identifier',
+            'validatorConfiguration' => 'validator_configuration',
+            'fieldTypeIdentifier' => 'type',
+        );
+
+        $this->arrayToStruct($createStruct, $keys);
     }
 
     /**
-     * @param FieldDefinitionUpdateStruct $fieldDefinitionStruct
+     * @param FieldDefinitionUpdateStruct $updateStruct
      */
-    public function populateFieldDefinitionUpdateStruct(FieldDefinitionUpdateStruct $fieldDefinitionStruct)
+    public function mapObjectToUpdateStruct(FieldDefinitionUpdateStruct $updateStruct)
     {
-        $this->populateStruct($fieldDefinitionStruct);
+        // Name collection (ez => transfer)
+        $keys = array(
+            'names' => 'names',
+            'descriptions' => 'descriptions',
+            'fieldGroup' => 'field_group',
+            'position' => 'position',
+            'isTranslatable' => 'is_translatable',
+            'isRequired' => 'is_required',
+            'isInfoCollector' => 'is_info_collector',
+            'isSearchable' => 'is_searchable',
+            'fieldSettings' => 'field_settings',
+            'defaultValue' => 'default_value',
+            'identifier' => 'identifier',
+            'validatorConfiguration' => 'validator_configuration',
+        );
+
+        $this->arrayToStruct($updateStruct, $keys);
     }
 
     /**
-     * @param ValueObject $fieldDefinitionStruct
-     *
-     * @return ValueObject
+     * @param FieldDefinitionCreateStruct|FieldDefinitionUpdateStruct $struct
+     * @param array                                                   $keys
      */
-    protected function populateStruct(ValueObject $fieldDefinitionStruct)
+    private function arrayToStruct($struct, $keys)
     {
-        $fieldDefinitionStruct->names = $this->fieldDefinitionObject->data['names'];
-        $fieldDefinitionStruct->descriptions = $this->fieldDefinitionObject->data['descriptions'];
-        $fieldDefinitionStruct->fieldGroup = $this->fieldDefinitionObject->data['field_group'];
-        $fieldDefinitionStruct->position = $this->fieldDefinitionObject->data['position'];
-        $fieldDefinitionStruct->isTranslatable = $this->fieldDefinitionObject->data['is_translatable'];
-        $fieldDefinitionStruct->isRequired = $this->fieldDefinitionObject->data['is_required'];
-        $fieldDefinitionStruct->isInfoCollector = $this->fieldDefinitionObject->data['is_info_collector'];
-        $fieldDefinitionStruct->isSearchable = $this->fieldDefinitionObject->data['is_searchable'];
-
-        return $fieldDefinitionStruct;
+        foreach ($keys as $ezKey => $transferKey) {
+            if (isset($this->fieldDefinitionObject->data[$transferKey])) {
+                $struct->$ezKey = $this->fieldDefinitionObject->data[$transferKey];
+            }
+        }
     }
 }
