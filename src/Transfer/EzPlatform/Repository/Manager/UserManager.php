@@ -109,7 +109,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             $object->data['main_language_code']
         );
 
-        $object->getMapper()->getNewUserCreateStruct($userCreateStruct);
+        $object->getMapper()->mapObjectToCreateStruct($userCreateStruct);
 
         $groups = [];
         foreach ($object->data['parents'] as $userGroup) {
@@ -138,7 +138,7 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
 
         // Populate struct
         $userUpdateStruct = $this->userService->newUserUpdateStruct();
-        $object->getMapper()->getNewUserUpdateStruct($userUpdateStruct);
+        $object->getMapper()->mapObjectToUpdateStruct($userUpdateStruct);
 
         // Update user
         $user = $this->userService->updateUser($user, $userUpdateStruct);

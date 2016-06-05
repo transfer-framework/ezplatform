@@ -134,7 +134,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
         );
 
         // Populate usergroup fields
-        $object->getMapper()->populateUserGroupCreateStruct($userGroupCreateStruct);
+        $object->getMapper()->mapObjectToCreateStruct($userGroupCreateStruct);
 
         // Create usergroup
         $userGroup = $this->userService->createUserGroup($userGroupCreateStruct, $parentUserGroup);
@@ -158,7 +158,7 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
         $userGroupUpdateStruct = $this->userService->newUserGroupUpdateStruct();
         $userGroupUpdateStruct->contentUpdateStruct = $this->contentService->newContentUpdateStruct();
 
-        $object->getMapper()->populateUserGroupUpdateStruct($userGroupUpdateStruct);
+        $object->getMapper()->mapObjectToUpdateStruct($userGroupUpdateStruct);
 
         $userGroup = $this->userService->updateUserGroup($userGroup, $userGroupUpdateStruct);
 

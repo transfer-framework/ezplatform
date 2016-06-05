@@ -38,6 +38,16 @@ class ContentObject extends EzPlatformObject
     }
 
     /**
+     * Allows direct control in ContentCreateStruct and ContentUpdateStruct.
+     *
+     * @param \Closure $callback
+     */
+    public function setStructCallback(\Closure $callback)
+    {
+        $this->setProperty('struct_callback', $callback);
+    }
+
+    /**
      * Constructs content object.
      *
      * @param array|Content $data       Field data

@@ -128,7 +128,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
 
         $locationCreateStruct = $this->locationService->newLocationCreateStruct($object->data['parent_location_id']);
 
-        $object->getMapper()->getNewLocationCreateStruct($locationCreateStruct);
+        $object->getMapper()->mapObjectToCreateStruct($locationCreateStruct);
 
         $location = $this->locationService->createLocation($contentInfo, $locationCreateStruct);
 
@@ -162,7 +162,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
 
         $locationUpdateStruct = $this->locationService->newLocationUpdateStruct();
 
-        $object->getMapper()->getNewLocationUpdateStruct($locationUpdateStruct);
+        $object->getMapper()->mapObjectToUpdateStruct($locationUpdateStruct);
 
         $location = $this->locationService->updateLocation($location, $locationUpdateStruct);
 

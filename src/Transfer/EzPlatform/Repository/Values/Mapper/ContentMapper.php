@@ -48,57 +48,76 @@ class ContentMapper
     }
 
     /**
-     * Maps object data to create struct.
-     *
-     * @param ContentObject       $object       Content object to map from
-     * @param ContentCreateStruct $createStruct Content create struct to map to
+     * @param ContentCreateStruct $createStruct
      *
      * @throws \InvalidArgumentException
      */
-    public function mapObjectToCreateStruct(ContentObject $object, ContentCreateStruct $createStruct)
+    public function mapObjectToCreateStruct(ContentCreateStruct $createStruct)
     {
-        if ($object->getProperty('main_language_code')) {
-            $createStruct->mainLanguageCode = $object->getProperty('main_language_code');
-        }
+        // Name collection (ez => transfer)
+        $keys = array(
+            'mainLanguageCode' => 'main_language_code',
+            'remoteId' => 'remote_id',
+        );
 
-        if ($object->getProperty('remote_id')) {
-            $createStruct->remoteId = $object->getProperty('remote_id');
-        }
+        $this->arrayToStruct($createStruct, $keys);
 
-        $this->assignStructFieldValues($object, $createStruct);
+        $this->assignStructFieldValues($createStruct);
+
+        $this->callStruct($createStruct);
     }
 
     /**
-     * Maps object data to update struct.
-     *
-     * @param ContentObject       $object              Content object to map from
-     * @param ContentUpdateStruct $contentUpdateStruct Content update struct to map to
-     *
-     * @throws \InvalidArgumentException
+     * @param ContentUpdateStruct $updateStruct
      */
-    public function mapObjectToUpdateStruct(ContentObject $object, ContentUpdateStruct $contentUpdateStruct)
+    public function mapObjectToUpdateStruct(ContentUpdateStruct $updateStruct)
     {
-        $this->assignStructFieldValues($object, $contentUpdateStruct);
+        // Name collection (ez => transfer)
+        $keys = array(
+            'creatorId' => 'creator_id',
+        );
+
+        $this->arrayToStruct($updateStruct, $keys);
+
+        $this->assignStructFieldValues($updateStruct);
+
+        $this->callStruct($updateStruct);
     }
 
     /**
-     * Copies content object data from a struct.
-     *
-     * @param ContentObject $object Content object to get values from
-     * @param object        $struct Struct to assign values to
+     * @param ContentCreateStruct|ContentUpdateStruct $struct
      */
-    private function assignStructFieldValues(ContentObject $object, $struct)
+    private function assignStructFieldValues($struct)
     {
-        foreach ($object->data as $key => $value) {
+        foreach ($this->contentObject->data as $key => $value) {
             if (is_array($value)) {
                 $value = end($value);
             }
 
             $struct->setField($key, $value);
         }
+    }
 
-        if ($object->getProperty('struct_callback')) {
-            $callback = $object->getProperty('struct_callback');
+    /**
+     * @param ContentCreateStruct|ContentUpdateStruct $struct
+     * @param array                                   $keys
+     */
+    private function arrayToStruct($struct, $keys)
+    {
+        foreach ($keys as $ezKey => $transferKey) {
+            if ($this->contentObject->getProperty($transferKey)) {
+                $struct->$ezKey = $this->contentObject->getProperty($transferKey);
+            }
+        }
+    }
+
+    /**
+     * @param ContentCreateStruct|ContentUpdateStruct $struct
+     */
+    private function callStruct($struct)
+    {
+        if ($this->contentObject->getProperty('struct_callback')) {
+            $callback = $this->contentObject->getProperty('struct_callback');
             $callback($struct);
         }
     }

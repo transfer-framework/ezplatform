@@ -30,15 +30,21 @@ class ContentTypeTestCase extends EzPlatformTestCase
         );
     }
 
-    protected function getContentTypeMini($identifier)
+    protected function getContentTypeMiniData($identifier)
     {
-        return array(array(
+        return array(
             'identifier' => $identifier,
             'fields' => array(
-                'title' => array(),
-                'content' => array(),
+                'title' => array(
+                    'type' => 'ezstring',
+                    'position' => 10,
+                ),
+                'content' => array(
+                    'type' => 'ezstring',
+                    'position' => 20,
+                ),
             ),
-        ));
+        );
     }
 
     protected function getContentTypeFull($identifier)
