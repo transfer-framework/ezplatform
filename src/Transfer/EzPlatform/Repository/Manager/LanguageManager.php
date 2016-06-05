@@ -100,8 +100,7 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
             $this->languageService->enableLanguage($language);
         } catch (NotFoundException $notFoundException) {
             $languageCreateStruct = $this->languageService->newLanguageCreateStruct();
-            $languageCreateStruct->languageCode = $object->data['code'];
-            $languageCreateStruct->name = $object->data['name'];
+            $object->getMapper()->mapObjectToCreateStruct($languageCreateStruct);
             $language = $this->languageService->createLanguage($languageCreateStruct);
         }
 

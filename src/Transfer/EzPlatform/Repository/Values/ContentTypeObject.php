@@ -37,6 +37,16 @@ class ContentTypeObject extends EzPlatformObject
     }
 
     /**
+     * Allows direct control in ContentTypeCreateStruct and ContentTypeUpdateStruct.
+     *
+     * @param \Closure $callback
+     */
+    public function setStructCallback(\Closure $callback)
+    {
+        $this->setProperty('struct_callback', $callback);
+    }
+
+    /**
      * Values in array must be of type Location, LocationObject or int.
      *
      * @param array $fieldDefinitionObjects
@@ -67,6 +77,10 @@ class ContentTypeObject extends EzPlatformObject
      */
     private function setMissingDefaults()
     {
+        if (!isset($this->data['contenttype_groups'])) {
+            $this->data['contenttype_groups'] = array('Content');
+        }
+
         if ($this->notSetOrEmpty($this->data, 'names')) {
             $this->data['names'] = array(
                 $this->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
@@ -110,13 +124,15 @@ class ContentTypeObject extends EzPlatformObject
      */
     public function getLanguageCodes()
     {
-        return array_unique(
-            array_merge(
-                array($this->data['main_language_code']),
-                array_keys($this->data['names']),
-                array_keys($this->data['descriptions'])
-            )
-        );
+        $languageCodes = array($this->data['main_language_code']);
+        if (isset($this->data['names'])) {
+            array_merge($languageCodes, array_keys($this->data['names']));
+        }
+        if (isset($this->data['descriptions'])) {
+            array_merge($languageCodes, array_keys($this->data['descriptions']));
+        }
+
+        return array_unique($languageCodes);
     }
 
     /**

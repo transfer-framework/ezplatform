@@ -104,6 +104,10 @@ class FieldDefinitionObject extends EzPlatformObject
 
     private function setMissingDefaults()
     {
+        if (!isset($this->contentType->data['main_language_code'])) {
+            $this->contentType->data['main_language_code'] = 'eng-GB';
+        }
+
         if (!isset($this->data['names']) || empty($this->data['names'])) {
             $this->data['names'] = array(
                 $this->contentType->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
