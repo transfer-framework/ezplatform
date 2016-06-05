@@ -8,8 +8,11 @@
  */
 namespace Transfer\EzPlatform\tests\integration\createorupdate;
 
+use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
 use Transfer\Adapter\Transaction\Request;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\tests\testcase\ContentTypeTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
@@ -19,7 +22,7 @@ class ContentTypeTest extends ContentTypeTestCase
     {
         $identifier = 'product';
 
-        $contentObjectData = $this->getContentTypeMini($identifier);
+        $contentObjectData = array($this->getContentTypeMiniData($identifier));
         $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
         $raw = current($transformer->handle($contentObjectData));
 
@@ -63,5 +66,32 @@ class ContentTypeTest extends ContentTypeTestCase
 
         $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
         $this->assertCount(1, $real->getContentTypeGroups());
+    }
+
+    /**
+     * Tests content struct callback.
+     */
+    public function testStructCallback()
+    {
+        $remoteId = 'test_integration_contenttype_3';
+        $identifier = 'struct_example';
+
+        $contentTypeObject = new ContentTypeObject($this->getContentTypeMiniData($identifier));
+
+        $contentTypeObject->setStructCallback(function (ContentTypeCreateStruct $struct) use ($remoteId) {
+            $struct->isContainer = false;
+            $struct->defaultSortField = Location::SORT_FIELD_SECTION;
+            $struct->remoteId = $remoteId;
+        });
+
+        $this->adapter->send(new Request(array(
+            $contentTypeObject,
+        )));
+
+        $contentType = static::$repository->getContentTypeService()->loadContentTypeByRemoteId($remoteId);
+
+        $this->assertEquals($remoteId, $contentType->remoteId);
+        $this->assertEquals(Location::SORT_FIELD_SECTION, $contentType->defaultSortField);
+        $this->assertFalse($contentType->isContainer);
     }
 }

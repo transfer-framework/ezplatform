@@ -39,6 +39,16 @@ class LocationObject extends EzPlatformObject
     }
 
     /**
+     * Allows direct control in LocationCreateStruct and LocationUpdateStruct.
+     *
+     * @param \Closure $callback
+     */
+    public function setStructCallback(\Closure $callback)
+    {
+        $this->setProperty('struct_callback', $callback);
+    }
+
+    /**
      * @return LocationMapper
      */
     public function getMapper()

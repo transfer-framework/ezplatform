@@ -33,4 +33,14 @@ class UserObject extends EzPlatformObject
 
         return $this->mapper;
     }
+
+    /**
+     * Allows direct control in UserCreateStruct and UserUpdateStruct.
+     *
+     * @param \Closure $callback
+     */
+    public function setStructCallback(\Closure $callback)
+    {
+        $this->setProperty('struct_callback', $callback);
+    }
 }

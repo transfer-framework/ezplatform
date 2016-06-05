@@ -52,65 +52,62 @@ class LocationMapper
     }
 
     /**
-     * @param LocationCreateStruct $locationCreateStruct
+     * @param LocationCreateStruct $createStruct
      */
-    public function getNewLocationCreateStruct(LocationCreateStruct $locationCreateStruct)
+    public function mapObjectToCreateStruct(LocationCreateStruct $createStruct)
     {
-        if (isset($this->locationObject->data['remote_id'])) {
-            $locationCreateStruct->remoteId = $this->locationObject->data['remote_id'];
-        }
+        // Name collection (ez => transfer)
+        $keys = array(
+            'remoteId' => 'remote_id',
+            'hidden' => 'hidden',
+            'priority' => 'priority',
+            'sortField' => 'sort_field',
+            'sortOrder' => 'sort_order',
+        );
 
-        if (isset($this->locationObject->data['hidden'])) {
-            $locationCreateStruct->hidden = $this->locationObject->data['hidden'];
-        }
+        $this->arrayToStruct($createStruct, $keys);
 
-        if (isset($this->locationObject->data['priority'])) {
-            $locationCreateStruct->priority = $this->locationObject->data['priority'];
-        }
-
-        if (isset($this->locationObject->data['sort_field'])) {
-            $locationCreateStruct->sortField = $this->locationObject->data['sort_field'];
-        }
-
-        if (isset($this->locationObject->data['sort_order'])) {
-            $locationCreateStruct->sortOrder = $this->locationObject->data['sort_order'];
-        }
-
-        $this->assignStructValues($this->locationObject, $locationCreateStruct);
+        $this->callStruct($createStruct);
     }
 
     /**
-     * @param LocationUpdateStruct $locationUpdateStruct
+     * @param LocationUpdateStruct $updateStruct
      */
-    public function getNewLocationUpdateStruct(LocationUpdateStruct $locationUpdateStruct)
+    public function mapObjectToUpdateStruct(LocationUpdateStruct $updateStruct)
     {
-        if (isset($this->locationObject->data['remote_id'])) {
-            $locationUpdateStruct->remoteId = $this->locationObject->data['remote_id'];
-        }
+        // Name collection (ez => transfer)
+        $keys = array(
+            'remoteId' => 'remote_id',
+            'priority' => 'priority',
+            'sortField' => 'sort_field',
+            'sortOrder' => 'sort_order',
+        );
 
-        if (isset($this->locationObject->data['priority'])) {
-            $locationUpdateStruct->priority = $this->locationObject->data['priority'];
-        }
+        $this->arrayToStruct($updateStruct, $keys);
 
-        if (isset($this->locationObject->data['sort_field'])) {
-            $locationUpdateStruct->sortField = $this->locationObject->data['sort_field'];
-        }
-
-        if (isset($this->locationObject->data['sort_order'])) {
-            $locationUpdateStruct->sortOrder = $this->locationObject->data['sort_order'];
-        }
-
-        $this->assignStructValues($this->locationObject, $locationUpdateStruct);
+        $this->callStruct($updateStruct);
     }
 
     /**
-     * @param LocationObject                            $object
+     * @param LocationCreateStruct|LocationUpdateStruct $struct
+     * @param array                                     $keys
+     */
+    private function arrayToStruct($struct, $keys)
+    {
+        foreach ($keys as $ezKey => $transferKey) {
+            if (isset($this->locationObject->data[$transferKey])) {
+                $struct->$ezKey = $this->locationObject->data[$transferKey];
+            }
+        }
+    }
+
+    /**
      * @param LocationCreateStruct|LocationUpdateStruct $struct
      */
-    private function assignStructValues(LocationObject $object, $struct)
+    private function callStruct($struct)
     {
-        if ($object->getProperty('struct_callback')) {
-            $callback = $object->getProperty('struct_callback');
+        if ($this->locationObject->getProperty('struct_callback')) {
+            $callback = $this->locationObject->getProperty('struct_callback');
             $callback($struct);
         }
     }

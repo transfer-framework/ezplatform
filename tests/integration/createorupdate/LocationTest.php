@@ -137,7 +137,7 @@ class LocationTest extends LocationTestCase
         $parentLocationId = 2;
 
         $locationObject = $this->getLocationObject($remoteId, $this->_test_content_id_1, $parentLocationId);
-        $locationObject->setProperty('struct_callback', function (LocationUpdateStruct $struct) {
+        $locationObject->setStructCallback(function (LocationUpdateStruct $struct) {
             $struct->priority = 1000;
         });
 
