@@ -9,6 +9,8 @@
 
 namespace Transfer\EzPlatform\Repository\Manager\Core;
 
+use Transfer\EzPlatform\Repository\Manager\Sub\ContentTypeGroupSubManager;
+use Transfer\EzPlatform\Repository\Manager\Sub\FieldDefinitionSubManager;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Values\LanguageObject;
@@ -58,6 +60,16 @@ class ObjectService extends AbstractRepositoryService
      * @var UserManager
      */
     private $userManager;
+
+    /**
+     * @var FieldDefinitionSubManager
+     */
+    private $fieldDefinitionSubManager;
+
+    /**
+     * @var ContentTypeGroupSubManager
+     */
+    private $contentTypeGroupSubManager;
 
     /**
      * Returns content manager.
@@ -110,7 +122,13 @@ class ObjectService extends AbstractRepositoryService
             return $this->contentTypeManager;
         }
 
-        $this->contentTypeManager = new ContentTypeManager($this->repository, $this->getLanguageManager());
+        $this->contentTypeManager = new ContentTypeManager(
+            $this->repository,
+            $this->getLanguageManager(),
+            $this->getFieldDefinitionSubManager(),
+            $this->getContentTypeGroupSubManager()
+        );
+
         if ($this->logger) {
             $this->contentTypeManager->setLogger($this->logger);
         }
@@ -176,6 +194,39 @@ class ObjectService extends AbstractRepositoryService
         }
 
         return $this->userManager;
+    }
+
+    /**
+     * @return FieldDefinitionSubManager
+     */
+    public function getFieldDefinitionSubManager()
+    {
+        if ($this->fieldDefinitionSubManager != null) {
+            return $this->fieldDefinitionSubManager;
+        }
+
+        $this->fieldDefinitionSubManager = new FieldDefinitionSubManager($this->getContentTypeService());
+
+        if ($this->logger) {
+            $this->fieldDefinitionSubManager->setLogger($this->logger);
+        }
+
+        return $this->fieldDefinitionSubManager;
+    }
+
+    public function getContentTypeGroupSubManager()
+    {
+        if ($this->contentTypeGroupSubManager != null) {
+            return $this->contentTypeGroupSubManager;
+        }
+
+        $this->contentTypeGroupSubManager = new ContentTypeGroupSubManager($this->getContentTypeService());
+
+        if ($this->logger) {
+            $this->contentTypeGroupSubManager->setLogger($this->logger);
+        }
+
+        return $this->contentTypeGroupSubManager;
     }
 
     /**

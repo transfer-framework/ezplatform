@@ -57,6 +57,8 @@ class FieldDefinitionMapper
         );
 
         $this->arrayToStruct($createStruct, $keys);
+
+        $this->callStruct($createStruct);
     }
 
     /**
@@ -81,6 +83,8 @@ class FieldDefinitionMapper
         );
 
         $this->arrayToStruct($updateStruct, $keys);
+
+        $this->callStruct($updateStruct);
     }
 
     /**
@@ -93,6 +97,17 @@ class FieldDefinitionMapper
             if (isset($this->fieldDefinitionObject->data[$transferKey])) {
                 $struct->$ezKey = $this->fieldDefinitionObject->data[$transferKey];
             }
+        }
+    }
+
+    /**
+     * @param FieldDefinitionCreateStruct|FieldDefinitionUpdateStruct $struct
+     */
+    private function callStruct($struct)
+    {
+        if ($this->fieldDefinitionObject->getProperty('struct_callback')) {
+            $callback = $this->fieldDefinitionObject->getProperty('struct_callback');
+            $callback($struct);
         }
     }
 }

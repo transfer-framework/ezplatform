@@ -68,7 +68,7 @@ class FieldDefinitionObject extends EzPlatformObject
     /**
      * {@inheritdoc}
      */
-    public function __construct($identifier, ContentTypeObject $parent, $data = array())
+    public function __construct($identifier, ContentTypeObject $parent, array $data = array())
     {
         $data['identifier'] = $identifier;
         $this->contentType = &$parent;
@@ -113,5 +113,15 @@ class FieldDefinitionObject extends EzPlatformObject
                 $this->contentType->data['main_language_code'] => $this->identifierToReadable($this->data['identifier']),
             );
         }
+    }
+
+    /**
+     * Allows direct control in FieldDefintiionCreateStruct and FieldDefintiionUpdateStruct.
+     *
+     * @param \Closure $callback
+     */
+    public function setStructCallback(\Closure $callback)
+    {
+        $this->setProperty('struct_callback', $callback);
     }
 }
