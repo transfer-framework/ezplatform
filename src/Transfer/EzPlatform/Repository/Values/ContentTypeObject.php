@@ -62,14 +62,12 @@ class ContentTypeObject extends EzPlatformObject
     /**
      * Convert parameters to FieldDefinitionObject and stores it on the ContentTypeObject.
      *
-     * @param string $identifier
-     * @param $fieldDefinitionObject
-     *
-     * @internal param array|FieldDefinitionObject $fieldDefinition
+     * @param string                      $identifier
+     * @param array|FieldDefinitionObject $fieldDefinition
      */
-    public function addFieldDefinitionObject($identifier, $fieldDefinitionObject)
+    public function addFieldDefinitionObject($identifier, $fieldDefinition)
     {
-        $this->data['fields'][$identifier] = new FieldDefinitionObject($identifier, $this, $fieldDefinitionObject);
+        $this->data['fields'][$identifier] = $this->convertToFieldDefintionObject($identifier, $fieldDefinition);
     }
 
     /**
@@ -145,5 +143,20 @@ class ContentTypeObject extends EzPlatformObject
         }
 
         return $this->mapper;
+    }
+
+    /**
+     * @param string                      $identifier
+     * @param array|FieldDefinitionObject $fieldDefinition
+     *
+     * @return FieldDefinitionObject
+     */
+    private function convertToFieldDefintionObject($identifier, $fieldDefinition)
+    {
+        if ($fieldDefinition instanceof FieldDefinitionObject) {
+            return $fieldDefinition;
+        } else {
+            return new FieldDefinitionObject($identifier, $this, $fieldDefinition);
+        }
     }
 }

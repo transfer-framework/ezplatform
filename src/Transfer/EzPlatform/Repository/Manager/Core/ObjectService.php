@@ -9,6 +9,8 @@
 
 namespace Transfer\EzPlatform\Repository\Manager\Core;
 
+use Transfer\EzPlatform\Repository\Manager\Sub\ContentTypeGroupSubManager;
+use Transfer\EzPlatform\Repository\Manager\Sub\FieldDefinitionSubManager;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Values\LanguageObject;
@@ -110,7 +112,11 @@ class ObjectService extends AbstractRepositoryService
             return $this->contentTypeManager;
         }
 
-        $this->contentTypeManager = new ContentTypeManager($this->repository, $this->getLanguageManager());
+        $this->contentTypeManager = new ContentTypeManager(
+            $this->repository,
+            $this->getLanguageManager()
+        );
+
         if ($this->logger) {
             $this->contentTypeManager->setLogger($this->logger);
         }
