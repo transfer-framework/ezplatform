@@ -19,6 +19,8 @@ use Transfer\EzPlatform\Repository\Manager\Core\ContentTreeService;
 use Transfer\EzPlatform\Repository\Manager\Core\ObjectService;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
+use Transfer\EzPlatform\Repository\Manager\Sub\ContentTypeGroupSubManager;
+use Transfer\EzPlatform\Repository\Manager\Sub\FieldDefinitionSubManager;
 use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
 use Transfer\EzPlatform\Repository\Manager\UserManager;
 
@@ -78,6 +80,16 @@ abstract class EzPlatformTestCase extends KernelTestCase
     protected static $contentTreeService;
 
     /**
+     * @var FieldDefinitionSubManager
+     */
+    protected static $fieldDefinitionSubManager;
+
+    /**
+     * @var ContentTypeGroupSubManager
+     */
+    protected static $contentTypeGroupSubManager;
+
+    /**
      * @var bool
      */
     protected static $hasDatabase;
@@ -91,15 +103,17 @@ abstract class EzPlatformTestCase extends KernelTestCase
         $setupFactory = new SetupFactory();
         static::$repository = $setupFactory->getRepository();
 
-        static::$languageManager = new LanguageManager(static::$repository);
-        static::$contentTypeManager = new ContentTypeManager(static::$repository, static::$languageManager);
-        static::$userGroupManager = new UserGroupManager(static::$repository);
-        static::$userManager = new UserManager(static::$repository, static::$userGroupManager);
-        static::$locationManager = new LocationManager(static::$repository);
-        static::$contentManager = new ContentManager(static::$repository, static::$locationManager);
-
+        // Services
         static::$objectService = new ObjectService(static::$repository);
         static::$contentTreeService = new ContentTreeService(static::$repository, static::$objectService);
+
+        // Managers
+        static::$languageManager = static::$objectService->getLanguageManager();
+        static::$contentTypeManager = static::$objectService->getContentTypeManager();
+        static::$userGroupManager = static::$objectService->getUserGroupManager();
+        static::$userManager = static::$objectService->getUserManager();
+        static::$locationManager = static::$objectService->getLocationManager();
+        static::$contentManager = static::$objectService->getContentManager();
 
         static::$hasDatabase = true;
     }

@@ -13,6 +13,8 @@ use Transfer\EzPlatform\Repository\Manager\ContentManager;
 use Transfer\EzPlatform\Repository\Manager\ContentTypeManager;
 use Transfer\EzPlatform\Repository\Manager\LanguageManager;
 use Transfer\EzPlatform\Repository\Manager\LocationManager;
+use Transfer\EzPlatform\Repository\Manager\Sub\ContentTypeGroupSubManager;
+use Transfer\EzPlatform\Repository\Manager\Sub\FieldDefinitionSubManager;
 use Transfer\EzPlatform\Repository\Manager\UserGroupManager;
 use Transfer\EzPlatform\Repository\Manager\UserManager;
 use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
@@ -32,6 +34,8 @@ class ObjectServiceTest extends EzPlatformTestCase
         $languageManager = static::$objectService->getLanguageManager();
         $userManager = static::$objectService->getUserManager();
         $userGroupManager = static::$objectService->getUserGroupManager();
+        $fieldDefinitionSubManager = static::$objectService->getFieldDefinitionSubManager();
+        $contentTypeGroupSubManager = static::$objectService->getContentTypeGroupSubManager();
 
         $this->assertInstanceOf(ContentManager::class, $contentManager);
         $this->assertInstanceOf(LocationManager::class, $locationManager);
@@ -39,6 +43,8 @@ class ObjectServiceTest extends EzPlatformTestCase
         $this->assertInstanceOf(LanguageManager::class, $languageManager);
         $this->assertInstanceOf(UserManager::class, $userManager);
         $this->assertInstanceOf(UserGroupManager::class, $userGroupManager);
+        $this->assertInstanceOf(FieldDefinitionSubManager::class, $fieldDefinitionSubManager);
+        $this->assertInstanceOf(ContentTypeGroupSubManager::class, $contentTypeGroupSubManager);
     }
 
     public function testDelete()

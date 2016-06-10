@@ -11,8 +11,10 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
 use Transfer\Adapter\Transaction\Request;
 use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
 use Transfer\EzPlatform\tests\testcase\ContentTypeTestCase;
 use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
@@ -93,5 +95,38 @@ class ContentTypeTest extends ContentTypeTestCase
         $this->assertEquals($remoteId, $contentType->remoteId);
         $this->assertEquals(Location::SORT_FIELD_SECTION, $contentType->defaultSortField);
         $this->assertFalse($contentType->isContainer);
+    }
+
+    /**
+     * Tests field definitions struct callback.
+     */
+    public function testFieldDefinitionStructCallback()
+    {
+        $remoteId = 'test_integration_fielddefinition_1';
+        $identifier = 'struct_fielddefinition_example';
+        $fieldDefinitionIdentifier = 'my_field';
+
+        $contentTypeObject = new ContentTypeObject($this->getContentTypeMiniData($identifier));
+        $contentTypeObject->setStructCallback(function (ContentTypeCreateStruct $struct) use ($remoteId) {
+            $struct->remoteId = $remoteId;
+        });
+
+        $fieldDefinition = new FieldDefinitionObject($fieldDefinitionIdentifier, $contentTypeObject, array(
+            'type' => 'ezstring',
+        ));
+
+        $fieldDefinition->setStructCallback(function (FieldDefinitionCreateStruct $createStruct) {
+            $createStruct->position = 50;
+        });
+        $contentTypeObject->addFieldDefinitionObject($fieldDefinitionIdentifier, $fieldDefinition);
+
+        $this->adapter->send(new Request(array(
+            $contentTypeObject,
+        )));
+
+        $contentType = static::$repository->getContentTypeService()->loadContentTypeByRemoteId($remoteId);
+        $fieldDefinition = $contentType->getFieldDefinition($fieldDefinitionIdentifier);
+
+        $this->assertEquals(50, $fieldDefinition->position);
     }
 }
