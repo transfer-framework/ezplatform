@@ -81,7 +81,7 @@ class ContentTestCase extends EzPlatformTestCase
     protected function setUpContentTypes()
     {
         $_ct_article = static::getContentTypeObject(static::_content_type_article);
-        static::$contentTypeManager->createOrUpdate($_ct_article);
+        static::$objectService->getContentTypeManager()->createOrUpdate($_ct_article);
     }
 
     /** @todo move to ContentTypeTestCase ? */
