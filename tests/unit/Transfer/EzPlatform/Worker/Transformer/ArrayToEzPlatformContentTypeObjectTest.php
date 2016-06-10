@@ -206,9 +206,9 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $f0->data['descriptions']);
         $this->assertNull($f0->data['default_value']);
         $this->assertFalse($f0->data['is_required']);
-        $this->assertTrue($f0->data['is_translatable']);
-        $this->assertTrue($f0->data['is_searchable']);
-        $this->assertFalse($f0->data['is_info_collector']);
+        $this->assertNull($f0->data['is_translatable']);
+        $this->assertNull($f0->data['is_searchable']);
+        $this->assertNull($f0->data['is_info_collector']);
 
         $f1 = $ct0->data['fields']['content'];
         $this->assertInstanceOf(FieldDefinitionObject::class, $f1);
@@ -221,9 +221,9 @@ class ArrayToEzPlatformContentTypeObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $f1->data['descriptions']);
         $this->assertNull($f1->data['default_value']);
         $this->assertFalse($f1->data['is_required']);
-        $this->assertTrue($f1->data['is_translatable']);
-        $this->assertTrue($f1->data['is_searchable']);
-        $this->assertFalse($f1->data['is_info_collector']);
+        $this->assertNull($f1->data['is_translatable']);
+        $this->assertNull($f1->data['is_searchable']);
+        $this->assertNull($f1->data['is_info_collector']);
     }
 
     public function testIdentifierAsKey()
