@@ -20,7 +20,7 @@ This requires [Composer](https://getcomposer.org/download/) to be installed glob
 Usage
 ------------
 
-Docs is coming.
+See the [documentation for eZ Platform](http://transfer-framework.com/docs/1.0/sources_and_targets/ezplatform/) on the official Transfer website. 
 
 Contribution
 ------------
