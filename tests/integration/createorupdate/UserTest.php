@@ -11,6 +11,9 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 use eZ\Publish\API\Repository\Values\User\User;
 use eZ\Publish\API\Repository\Values\User\UserCreateStruct;
 use Transfer\Adapter\Transaction\Request;
+use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
+use Transfer\EzPlatform\Repository\Values\UserGroupObject;
+use Transfer\EzPlatform\Repository\Values\UserObject;
 use Transfer\EzPlatform\tests\testcase\UserTestCase;
 
 class UserTest extends UserTestCase
@@ -73,5 +76,68 @@ class UserTest extends UserTestCase
         $user = static::$repository->getUserService()->loadUserByLogin($username);
 
         $this->assertEquals($sectionId, $user->contentInfo->sectionId);
+    }
+
+    /**
+     * Creates a new Content Type, with an ezuser fieldtype.
+     * Then we create a new user, with this custom user contenttype.
+     */
+    public function testCreateWithCustomContentType()
+    {
+        $contentTypeIdentifier = 'new_user_contenttype';
+        $contentTypeName = 'My New User Contenttype';
+
+        $contentObjectData = new ContentTypeObject(array(
+            'identifier' => $contentTypeIdentifier,
+            'names' => array('eng-GB' => $contentTypeName),
+            'fields' => array(
+                'identification' => array(
+                    'type' => 'ezinteger',
+                    'position' => 5,
+                ),
+                'full_name' => array(
+                    'type' => 'ezstring',
+                    'position' => 10,
+                ),
+                'account' => array(
+                    'type' => 'ezuser',
+                    'position' => 20,
+                ),
+            ),
+        ));
+
+        $username = 'contenttypeuser@example.com';
+        $userObject = new UserObject(array(
+            'username' => $username,
+            'email' => $username,
+            'password' => 'test123',
+            'main_language_code' => 'eng-GB',
+            'content_type' => $contentTypeIdentifier,
+            'fields' => array(
+                'identification' => 1337,
+                'full_name' => 'Harald Tollefsen',
+            ),
+            'parents' => array(
+                new UserGroupObject(array(
+                    'parent_id' => 12,
+                    'content_type_identifier' => 'user_group',
+                    'main_language_code' => 'eng-GB',
+                    'fields' => array(
+                        'name' => 'My User Group',
+                    ),
+                )),
+            ),
+        ));
+
+        $this->adapter->send(new Request(array(
+            $contentObjectData,
+            $userObject,
+        )));
+
+        $user = static::$repository->getUserService()->loadUserByLogin($username);
+        $this->assertEquals($username, $user->getField('account')->value->login);
+
+        $contentType = static::$repository->getContentTypeService()->loadContentType($user->contentInfo->contentTypeId);
+        $this->assertEquals($contentTypeName, $contentType->getName('eng-GB'));
     }
 }

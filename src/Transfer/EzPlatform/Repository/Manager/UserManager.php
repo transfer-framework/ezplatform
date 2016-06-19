@@ -106,7 +106,8 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             $object->data['username'],
             $object->data['email'],
             $object->data['password'],
-            $object->data['main_language_code']
+            $object->data['main_language_code'],
+            $this->getContentType($object)
         );
 
         $object->getMapper()->mapObjectToCreateStruct($userCreateStruct);
@@ -231,5 +232,19 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
                 $this->userService->unAssignUserFromUserGroup($user, $existingUserGroup);
             }
         }
+    }
+
+    /**
+     * @param UserObject $object
+     *
+     * @return \eZ\Publish\API\Repository\Values\ContentType\ContentType|null
+     */
+    protected function getContentType(UserObject $object)
+    {
+        if (isset($object->data['content_type'])) {
+            return $this->repository->getContentTypeService()->loadContentTypeByIdentifier($object->data['content_type']);
+        }
+
+        return;
     }
 }
