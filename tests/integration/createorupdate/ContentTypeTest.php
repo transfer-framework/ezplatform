@@ -24,12 +24,10 @@ class ContentTypeTest extends ContentTypeTestCase
     {
         $identifier = 'product';
 
-        $contentObjectData = array($this->getContentTypeMiniData($identifier));
-        $transformer = new ArrayToEzPlatformContentTypeObjectTransformer();
-        $raw = current($transformer->handle($contentObjectData));
+        $contentObject = $this->getContentTypeMini($identifier);
 
         $this->adapter->send(new Request(array(
-            $raw,
+            $contentObject,
         )));
         $real = static::$repository->getContentTypeService()->loadContentTypeByIdentifier($identifier);
 
@@ -78,7 +76,7 @@ class ContentTypeTest extends ContentTypeTestCase
         $remoteId = 'test_integration_contenttype_3';
         $identifier = 'struct_example';
 
-        $contentTypeObject = new ContentTypeObject($this->getContentTypeMiniData($identifier));
+        $contentTypeObject = $this->getContentTypeMini($identifier);
 
         $contentTypeObject->setStructCallback(function (ContentTypeCreateStruct $struct) use ($remoteId) {
             $struct->isContainer = false;
@@ -106,7 +104,7 @@ class ContentTypeTest extends ContentTypeTestCase
         $identifier = 'struct_fielddefinition_example';
         $fieldDefinitionIdentifier = 'my_field';
 
-        $contentTypeObject = new ContentTypeObject($this->getContentTypeMiniData($identifier));
+        $contentTypeObject = $this->getContentTypeMini($identifier);
         $contentTypeObject->setStructCallback(function (ContentTypeCreateStruct $struct) use ($remoteId) {
             $struct->remoteId = $remoteId;
         });
