@@ -81,14 +81,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             } elseif ($object->getProperty('id')) {
                 $location = $this->locationService->loadLocation($object->getProperty('id'));
             } elseif (isset($object->data['content_id'])) {
-                $contentInfo = $this->contentService->loadContentInfo($object->data['content_id']);
-                $locations = $this->locationService->loadLocations($contentInfo);
-                foreach ($locations as $loc) {
-                    if ($loc->parentLocationId === $object->data['parent_location_id']) {
-                        $location = $loc;
-                        break;
-                    }
-                }
+                $location = $this->getLocationByObject($object);
             }
         } catch (NotFoundException $notFoundException) {
             // We'll throw our own exception later instead.
@@ -99,6 +92,25 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
         }
 
         return $location;
+    }
+
+    /**
+     * Get location by content_id and parent_location_id
+     *
+     * @param ValueObject $object
+     *
+     * @return Location|null
+     */
+    private function getLocationByObject(ValueObject $object)
+    {
+        $contentInfo = $this->contentService->loadContentInfo($object->data['content_id']);
+        $locations = $this->locationService->loadLocations($contentInfo);
+        foreach ($locations as $loc) {
+            if ($loc->parentLocationId === $object->data['parent_location_id']) {
+                return $loc;
+            }
+        }
+        return null;
     }
 
     /**
