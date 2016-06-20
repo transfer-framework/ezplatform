@@ -14,7 +14,6 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Content;
-use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Transfer\Data\ObjectInterface;
@@ -128,7 +127,7 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         }
 
         $content = $this->contentService->createContent($createStruct, $locationCreateStructs);
-        $this->contentService->publishVersion($content->versionInfo);
+        $content = $this->contentService->publishVersion($content->versionInfo);
 
         if ($this->logger) {
             $this->logger->info(sprintf('Published new version of %s', $object->getProperty('name')), array('ContentManager::create'));
@@ -212,24 +211,5 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         } catch (NotFoundException $notFound) {
             return false;
         }
-    }
-
-    /**
-     * Assigns a main location ID for a content object.
-     *
-     * @param ContentObject $object   Content object
-     * @param Location      $location Location
-     *
-     * @return Content
-     */
-    public function setMainLocation(ContentObject $object, Location $location)
-    {
-        $contentMetadataUpdateStruct = $this->contentService->newContentMetadataUpdateStruct();
-
-        $contentMetadataUpdateStruct->mainLocationId = $location->id;
-
-        $object->setProperty('main_location_id', $location->id);
-
-        return $this->contentService->updateContentMetadata($object->getProperty('content_info'), $contentMetadataUpdateStruct);
     }
 }

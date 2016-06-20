@@ -35,6 +35,7 @@ class ContentTreeServiceTest extends ContentTreeTestCase
                 'priority' => 1,
             )
         );
+        $rootContentObject->addParentLocation(2);
 
         $secondaryContentObject = new ContentObject(
             array(
@@ -51,8 +52,6 @@ class ContentTreeServiceTest extends ContentTreeTestCase
         );
 
         $treeObject = new TreeObject($rootContentObject);
-        $treeObject->setProperty('parent_location_id', 2);
-
         $treeObject->addNode($secondaryContentObject);
         $treeObject->addNode(new TreeObject($secondaryContentObject));
 
