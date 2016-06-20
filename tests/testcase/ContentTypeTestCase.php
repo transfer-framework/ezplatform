@@ -34,9 +34,8 @@ class ContentTypeTestCase extends EzPlatformTestCase
     {
         return new ContentTypeObject(array(
             'identifier' => $identifier,
-            'main_language_code' => 'eng-GB',
             'fields' => array(
-                'title' => array(
+                'name' => array(
                     'type' => 'ezstring',
                     'position' => 10,
                 ),
