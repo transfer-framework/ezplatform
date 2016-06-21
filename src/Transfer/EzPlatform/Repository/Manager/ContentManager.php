@@ -12,7 +12,6 @@ use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LocationService;
-use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -35,6 +34,16 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var LocationManager
      */
     private $locationManager;
@@ -55,20 +64,18 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
     protected $locationService;
 
     /**
-     * @var LoggerInterface
+     * @param ContentService     $contentService
+     * @param ContentTypeService $contentTypeService
+     * @param LocationService    $locationService
+     * @param LocationManager    $locationManager
      */
-    protected $logger;
-
-    /**
-     * @param Repository      $repository
-     * @param LocationManager $locationManager
-     */
-    public function __construct(Repository $repository, LocationManager $locationManager)
+    public function __construct(array $options, ContentService $contentService, ContentTypeService $contentTypeService, LocationService $locationService, LocationManager $locationManager)
     {
+        $this->options = $options;
+        $this->contentService = $contentService;
+        $this->contentTypeService = $contentTypeService;
+        $this->locationService = $locationService;
         $this->locationManager = $locationManager;
-        $this->contentService = $repository->getContentService();
-        $this->contentTypeService = $repository->getContentTypeService();
-        $this->locationService = $repository->getLocationService();
     }
 
     /**
@@ -107,6 +114,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         if (!$object instanceof ContentObject) {
             throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
         }
+
+        $this->ensureDefaults($object);
 
         $createStruct = $this->contentService->newContentCreateStruct(
             $this->contentTypeService->loadContentTypeByIdentifier($object->getProperty('content_type_identifier')),
@@ -148,6 +157,8 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
         if (!$object instanceof ContentObject) {
             throw new UnsupportedObjectOperationException(ContentObject::class, get_class($object));
         }
+
+        $this->ensureDefaults($object);
 
         $existingContent = $this->find($object);
         if (null === $object->getProperty('content_info')) {
@@ -210,6 +221,22 @@ class ContentManager implements LoggerAwareInterface, CreatorInterface, UpdaterI
             return true;
         } catch (NotFoundException $notFound) {
             return false;
+        }
+    }
+
+    /**
+     * @param ContentObject $object
+     *
+     * @return ContentObject
+     */
+    private function ensureDefaults(ContentObject $object)
+    {
+        $defaultProperties = ['main_language_code'];
+
+        foreach ($defaultProperties as $defaultOption) {
+            if (!$object->getProperty($defaultOption)) {
+                $object->setProperty($defaultOption, $this->options[$defaultOption]);
+            }
         }
     }
 }

@@ -82,7 +82,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->contentManager;
         }
 
-        $this->contentManager = new ContentManager($this->repository, $this->getLocationManager());
+        $this->contentManager = new ContentManager($this->options, $this->getContentService(), $this->getContentTypeService(), $this->getLocationService(), $this->getLocationManager());
 
         if ($this->logger) {
             $this->contentManager->setLogger($this->logger);
@@ -102,7 +102,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->locationManager;
         }
 
-        $this->locationManager = new LocationManager($this->repository);
+        $this->locationManager = new LocationManager($this->getLocationService(), $this->getContentService());
 
         if ($this->logger) {
             $this->locationManager->setLogger($this->logger);
@@ -122,12 +122,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->contentTypeManager;
         }
 
-        $this->contentTypeManager = new ContentTypeManager(
-            $this->repository,
-            $this->getLanguageManager(),
-            $this->getFieldDefinitionSubManager(),
-            $this->getContentTypeGroupSubManager()
-        );
+        $this->contentTypeManager = new ContentTypeManager($this->getContentTypeService(), $this->getLanguageManager(), $this->getFieldDefinitionSubManager(), $this->getContentTypeGroupSubManager());
 
         if ($this->logger) {
             $this->contentTypeManager->setLogger($this->logger);
@@ -147,7 +142,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->languageManager;
         }
 
-        $this->languageManager = new LanguageManager($this->repository);
+        $this->languageManager = new LanguageManager($this->getLanguageService());
 
         if ($this->logger) {
             $this->languageManager->setLogger($this->logger);
@@ -167,7 +162,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->userGroupManager;
         }
 
-        $this->userGroupManager = new UserGroupManager($this->repository);
+        $this->userGroupManager = new UserGroupManager($this->options, $this->getUserService(), $this->getContentService(), $this->getContentTypeService());
 
         if ($this->logger) {
             $this->userGroupManager->setLogger($this->logger);
@@ -187,7 +182,7 @@ class ObjectService extends AbstractRepositoryService
             return $this->userManager;
         }
 
-        $this->userManager = new UserManager($this->repository, $this->getUserGroupManager());
+        $this->userManager = new UserManager($this->options, $this->getUserService(), $this->getContentTypeService(), $this->getUserGroupManager());
 
         if ($this->logger) {
             $this->userManager->setLogger($this->logger);

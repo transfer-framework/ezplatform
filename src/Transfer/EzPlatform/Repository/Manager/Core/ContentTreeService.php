@@ -29,13 +29,13 @@ class ContentTreeService extends AbstractRepositoryService
     protected $objectService;
 
     /**
-     * @param Repository    $repository    eZ Platform Repository
+     * @param Repository    $repository
+     * @param array         $options
      * @param ObjectService $objectService Object service
      */
-    public function __construct($repository, $objectService)
+    public function __construct(Repository $repository, array $options, ObjectService $objectService)
     {
-        parent::__construct($repository);
-
+        parent::__construct($repository, $options);
         $this->objectService = $objectService;
     }
 

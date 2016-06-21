@@ -39,7 +39,15 @@ class AbstractRepositoryServiceTest extends EzPlatformTestCase
             ->willReturn($this->getMock('eZ\Publish\API\Repository\UserService'));
 
         $this->mock = $this
-            ->getMockForAbstractClass(AbstractRepositoryService::class, array($repositoryMock));
+            ->getMockForAbstractClass(
+                AbstractRepositoryService::class,
+                array(
+                    $repositoryMock,
+                    array(
+                        'main_language_code' => 'eng-GB',
+                    ),
+                )
+            );
     }
 
     public function testGetRepository()
