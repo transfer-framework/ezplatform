@@ -90,6 +90,11 @@ abstract class EzPlatformTestCase extends KernelTestCase
     protected static $contentTypeGroupSubManager;
 
     /**
+     * @var array
+     */
+    protected static $options;
+
+    /**
      * @var bool
      */
     protected static $hasDatabase;
@@ -104,8 +109,12 @@ abstract class EzPlatformTestCase extends KernelTestCase
         static::$repository = $setupFactory->getRepository();
 
         // Services
-        static::$objectService = new ObjectService(static::$repository);
-        static::$contentTreeService = new ContentTreeService(static::$repository, static::$objectService);
+        static::$options = array(
+            'current_user' => 'admin',
+            'main_language_code' => 'eng-GB',
+        );
+        static::$objectService = new ObjectService(static::$repository, static::$options);
+        static::$contentTreeService = new ContentTreeService(static::$repository, static::$options, static::$objectService);
 
         // Managers
         static::$languageManager = static::$objectService->getLanguageManager();

@@ -11,7 +11,6 @@ namespace Transfer\EzPlatform\Repository\Manager;
 use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LocationService;
-use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -38,11 +37,6 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     protected $logger;
 
     /**
-     * @var Repository
-     */
-    private $repository;
-
-    /**
      * @var LocationService Location service
      */
     private $locationService;
@@ -53,13 +47,13 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     private $contentService;
 
     /**
-     * @param Repository $repository
+     * @param LocationService $locationService
+     * @param ContentService  $contentService
      */
-    public function __construct(Repository $repository)
+    public function __construct(LocationService $locationService, ContentService $contentService)
     {
-        $this->repository = $repository;
-        $this->locationService = $repository->getLocationService();
-        $this->contentService = $repository->getContentService();
+        $this->locationService = $locationService;
+        $this->contentService = $contentService;
     }
 
     /**
@@ -95,7 +89,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
     }
 
     /**
-     * Get location by content_id and parent_location_id
+     * Get location by content_id and parent_location_id.
      *
      * @param ValueObject $object
      *
@@ -110,7 +104,8 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
                 return $loc;
             }
         }
-        return null;
+
+        return;
     }
 
     /**
@@ -136,7 +131,7 @@ class LocationManager implements LoggerAwareInterface, CreatorInterface, Updater
             throw new UnsupportedObjectOperationException(LocationObject::class, get_class($object));
         }
 
-        $contentInfo = $this->repository->getContentService()->loadContentInfo($object->data['content_id']);
+        $contentInfo = $this->contentService->loadContentInfo($object->data['content_id']);
 
         $locationCreateStruct = $this->locationService->newLocationCreateStruct($object->data['parent_location_id']);
 

@@ -68,13 +68,14 @@ class ContentTypeManager implements LoggerAwareInterface, CreatorInterface, Upda
     private $contentTypeGroupSubManager;
 
     /**
-     * @param Repository      $repository
-     * @param LanguageManager $languageManager
+     * @param ContentTypeService         $contentTypeService
+     * @param LanguageManager            $languageManager
+     * @param FieldDefinitionSubManager  $fieldDefinitionSubManager
+     * @param ContentTypeGroupSubManager $contentTypeGroupSubManager
      */
-    public function __construct(Repository $repository, LanguageManager $languageManager, FieldDefinitionSubManager $fieldDefinitionSubManager, ContentTypeGroupSubManager $contentTypeGroupSubManager)
+    public function __construct(ContentTypeService $contentTypeService, LanguageManager $languageManager, FieldDefinitionSubManager $fieldDefinitionSubManager, ContentTypeGroupSubManager $contentTypeGroupSubManager)
     {
-        $this->repository = $repository;
-        $this->contentTypeService = $repository->getContentTypeService();
+        $this->contentTypeService = $contentTypeService;
         $this->languageManager = $languageManager;
         $this->fieldDefinitionSubManager = $fieldDefinitionSubManager;
         $this->contentTypeGroupSubManager = $contentTypeGroupSubManager;

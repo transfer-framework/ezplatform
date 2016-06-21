@@ -13,10 +13,8 @@ use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct;
 use Transfer\Adapter\Transaction\Request;
-use Transfer\EzPlatform\Repository\Values\ContentTypeObject;
 use Transfer\EzPlatform\Repository\Values\FieldDefinitionObject;
 use Transfer\EzPlatform\tests\testcase\ContentTypeTestCase;
-use Transfer\EzPlatform\Worker\Transformer\ArrayToEzPlatformContentTypeObjectTransformer;
 
 class ContentTypeTest extends ContentTypeTestCase
 {
