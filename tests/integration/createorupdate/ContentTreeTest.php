@@ -11,6 +11,7 @@ namespace Transfer\EzPlatform\tests\integration\createorupdate;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Transfer\Adapter\Transaction\Request;
+use Transfer\Data\TreeObject;
 use Transfer\EzPlatform\Repository\Values\ContentObject;
 use Transfer\EzPlatform\tests\testcase\ContentTreeTestCase;
 
@@ -31,8 +32,9 @@ class ContentTreeTest extends ContentTreeTestCase
         $folder = $this->getContentObject(array(
             'name' => 'Test folder',
         ), 'tree_folder_0', 'folder');
+        $folder->addParentLocation(2);
 
-        $tree = $this->getTreeObject(2, $folder);
+        $tree = new TreeObject($folder);
         $tree->addNode($article);
 
         $this->adapter->send(new Request(array(
@@ -78,7 +80,8 @@ class ContentTreeTest extends ContentTreeTestCase
             'name' => 'Updated folder',
         ), 'tree_folder_0', 'folder');
 
-        $tree = $this->getTreeObject(2, $folder);
+        $folder->addParentLocation(2);
+        $tree = new TreeObject($folder);
 
         $tree->addNode($article);
 
@@ -117,9 +120,10 @@ class ContentTreeTest extends ContentTreeTestCase
             'name' => 'Updated folder',
         ), 'tree_folder_1', 'folder');
 
-        $tree1 = $this->getTreeObject(2, $topFolder);
-        $tree2 = $this->getTreeObject($topFolder->getProperty('content_info')->mainLocationId, $folder);
-
+        $topFolder->addParentLocation(2);
+        $tree1 = new TreeObject($topFolder);
+        $folder->addParentLocation($topFolder->getProperty('content_info')->mainLocationId);
+        $tree2 = new TreeObject($folder);
         $tree1->addNode($tree2);
 
         $this->adapter->send(new Request(array(
