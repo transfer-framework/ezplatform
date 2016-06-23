@@ -11,6 +11,7 @@ namespace Transfer\EzPlatform\Repository\Manager\Core;
 
 use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\ContentTypeService;
+use eZ\Publish\API\Repository\LanguageService;
 use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\UserService;
@@ -26,21 +27,28 @@ use Transfer\Data\ObjectInterface;
 abstract class AbstractRepositoryService implements LoggerAwareInterface
 {
     /**
-     * @var Repository eZ Platform Repository
-     */
-    protected $repository;
-
-    /**
      * @var LoggerInterface Logger
      */
     protected $logger;
 
     /**
-     * @param Repository $repository eZ Platform Repository
+     * @var array Options
      */
-    public function __construct(Repository $repository)
+    protected $options;
+
+    /**
+     * @var Repository
+     */
+    protected $repository;
+
+    /**
+     * @param Repository $repository
+     * @param array      $options
+     */
+    public function __construct(Repository $repository, array $options)
     {
         $this->repository = $repository;
+        $this->options = $options;
     }
 
     /**
@@ -101,6 +109,14 @@ abstract class AbstractRepositoryService implements LoggerAwareInterface
     public function getLocationService()
     {
         return $this->repository->getLocationService();
+    }
+
+    /**
+     * @return LanguageService
+     */
+    public function getLanguageService()
+    {
+        return $this->repository->getContentLanguageService();
     }
 
     /**

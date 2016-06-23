@@ -67,12 +67,12 @@ class LocationTestCase extends ContentTestCase
     protected function setUpLocations()
     {
         // First one
-        $locationObject = $this->getLocationObject($this->_test_location_remote_id_1, $this->_test_content_id_1, 60);
+        $locationObject = $this->getLocationObject($this->_test_location_remote_id_1, $this->_test_content_id_1, 61);
         $co = static::$locationManager->createOrUpdate($locationObject);
         $this->_test_locationId_0 = $co->getProperty('id');
 
         // Another one
-        $locationObject = $this->getLocationObject($this->_test_location_remote_id_2, $this->_test_content_id_2, 63);
+        $locationObject = $this->getLocationObject($this->_test_location_remote_id_2, $this->_test_content_id_2, 64);
         $co = static::$locationManager->createOrUpdate($locationObject);
         $this->_test_locationId_1 = $co->getProperty('id');
     }

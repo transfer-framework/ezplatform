@@ -33,9 +33,6 @@ class UserGroupObject extends EzPlatformObject
         if (!isset($data['parent_id'])) {
             $data['parent_id'] = 12;
         }
-        if (!isset($data['main_language_code'])) {
-            $data['main_language_code'] = 'eng-GB';
-        }
         if (!isset($data['content_type_identifier'])) {
             $data['content_type_identifier'] = 'user_group';
         }

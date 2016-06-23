@@ -22,9 +22,7 @@ class ContentTypeTestCase extends EzPlatformTestCase
 
     public function setUp()
     {
-        $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository,
-        ));
+        $this->adapter = new EzPlatformAdapter(static::$repository);
         $this->adapter->setLogger(
             $this->getMock(LoggerInterface::class)
         );

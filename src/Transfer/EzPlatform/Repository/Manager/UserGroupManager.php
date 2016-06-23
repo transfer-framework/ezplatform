@@ -10,7 +10,6 @@ namespace Transfer\EzPlatform\Repository\Manager;
 
 use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\ContentTypeService;
-use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\UserService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -34,14 +33,14 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 class UserGroupManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
-     * @var Repository
-     */
-    private $repository;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var array
+     */
+    private $options;
 
     /**
      * @var UserService
@@ -59,14 +58,17 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
     private $contentTypeService;
 
     /**
-     * @param Repository $repository
+     * @param array              $options
+     * @param UserService        $userService
+     * @param ContentService     $contentService
+     * @param ContentTypeService $contentTypeService
      */
-    public function __construct(Repository $repository)
+    public function __construct(array $options, UserService $userService, ContentService $contentService, ContentTypeService $contentTypeService)
     {
-        $this->repository = $repository;
-        $this->userService = $repository->getUserService();
-        $this->contentService = $repository->getContentService();
-        $this->contentTypeService = $repository->getContentTypeService();
+        $this->options = $options;
+        $this->userService = $userService;
+        $this->contentService = $contentService;
+        $this->contentTypeService = $contentTypeService;
     }
 
     /**
@@ -124,6 +126,8 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             throw new UnsupportedObjectOperationException(UserGroupObject::class, get_class($object));
         }
 
+        $this->ensureDefaults($object);
+
         $parentUserGroup = $this->findById($object->data['parent_id'], true);
 
         // Instantiate usergroup
@@ -154,6 +158,8 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
         }
 
         $userGroup = $this->find($object, true);
+
+        $this->ensureDefaults($object);
 
         $userGroupUpdateStruct = $this->userService->newUserGroupUpdateStruct();
         $userGroupUpdateStruct->contentUpdateStruct = $this->contentService->newContentUpdateStruct();
@@ -207,6 +213,20 @@ class UserGroupManager implements LoggerAwareInterface, CreatorInterface, Update
             return true;
         } catch (NotFoundException $notFound) {
             return false;
+        }
+    }
+
+    /**
+     * @param UserGroupObject $userObject
+     */
+    private function ensureDefaults(UserGroupObject $userObject)
+    {
+        $defaultData = ['main_language_code'];
+
+        foreach ($defaultData as $defaultOption) {
+            if (!isset($userObject->data[$defaultOption])) {
+                $userObject->data[$defaultOption] = $this->options[$defaultOption];
+            }
         }
     }
 }

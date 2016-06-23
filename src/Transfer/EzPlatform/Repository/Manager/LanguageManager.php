@@ -10,7 +10,6 @@ namespace Transfer\EzPlatform\Repository\Manager;
 
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\LanguageService;
-use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Language;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
@@ -35,9 +34,9 @@ use Transfer\EzPlatform\Repository\Manager\Type\UpdaterInterface;
 class LanguageManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
-     * @var Repository
+     * @var LanguageService Language service
      */
-    private $repository;
+    private $languageService;
 
     /**
      * @var LoggerInterface Logger
@@ -45,17 +44,11 @@ class LanguageManager implements LoggerAwareInterface, CreatorInterface, Updater
     private $logger;
 
     /**
-     * @var LanguageService Language service
+     * @param LanguageService $languageService
      */
-    private $languageService;
-
-    /**
-     * @param Repository $repository
-     */
-    public function __construct(Repository $repository)
+    public function __construct(LanguageService $languageService)
     {
-        $this->repository = $repository;
-        $this->languageService = $repository->getContentLanguageService();
+        $this->languageService = $languageService;
     }
 
     /**

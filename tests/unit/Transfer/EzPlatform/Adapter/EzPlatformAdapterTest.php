@@ -8,30 +8,13 @@
  */
 namespace Transfer\EzPlatform\tests\Repository\Manager;
 
-use Psr\Log\LoggerInterface;
 use Transfer\Adapter\Transaction\Request;
-use Transfer\EzPlatform\Adapter\EzPlatformAdapter;
 use Transfer\EzPlatform\Repository\Values\Action\Enum\Action;
 use Transfer\EzPlatform\Repository\Values\UserObject;
-use Transfer\EzPlatform\tests\testcase\EzPlatformTestCase;
+use Transfer\EzPlatform\tests\testcase\EzPlatformAdapterTestCase;
 
-class EzPlatformAdapterTest extends EzPlatformTestCase
+class EzPlatformAdapterTest extends EzPlatformAdapterTestCase
 {
-    /**
-     * @var EzPlatformAdapter
-     */
-    public $adapter;
-
-    public function setUp()
-    {
-        $this->adapter = new EzPlatformAdapter(array(
-            'repository' => static::$repository,
-        ));
-        $this->adapter->setLogger(
-            $this->getMock(LoggerInterface::class)
-        );
-    }
-
     public function testSendSkipAction()
     {
         $object = new UserObject([]);
