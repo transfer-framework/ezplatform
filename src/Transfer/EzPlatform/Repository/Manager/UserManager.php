@@ -8,7 +8,7 @@
  */
 namespace Transfer\EzPlatform\Repository\Manager;
 
-use eZ\Publish\API\Repository\Repository;
+use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\UserService;
 use eZ\Publish\API\Repository\Values\User\User;
 use eZ\Publish\API\Repository\Values\User\UserGroup;
@@ -35,14 +35,14 @@ use eZ\Publish\API\Repository\Exceptions\InvalidArgumentException;
 class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInterface, RemoverInterface, FinderInterface
 {
     /**
-     * @var Repository
-     */
-    private $repository;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var array
+     */
+    private $options;
 
     /**
      * @var UserService
@@ -50,18 +50,26 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     private $userService;
 
     /**
+     * @var ContentTypeService
+     */
+    private $contentTypeService;
+
+    /**
      * @var UserGroupManager
      */
     private $userGroupManager;
 
     /**
-     * @param Repository       $repository
-     * @param UserGroupManager $userGroupManager
+     * @param array              $options
+     * @param UserService        $userService
+     * @param ContentTypeService $contentTypeService
+     * @param UserGroupManager   $userGroupManager
      */
-    public function __construct(Repository $repository, UserGroupManager $userGroupManager)
+    public function __construct(array $options, UserService $userService, ContentTypeService $contentTypeService, UserGroupManager $userGroupManager)
     {
-        $this->repository = $repository;
-        $this->userService = $repository->getUserService();
+        $this->options = $options;
+        $this->userService = $userService;
+        $this->contentTypeService = $contentTypeService;
         $this->userGroupManager = $userGroupManager;
     }
 
@@ -102,6 +110,8 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
             throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
 
+        $this->ensureDefaults($object);
+
         $userCreateStruct = $this->userService->newUserCreateStruct(
             $object->data['username'],
             $object->data['email'],
@@ -134,6 +144,8 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
         if (!$object instanceof UserObject) {
             throw new UnsupportedObjectOperationException(UserObject::class, get_class($object));
         }
+
+        $this->ensureDefaults($object);
 
         $user = $this->find($object);
 
@@ -242,9 +254,23 @@ class UserManager implements LoggerAwareInterface, CreatorInterface, UpdaterInte
     protected function getContentType(UserObject $object)
     {
         if (isset($object->data['content_type'])) {
-            return $this->repository->getContentTypeService()->loadContentTypeByIdentifier($object->data['content_type']);
+            return $this->contentTypeService->loadContentTypeByIdentifier($object->data['content_type']);
         }
 
         return;
+    }
+
+    /**
+     * @param UserObject $object
+     */
+    private function ensureDefaults(UserObject $object)
+    {
+        $defaultData = ['main_language_code'];
+
+        foreach ($defaultData as $defaultOption) {
+            if (!isset($object->data[$defaultOption])) {
+                $object->data[$defaultOption] = $this->options[$defaultOption];
+            }
+        }
     }
 }

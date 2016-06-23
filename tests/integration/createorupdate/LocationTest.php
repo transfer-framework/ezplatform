@@ -116,7 +116,7 @@ class LocationTest extends LocationTestCase
             'parent_locations' => $locations,
         ));
 
-        $contentObject->addParentLocation(65);
+        $contentObject->addParentLocation(66);
 
         $this->adapter->send(new Request(array(
             $contentObject,

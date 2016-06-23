@@ -29,6 +29,21 @@ use Transfer\EzPlatform\Repository\Values\EzPlatformObject;
 class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
 {
     /**
+     * @var array Options
+     */
+    protected $options;
+
+    /**
+     * @var LoggerInterface Logger
+     */
+    protected $logger;
+
+    /**
+     * @var Repository
+     */
+    protected $repository;
+
+    /**
      * @var ContentTreeService Tree service
      */
     protected $treeService;
@@ -39,29 +54,22 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
     protected $objectService;
 
     /**
-     * @var LoggerInterface Logger
-     */
-    protected $logger;
-
-    /**
-     * @var array Options
-     */
-    protected $options;
-
-    /**
      * Constructor.
      *
-     * @param array $options
+     * @param Repository $repository
+     * @param array      $options
      */
-    public function __construct(array $options = array())
+    public function __construct(Repository $repository, array $options = array())
     {
+        $this->repository = $repository;
+
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
 
         $this->options = $resolver->resolve($options);
 
-        $this->objectService = new ObjectService($this->options['repository']);
-        $this->treeService = new ContentTreeService($this->options['repository'], $this->objectService);
+        $this->objectService = new ObjectService($repository, $this->options);
+        $this->treeService = new ContentTreeService($repository, $this->options, $this->objectService);
     }
 
     /**
@@ -72,13 +80,12 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'repository_current_user' => 'admin',
+            'current_user' => 'admin',
+            'main_language_code' => 'eng-GB',
         ));
 
-        $resolver->setRequired(array('repository'));
-
-        $resolver->setAllowedTypes('repository', array('eZ\Publish\API\Repository\Repository'));
-        $resolver->setAllowedTypes('repository_current_user', array('string', 'null'));
+        $resolver->setAllowedTypes('current_user', array('string', 'null'));
+        $resolver->setAllowedTypes('main_language_code', array('string', 'null'));
     }
 
     /**
@@ -96,9 +103,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
      */
     public function send(Request $request)
     {
-        /** @var Repository $repository */
-        $repository = $this->options['repository'];
-        $repository->beginTransaction();
+        $this->repository->beginTransaction();
 
         if ($this->logger) {
             $this->treeService->setLogger($this->logger);
@@ -114,7 +119,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
             try {
                 $objects[] = $this->executeAction($object, $service);
             } catch (\Exception $e) {
-                $repository->rollback();
+                $this->repository->rollback();
                 throw $e;
             }
 
@@ -123,7 +128,7 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
             }
         }
 
-        $repository->commit();
+        $this->repository->commit();
 
         return $response;
     }
@@ -168,8 +173,8 @@ class EzPlatformAdapter implements TargetAdapterInterface, LoggerAwareInterface
             $service = $this->objectService;
         }
 
-        if ($this->options['repository_current_user']) {
-            $service->setCurrentUser($this->options['repository_current_user']);
+        if ($this->options['current_user']) {
+            $service->setCurrentUser($this->options['current_user']);
         }
 
         return $service;
