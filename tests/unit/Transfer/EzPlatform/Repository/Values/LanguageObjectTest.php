@@ -6,6 +6,7 @@
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
+
 namespace Transfer\EzPlatform\Tests\Repository\Values;
 
 use Transfer\EzPlatform\Exception\LanguageNotFoundException;
