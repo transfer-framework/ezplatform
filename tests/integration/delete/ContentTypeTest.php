@@ -6,6 +6,7 @@
  * For the full copyright and license information, please view the LICENSE file located
  * in the root directory.
  */
+
 namespace Transfer\EzPlatform\tests\integration\delete;
 
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
