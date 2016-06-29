@@ -16,7 +16,7 @@ use Transfer\EzPlatform\Repository\Values\UserObject;
 
 class UserTestCase extends EzPlatformTestCase
 {
-    protected $_to_be_deleted_username = 'toBeDeleted@example.com';
+    protected $_to_be_deleted_username = 'tobedeleted@example.com';
 
     /**
      * @var EzPlatformAdapter
