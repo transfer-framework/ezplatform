@@ -126,7 +126,8 @@ class UserGroupTest extends UserGroupTestCase
         )));
 
         /** @var UserGroupObject $userGroupObject */
-        $userGroupObject = current($response->getData());
+        $userGroupObject = $response->getData();
+        $userGroupObject = $userGroupObject[0];
         $userGroup = static::$repository->getUserService()->loadUserGroup($userGroupObject->getProperty('id'));
 
         $this->assertEquals(10, $userGroup->contentInfo->ownerId);
