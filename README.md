@@ -1,7 +1,8 @@
 Transfer eZ Platform
 ====================
 
-[![Build Status](https://travis-ci.org/transfer-framework/ezplatform.svg?branch=1.0)](https://travis-ci.org/transfer-framework/ezplatform)
+[![Build Status](https://travis-ci.org/transfer-framework/ezplatform.svg?branch=1.0)](https://travis-ci.org/transfer-framework/ezplatform) 
+[![Code Coverage](https://scrutinizer-ci.com/g/transfer-framework/ezplatform/badges/coverage.png?b=1.0)](https://scrutinizer-ci.com/g/transfer-framework/ezplatform/?branch=1.0)
 
 Installation
 ------------
